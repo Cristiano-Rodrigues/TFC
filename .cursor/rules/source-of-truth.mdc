@@ -1,0 +1,8 @@
+---
+alwaysApply: true
+---
+
+Always use docs/context.md as the primary source of truth for:
+- project requirements
+- architecture decisions
+- writing style

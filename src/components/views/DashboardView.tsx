@@ -13,9 +13,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
     {
       id: "stat-docs",
       title: "Documentos Totais",
-      value: "148",
-      change: "+12 este mês",
-      trend: "up",
+      value: "0",
+      change: "Sem dados",
+      trend: "stable",
       icon: FileText,
       color: "text-blue-600 bg-blue-50 border-blue-100",
       targetTab: "documents"
@@ -23,8 +23,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
     {
       id: "stat-users",
       title: "Utilizadores Ativos",
-      value: "27",
-      change: "98% de taxa de adoção",
+      value: "0",
+      change: "Sem dados",
       trend: "stable",
       icon: Users,
       color: "text-emerald-600 bg-emerald-50 border-emerald-100",
@@ -33,9 +33,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
     {
       id: "stat-integrations",
       title: "Fontes Integradas",
-      value: "4 / 6",
-      change: "Slack, Gmail, Drive ligadas",
-      trend: "up",
+      value: "0 / 6",
+      change: "Nenhuma ligada",
+      trend: "stable",
       icon: Network,
       color: "text-indigo-600 bg-indigo-50 border-indigo-100",
       targetTab: "integrations"
@@ -43,36 +43,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
     {
       id: "stat-searches",
       title: "Pesquisas RAG (IA)",
-      value: "1,240",
-      change: "+182 nas últimas 24h",
-      trend: "up",
+      value: "0",
+      change: "Sem dados",
+      trend: "stable",
       icon: Search,
       color: "text-amber-600 bg-amber-50 border-amber-100",
       targetTab: "search"
     }
   ];
 
-  const departmentDistribution = [
-    { name: "Tecnologia e Segurança", count: 42, percentage: "28%" },
-    { name: "Recursos Humanos", count: 31, percentage: "21%" },
-    { name: "Suporte e Operações", count: 28, percentage: "19%" },
-    { name: "Compliance & Legal", count: 25, percentage: "17%" },
-    { name: "Financeiro", count: 22, percentage: "15%" },
-  ];
+  const departmentDistribution: any[] = [];
 
-  const popDocs = [
-    { id: "pop-01", name: "Manual de Integração do Colaborador (RH)", views: 342, lastAccess: "Há 10 minutos" },
-    { id: "pop-02", name: "Política de Segurança de TI e Acessos VPN", views: 289, lastAccess: "Há 41 minutos" },
-    { id: "pop-03", name: "Diretrizes de Reembolso de Despesas de Viagem", views: 187, lastAccess: "Há 2 horas" },
-    { id: "pop-04", name: "Código de Ética e Compliance 2026", views: 120, lastAccess: "Ontem" },
-  ];
+  const popDocs: any[] = [];
 
-  const recentQueries = [
-    { q: "Qual o limite de reembolso para passagens internacionais?", user: "suporte@empresa.com", doc: "Diretrizes de Reembolso", resolved: true },
-    { q: "Como configurar o FortiClient MFA?", user: "rui.silva@empresa.com", doc: "Política de TI", resolved: true },
-    { q: "Até quando posso planejar as minhas férias?", user: "ana.martins@empresa.com", doc: "Manual de Integração (RH)", resolved: true },
-    { q: "Quais são as metas trimestrais de OKR?", user: "admin@empresa.com", doc: "Não catalogado - Geral", resolved: false },
-  ];
+  const recentQueries: any[] = [];
 
   return (
     <div className="space-y-6">
@@ -128,6 +112,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
             <Layers className="h-4.5 w-4.5 text-slate-500" />
             <h2 className="text-sm font-semibold text-slate-900">Documentação por Área</h2>
           </div>
+          {departmentDistribution.length === 0 && (
+            <div className="py-8 text-center text-slate-400 text-xs">Sem dados para apresentar</div>
+          )}
           <div className="space-y-4">
             {departmentDistribution.map((dept, idx) => (
               <div key={idx} className="space-y-1.5">
@@ -145,7 +132,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
             ))}
           </div>
           <div className="mt-5 p-3.5 bg-slate-50 rounded-md border border-slate-100 text-xs text-slate-500 leading-relaxed">
-            Áreas de <strong>SLA Crítico</strong> e <strong>RH</strong> registraram o maior número de pesquisas indexadas por IA na última semana corporativa.
+            Aqui serão exibidas as áreas de <strong>SLA Crítico</strong> e com o maior número de pesquisas indexadas por IA.
           </div>
         </div>
 
@@ -155,6 +142,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
             <FileText className="h-4.5 w-4.5 text-slate-500" />
             <h2 className="text-sm font-semibold text-slate-900">Documentos Mais Consultados</h2>
           </div>
+          {popDocs.length === 0 && (
+            <div className="py-8 text-center text-slate-400 text-xs">Nenhum documento consultado</div>
+          )}
           <div className="divide-y divide-slate-100">
             {popDocs.map((doc, idx) => (
               <div key={doc.id} className="py-3 flex items-center justify-between first:pt-0 last:pb-0">
@@ -180,6 +170,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
             <Search className="h-4.5 w-4.5 text-slate-500" />
             <h2 className="text-sm font-semibold text-slate-900">Pesquisas Recentes (SLA RAG)</h2>
           </div>
+          {recentQueries.length === 0 && (
+            <div className="py-8 text-center text-slate-400 text-xs">Nenhuma pesquisa recente</div>
+          )}
           <div className="space-y-3.5">
             {recentQueries.map((item, idx) => (
               <div key={idx} className="text-xs">

@@ -22,10 +22,10 @@ export const IntegrationsView: React.FC = () => {
       name: "Slack",
       type: "Comunicação Interna",
       logo: Slack,
-      status: "Conectado",
-      lastSync: "Há 4 horas",
-      importedItemsCount: 42,
-      scopes: ["#suporte-l1", "#comunicados-rh"],
+      status: "Desconectado",
+      lastSync: "Nunca sincronizado",
+      importedItemsCount: 0,
+      scopes: [],
       isLoadingSync: false
     },
     {
@@ -33,10 +33,10 @@ export const IntegrationsView: React.FC = () => {
       name: "Gmail / GSuite Workspace",
       type: "Mensagens & Email",
       logo: Mail,
-      status: "Conectado",
-      lastSync: "Ontem, às 18:24",
-      importedItemsCount: 120,
-      scopes: ["Marcadores: rh-diretivas, ti-VPN"],
+      status: "Desconectado",
+      lastSync: "Nunca sincronizado",
+      importedItemsCount: 0,
+      scopes: [],
       isLoadingSync: false
     },
     {
@@ -44,10 +44,10 @@ export const IntegrationsView: React.FC = () => {
       name: "Google Drive",
       type: "Armazenamento Nuvem",
       logo: HardDrive,
-      status: "Conectado",
-      lastSync: "Há 12 minutos",
-      importedItemsCount: 312,
-      scopes: ["Pasta: Políticas Corporativas 2026"],
+      status: "Desconectado",
+      lastSync: "Nunca sincronizado",
+      importedItemsCount: 0,
+      scopes: [],
       isLoadingSync: false
     },
     {
@@ -135,16 +135,6 @@ export const IntegrationsView: React.FC = () => {
         <p className="text-sm text-slate-500 mt-1">
           Gerencie e integre canais externos para que a inteligência artificial absorva e documente as transformações da organização.
         </p>
-      </div>
-
-      <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg flex items-start gap-3">
-        <ShieldCheck className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
-        <div className="text-xs text-amber-800 space-y-1">
-          <span className="font-bold block">Conformidade GDPR & Segurança Empresarial</span>
-          <p className="leading-relaxed">
-            As fontes externas sincronizadas usam autenticação OAuth 2.0 criptografada. Os dados extraídos de emails ou chats com os marcadores definidos são anonimizados e apenas as chaves semânticas são salvas na nossa base de dados privada para consultas de RAG da IA. Senhas ou chaves pessoais nunca são armazenadas.
-          </p>
-        </div>
       </div>
 
       {/* Grid structure list */}

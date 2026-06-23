@@ -36,35 +36,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // High-fidelity pre-configured enterprise profiles for resilient fallback
-const SEED_PROFILES: UserProfile[] = [
-  {
-    id: "user-admin-01",
-    email: "realchrisvibez@gmail.com",
-    fullName: "Christian Vibez (Admin)",
-    role: "admin",
-    department: "Tecnologia e Segurança",
-    active: true,
-    permissions: ["doc:view", "doc:upload", "doc:delete", "doc:manage_perms", "wiki:view", "wiki:generate", "integrations:manage", "users:manage"]
-  },
-  {
-    id: "user-mgr-02",
-    email: "gestor.hr@empresa.com",
-    fullName: "Ana Sofia Martins",
-    role: "manager",
-    department: "Recursos Humanos",
-    active: true,
-    permissions: ["doc:view", "doc:upload", "wiki:view", "wiki:generate", "integrations:manage"]
-  },
-  {
-    id: "user-staff-03",
-    email: "suporte.op@empresa.com",
-    fullName: "Rui Miguel Silva",
-    role: "user",
-    department: "Suporte e Operações",
-    active: true,
-    permissions: ["doc:view", "wiki:view"]
-  }
-];
+const SEED_PROFILES: UserProfile[] = [];
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<any | null>(null);

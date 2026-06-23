@@ -117,21 +117,6 @@ export const AdminView: React.FC = () => {
         </div>
       </div>
 
-      {dbSynced ? (
-        <div className="bg-blue-50 border border-blue-200 p-3.5 rounded text-xs text-blue-700 flex items-center gap-2">
-          <ShieldCheck className="h-4.5 w-4.5" />
-          <span>Sincronia real via tabela <strong>users</strong> do PostgreSQL ativa. Modificações alterarão o ambiente de produção.</span>
-        </div>
-      ) : (
-        <div className="bg-slate-50 border border-slate-250 p-3.5 rounded text-xs text-slate-500 flex items-center justify-between">
-          <span className="flex items-center gap-2 font-medium">
-            <KeyRound className="h-4.5 w-4.5 text-slate-400" />
-            Sincronia: Ficheiro local de desenvolvimento ativo de forma fluida.
-          </span>
-          <span className="text-[10px] font-bold uppercase py-0.5 px-2 bg-slate-200 text-slate-600 rounded">Modo Resiliente</span>
-        </div>
-      )}
-
       {/* Advanced Filter Pane */}
       <div className="bg-white p-4 border border-slate-200 rounded-lg grid grid-cols-1 sm:grid-cols-3 gap-3 items-end shadow-3xs">
         <div className="space-y-1">

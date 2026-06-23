@@ -10,17 +10,6 @@ export const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
-  const preconfiguredAccounts = [
-    { email: "realchrisvibez@gmail.com", label: "Administrador Global", role: "admin" },
-    { email: "gestor.hr@empresa.com", label: "Gestor de RH", role: "manager" },
-    { email: "suporte.op@empresa.com", label: "Suporte e Operações", role: "user" }
-  ];
-
-  const handleFillerSelection = (accountEmail: string) => {
-    setEmail(accountEmail);
-    setPassword("senha123");
-  };
-
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');

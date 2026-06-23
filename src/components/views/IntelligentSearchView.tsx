@@ -24,23 +24,16 @@ export const IntelligentSearchView: React.FC = () => {
   ]);
   const [selectedSource, setSelectedSource] = useState<any | null>(null);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   // Auto scroll
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
   }, [messages, isSubmitting]);
 
-  const shortcutQuestions = [
-    { text: "Quantos dias úteis de férias tenho direito?", category: "RH" },
-    { text: "Como funciona a política de VPN e FortiClient?", category: "Segurança" },
-    { text: "Qual o limite financeiro para reembolso de refeições?", category: "Financeiro" },
-    { text: "Quais brinquedos organizacionais posso receber de fornecedores?", category: "Compliance" }
-  ];
 
-  const handleShortcutClick = (text: string) => {
-    setQuery(text);
-  };
 
   const handleSearchSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,9 +91,9 @@ export const IntelligentSearchView: React.FC = () => {
     <div className="grid grid-cols-1 xl:grid-cols-4 h-[calc(100vh-140px)] border border-slate-200 rounded-lg overflow-hidden bg-white shadow-xs">
       
       {/* Left Chat/Results Panel */}
-      <div className="xl:col-span-3 flex flex-col h-full bg-slate-50/50 border-r border-slate-200 relative">
+      <div className="xl:col-span-3 flex flex-col h-full bg-slate-50/50 border-r border-slate-200 relative overflow-hidden">
         {/* Toggle Mode */}
-        <div className="flex items-center justify-between px-5 py-3.5 bg-white border-b border-slate-200">
+        <div className="flex items-center justify-between px-5 py-3.5 bg-white border-b border-slate-200 shrink-0">
           <div className="flex items-center gap-2">
             <Sparkles className="h-4.5 w-4.5 text-blue-600" />
             <h2 className="text-sm font-semibold text-slate-900">Workspace de Pesquisa Inteligente</h2>
@@ -108,7 +101,7 @@ export const IntelligentSearchView: React.FC = () => {
         </div>
 
         {/* Dynamic Mode Area */}
-        <div id="workspace-search-container" className="flex-1 overflow-y-auto p-5 space-y-4">
+        <div id="workspace-search-container" ref={messagesContainerRef} className="flex-1 overflow-y-auto p-5 space-y-4 min-h-0">
             <div className="space-y-6">
               {messages.map((message) => (
                 <div
@@ -169,12 +162,11 @@ export const IntelligentSearchView: React.FC = () => {
                   </div>
                 </div>
               )}
-              <div ref={messagesEndRef} />
             </div>
         </div>
 
         {/* Input box docked below */}
-        <div className="p-4 bg-white border-t border-slate-205">
+        <div className="p-4 bg-white border-t border-slate-205 shrink-0">
           <form id="search-input-form" onSubmit={handleSearchSubmit} className="relative flex items-center bg-slate-50 border border-slate-205 focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/10 rounded-lg p-1 transition-all">
             <input
               id="input-query-field"
@@ -197,28 +189,6 @@ export const IntelligentSearchView: React.FC = () => {
               </button>
             </div>
           </form>
-
-          {/* Quick Shortcuts */}
-          {messages.length < 3 && (
-            <div className="mt-4 space-y-1.5">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block px-1">Perguntas Frequentes Organizacionais:</span>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {shortcutQuestions.map((sc, i) => (
-                  <button
-                    key={i}
-                    onClick={() => handleShortcutClick(sc.text)}
-                    className="text-left bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded p-2.5 text-xs text-slate-700 transition-all flex items-start gap-1.5 group cursor-pointer"
-                  >
-                    <HelpCircle className="h-3.5 w-3.5 text-indigo-500 mt-0.5 shrink-0" />
-                    <div className="truncate">
-                      <span className="font-semibold block text-[9px] text-[#475569] uppercase tracking-wider mb-0.5">{sc.category}</span>
-                      <p className="truncate text-slate-800 group-hover:text-blue-600 font-medium">{sc.text}</p>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
 

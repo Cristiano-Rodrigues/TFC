@@ -231,22 +231,11 @@ export default function Home() {
           <div className="hidden lg:flex items-center gap-3 text-xs">
             <div className="flex items-center gap-1 text-[#475569] font-medium bg-slate-50 border border-slate-200/80 px-3 py-1 rounded-md">
               <Building className="h-3.5 w-3.5 text-slate-450" />
-              <span>Organização: <strong>SaaS Enterprise (Portugal)</strong></span>
+              <span>Organização: <strong>Organização de teste</strong></span>
             </div>
-            
-            {/* Status indicator */}
-            <span className="inline-flex items-center gap-1 text-[10px] bg-emerald-50 border border-emerald-100 text-emerald-700 px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Grounded RAG Live
-            </span>
           </div>
 
-          {/* Clock & active profile summary */}
           <div className="flex items-center gap-4 text-xs font-semibold text-slate-600">
-            <span className="hidden sm:inline-flex items-center gap-1 text-slate-450">
-              <Clock className="h-3.5 w-3.5 text-slate-400" />
-              {currentTime || "00:00"} UTC
-            </span>
             <div
               onClick={() => setActiveTab('profile')}
               className="flex items-center gap-2 bg-slate-50 border border-slate-200/60 p-1.5 rounded-md hover:border-slate-300 cursor-pointer select-none transition-all mr-1.5"

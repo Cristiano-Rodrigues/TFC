@@ -2,10 +2,10 @@
 
 import React from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { ShieldAlert, User, Shield, Info, Landmark, CheckCircle, RefreshCw, KeyRound, Mail } from 'lucide-react';
+import { Shield, Info, Landmark, CheckCircle, Mail } from 'lucide-react';
 
 export const ProfileView: React.FC = () => {
-  const { profile, signOut, changeMockRole, dbSynced } = useAuth();
+  const { profile, signOut, changeMockRole } = useAuth();
 
   if (!profile) return null;
 

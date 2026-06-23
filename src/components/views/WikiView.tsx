@@ -16,44 +16,7 @@ interface WikiArticle {
   popularity: number;
 }
 
-const INITIAL_ARTICLES: WikiArticle[] = [
-  {
-    id: "wiki-01",
-    title: "Guia Rápido de Férias e Ausências",
-    category: "Recursos Humanos",
-    summary: "Como solicitar faturamentos de férias anuais de 22 dias no Portal de Recursos Humanos.",
-    content: "### 1. Dos Direitos Globais\nQualquer colaborador tem direito a **22 dias úteis de férias** por ano fiscal, conforme o regulamento nacional de contratação de talentos.\n\n### 2. Dos Prazos para Submissão\n* É mandatório submeter no पोर्टल MyHR com no mínimo **30 dias de antecedência**.\n* Mudanças ou cancelamentos requerem aviso formal de 15 dias para realinhamento da escala da empresa.\n\n### 3. Workflow de Aprovação\nO sistema encaminhará para o Coordenador Direto de Divisão e, subsequentemente, ao Diretor Setorial de Recursos Humanos.",
-    sources: ["Manual do Colaborador 2026.pdf", "Anexo Regulatório de Trabalho da Organização"],
-    updatedAt: "2026-06-12",
-    isAiGenerated: true,
-    isGrounded: true,
-    popularity: 124
-  },
-  {
-    id: "wiki-02",
-    title: "Normas de Utilização e Segurança da VPN Corporativa",
-    category: "Tecnologia e Segurança",
-    summary: "Passo a passo técnico de configuração do FortiClient e autenticação multifatorial obrigatória.",
-    content: "### 1. Da Conexão Ativa via FortiClient\nPara obter acesso a ambientes protegidos de dados na AWS, é obrigatório ligar a nossa VPN dedicada via cliente oficial.\n\n### 2. Autenticação Multifatorial (MFA)\n* A autenticação de dois fatores deve estar sincronizada via Google Authenticator.\n* O compartilhamento de tokens ou chaves SSH é estritamente proibido.\n\n### 3. Bloqueio por Inatividade\nO software bloqueia sessões após 5 minutos de ociosidade total.",
-    sources: ["Manual de Normativa de Segurança Orgânica v2", "Termos de Uso de Equipamentos de TI"],
-    updatedAt: "2026-06-18",
-    isAiGenerated: true,
-    isGrounded: true,
-    popularity: 98
-  },
-  {
-    id: "wiki-03",
-    title: "Tabelas e Limites de Reembolso de Despesas de Viagem",
-    category: "Financeiro",
-    summary: "Valores diários para viagens de serviço nacionais e internacionais e reembolso quilométrico.",
-    content: "### 1. Política de Alimentação\n* **Nacional**: Limite máximo de **35,00€** diários reembolsáveis.\n* **Internacional**: Limite máximo de **70,00€** diários reembolsáveis.\n\n### 2. Deslocamentos via Carro Próprio\nReembolso de **0,40€** por quilómetro registado e fundamentado via relatório de KMs anexado na submissão mensal.",
-    sources: ["Diretrizes de Reembolso Executivo 2026"],
-    updatedAt: "2026-05-30",
-    isAiGenerated: true,
-    isGrounded: true,
-    popularity: 85
-  }
-];
+const INITIAL_ARTICLES: WikiArticle[] = [];
 
 export const WikiView: React.FC = () => {
   const [articles, setArticles] = useState<WikiArticle[]>(() => {

@@ -17,68 +17,7 @@ interface DocBase {
   source: 'Local Upload' | 'Slack Integration' | 'Gmail Sync' | 'Google Drive';
 }
 
-const INITIAL_DOCS: DocBase[] = [
-  {
-    id: "doc-rh-01",
-    name: "Manual de Integração do Colaborador.pdf",
-    type: "PDF",
-    department: "Recursos Humanos",
-    updatedAt: "2026-04-10",
-    indexingState: "Indexado",
-    allowedRoles: ["admin", "manager", "user"],
-    content: "O presente Manual de Integração consolida os propósitos e diretrizes de acolhimento. Férias e Descanso: Todo colaborador tem direito a 22 dias úteis de férias por ano civil trabalhado. O pedido deve ser submetido com no mínimo 30 dias de antecedência no Portal de Recursos Humanos (MyHR). O expediente padrão é das 09:00 às 18:00 com 1 hora de almoço flexível a ser usufruída entre as 12:00 e as 14:30. Horas extraordinárias necessitam de aprovação direta da chefia.",
-    highlightedClasue: "Férias e Descanso: Todo colaborador tem direito a 22 dias úteis de férias por ano civil trabalhado. Solicitação com mínimo 30 dias de antecedência.",
-    source: "Google Drive"
-  },
-  {
-    id: "doc-ti-02",
-    name: "Política de Segurança de TI e Acessos VPN.docx",
-    type: "DOCX",
-    department: "Tecnologia e Segurança",
-    updatedAt: "2026-05-18",
-    indexingState: "Indexado",
-    allowedRoles: ["admin", "manager"],
-    content: "Segurança de Acessos: Contas empresariais exigem MFA. VPN Corporativa: O acesso aos servidores produtivos e dados sigilosos exige conexão ativa via cliente VPN FortiClient configurado. Credenciais: É proibido compartilhar passcodes ou chaves criptográficas entre funcionários. Ecrãs ociosos por mais de 5 minutos acionarão bloqueio automático de segurança.",
-    highlightedClasue: "Acesso aos servidores produtivos e dados sigilosos exige conexão ativa via cliente VPN FortiClient configurado. Travas automáticas pós 5 min.",
-    source: "Local Upload"
-  },
-  {
-    id: "doc-comp-03",
-    name: "Código de Ética e Compliance 2026.txt",
-    type: "TXT",
-    department: "Compliance",
-    updatedAt: "2026-01-15",
-    indexingState: "Indexado",
-    allowedRoles: ["admin", "manager", "user"],
-    content: "Políticas Anticorrupção e Transparência: É terminantemente proibido aceitar ou dar presentes de valoração mercantil superior a 50€ de clientes ou parceiros. Lembranças de baixo peso financeiro podem ser declarada de boa-fé. Linha de Denúncia: Quaisquer assédios ou abusos profissionais devem ser informados confidencialmente em etica@empresa.com.",
-    highlightedClasue: "Proibido aceitar ou dar presentes de valoração mercantil superior a 50€ de fornecedores ativos na carteira corporal.",
-    source: "Gmail Sync"
-  },
-  {
-    id: "doc-sup-04",
-    name: "Manual de Operações e SLAs de Suporte.pdf",
-    type: "PDF",
-    department: "Suporte e Operações",
-    updatedAt: "2026-03-22",
-    indexingState: "Indexado",
-    allowedRoles: ["admin", "manager", "user"],
-    content: "Diretrizes de Suporte: SLAs para ocorrências críticas de nível P1 exigem resposta preliminar em 15 minutos e reversão garantida do incidente em até 4 horas. Incidentes P2 de alta relevância dispõem de 1 hora. O vocabulário deve ser polido e cortês: 'Olá, agradecemos o contacto. O meu nome é Rui, como poderei ajudar?'.",
-    highlightedClasue: "SLAs críticos P1 exigem resposta preliminar em 15 minutos e reversão garantida do incidente em até 4 horas.",
-    source: "Slack Integration"
-  },
-  {
-    id: "doc-fin-05",
-    name: "Diretrizes de Reembolso de Despesas de Viagem.xlsx",
-    type: "XLSX",
-    department: "Financeiro",
-    updatedAt: "2026-02-28",
-    indexingState: "Indexado",
-    allowedRoles: ["admin", "manager"],
-    content: "Mapeamento Financeiro: Despesas em serviço necessitam de recibo comercial contendo o NIF da organização. Diárias de Refeições: Limite de 35€ em voos nacionais e 70€ em viagens multinacionais. Deslocação com veículo privado: É outorgado 0,40€ por quilómetro mediante boletim preenchido.",
-    highlightedClasue: "Refeições: Limite de 35€ em serviço nacional e 70€ em missão internacional. Reembolso de km a 0,40€.",
-    source: "Google Drive"
-  }
-];
+const INITIAL_DOCS: DocBase[] = [];
 
 export const DocumentsView: React.FC = () => {
   const { profile } = useAuth();

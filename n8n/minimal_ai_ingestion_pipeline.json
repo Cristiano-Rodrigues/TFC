@@ -1,0 +1,502 @@
+{
+  "name": "Minimal AI Ingestion Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "id": "extract-1",
+      "name": "Extract Text",
+      "position": [
+        208,
+        0
+      ],
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const text = $json.data || JSON.stringify($json);\nreturn { text };"
+      },
+      "id": "code-1",
+      "name": "Normalize Text",
+      "position": [
+        400,
+        0
+      ],
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $json.text;\nconst size = 500;\n\nlet chunks = [];\n\nfor (let i = 0; i < text.length; i += size) {\n  chunks.push({\n    pageContent: text.slice(i, i + size)\n  });\n}\n\nreturn chunks;"
+      },
+      "id": "code-2",
+      "name": "Chunking Node",
+      "position": [
+        608,
+        0
+      ],
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "split-1",
+      "name": "Split In Batches",
+      "position": [
+        816,
+        0
+      ],
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cohere.ai/v1/embed",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_COHERE_API_KEY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ texts: [$json.pageContent], model: \"embed-multilingual-v3.0\", input_type: \"search_document\" }) }}\n\n",
+        "options": {}
+      },
+      "id": "cohere-1",
+      "name": "Cohere Embeddings",
+      "position": [
+        1008,
+        0
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4
+    },
+    {
+      "parameters": {
+        "tableId": "chunks",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "content",
+              "fieldValue": "={{ $json.texts[0] }}"
+            },
+            {
+              "fieldId": "embedding",
+              "fieldValue": "={{ $json.embeddings[0] }}"
+            }
+          ]
+        }
+      },
+      "id": "supabase-1",
+      "name": "Supabase Vector Store Node",
+      "position": [
+        1216,
+        0
+      ],
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "credentials": {
+        "supabaseApi": {
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"stored\"\n}",
+        "options": {}
+      },
+      "id": "respond-1",
+      "name": "Respond to Webhook",
+      "position": [
+        1136,
+        256
+      ],
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ answer: $json.text }) }}",
+        "options": {}
+      },
+      "id": "36bb6b18-e289-4a24-970f-c4e21237266d",
+      "name": "Respond_to_Webhook",
+      "position": [
+        1584,
+        528
+      ],
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "upload",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-1",
+      "name": "Upload webhook",
+      "position": [
+        0,
+        0
+      ],
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "query",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "131a5daf-225d-4f98-a9f0-3891c36884cd",
+      "name": "Search webhook",
+      "position": [
+        -80,
+        512
+      ],
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cohere.ai/v1/embed",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_COHERE_API_KEY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"texts\": [\"{{ $json.query }}\"],\n  \"model\": \"embed-multilingual-v3.0\",\n  \"input_type\": \"search_query\"\n}",
+        "options": {}
+      },
+      "id": "ea688db7-71ea-419f-ada0-ff6f6fa77671",
+      "name": "Cohere Embedding Node",
+      "position": [
+        176,
+        720
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4
+    },
+    {
+      "parameters": {
+        "jsCode": "const webhookData = $(\"Search webhook\").first().json;\nconst currentData = $json;\n\nlet finalQuery = \"\";\n\nif (webhookData.query && typeof webhookData.query === 'string') {\n  finalQuery = webhookData.query;\n} else if (webhookData.body && webhookData.body.query) {\n  finalQuery = webhookData.body.query;\n} else if (currentData.query && typeof currentData.query === 'string') {\n  finalQuery = currentData.query;\n} else {\n  const values = Object.values(webhookData);\n  finalQuery = values.find(v => typeof v === 'string') || \"Pergunta não detectada\";\n}\n\nreturn [{\n  body: {\n    p_embedding: $json.embeddings[0],\n    p_threshold: 0.1,\n    p_count: 15\n  },\n  query: finalQuery\n}];"
+      },
+      "id": "3d83eafd-c570-4f41-9514-28a923181e47",
+      "name": "Format_Data_For_Search_Final",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        688,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nlet context = \"\";\n\nif (items.length > 0) {\n  context = items.map((item, index) => {\n    let text = \"\";\n    if (typeof item.json === 'string') text = item.json;\n    else text = item.json.value || item.json.content || JSON.stringify(item.json);\n    return `[Trecho ${index + 1}]:\\n${text}`;\n  }).join('\\n\\n---\\n\\n');\n}\n\nconst query = $(\"Format_Data_For_Search_Final\").first().json.query;\n\nreturn [{\n  cohereBody: {\n    model: \"command-a-03-2025\",\n    message: `Pergunta: ${query}`,\n    preamble: `És um assistente preciso e analítico. Responde APENAS com base no contexto fornecido abaixo. Se a resposta não estiver no contexto, diz que não sabes.\\n\\nATENÇÃO: O contexto abaixo é formado por múltiplos fragmentos de documentos completamente diferentes e independentes (ex: apontamentos de aulas vs. estudos religiosos). NÃO mistures os temas nem assumas que pertencem ao mesmo texto. Lê atentamente e separa os conceitos.\\n\\nContexto:\\n${context || \"Nenhum documento relevante encontrado.\"}`,\n    temperature: 0.2\n  }\n}];"
+      },
+      "id": "a6a920e7-b6ff-4b35-b2a9-621302206fec",
+      "name": "Final_Context_Assembler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1136,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "81dc6764-aab7-4bd3-b666-17055d7b83b7",
+      "name": "Merge_Query_Embedding_v2",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        416,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://YOUR_SUPABASE_PROJECT_REF.supabase.co/rest/v1/rpc/match_chunks",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "YOUR_SUPABASE_PUBLISHABLE_KEY"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_SUPABASE_PUBLISHABLE_KEY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.body }}",
+        "options": {}
+      },
+      "id": "8afd0b15-e76b-4a65-8893-3e6257541192",
+      "name": "Supabase_RPC_Search_Manual",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        912,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cohere.ai/v1/chat",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_COHERE_API_KEY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.cohereBody }}",
+        "options": {}
+      },
+      "id": "2edbcee5-a69c-43bb-a076-13d961a80ce1",
+      "name": "Cohere_Chat_Node",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1376,
+        528
+      ]
+    }
+  ],
+  "connections": {
+    "Chunking Node": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Split In Batches",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Extract Text": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Normalize Text",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Normalize Text": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Chunking Node",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Split In Batches": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Cohere Embeddings",
+            "type": "main"
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "node": "Respond to Webhook",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store Node": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Split In Batches",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Cohere Embeddings": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store Node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload webhook": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Extract Text",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Search webhook": {
+      "main": [
+        [
+          {
+            "node": "Cohere Embedding Node",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge_Query_Embedding_v2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cohere Embedding Node": {
+      "main": [
+        [
+          {
+            "node": "Merge_Query_Embedding_v2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge_Query_Embedding_v2": {
+      "main": [
+        [
+          {
+            "node": "Format_Data_For_Search_Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format_Data_For_Search_Final": {
+      "main": [
+        [
+          {
+            "node": "Supabase_RPC_Search_Manual",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase_RPC_Search_Manual": {
+      "main": [
+        [
+          {
+            "node": "Final_Context_Assembler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final_Context_Assembler": {
+      "main": [
+        [
+          {
+            "node": "Cohere_Chat_Node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cohere_Chat_Node": {
+      "main": [
+        [
+          {
+            "node": "Respond_to_Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {}
+}

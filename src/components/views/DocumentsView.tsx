@@ -1,0 +1,538 @@
+'use client';
+
+import React, { useState } from 'react';
+import { Search, FileText, Download, Trash2, Shield, RefreshCw, Eye, X, Filter, FileCode, CheckCircle2, AlertCircle, ShieldCheck, ChevronRight, HelpCircle } from 'lucide-react';
+import { useAuth } from '@/lib/auth-context';
+
+interface DocBase {
+  id: string;
+  name: string;
+  type: 'PDF' | 'DOCX' | 'TXT' | 'XLSX';
+  department: string;
+  updatedAt: string;
+  indexingState: 'Indexado' | 'Em Processamento' | 'Não Indexado';
+  allowedRoles: ('admin' | 'manager' | 'user')[];
+  content: string;
+  highlightedClasue: string;
+  source: 'Local Upload' | 'Slack Integration' | 'Gmail Sync' | 'Google Drive';
+}
+
+const INITIAL_DOCS: DocBase[] = [
+  {
+    id: "doc-rh-01",
+    name: "Manual de Integração do Colaborador.pdf",
+    type: "PDF",
+    department: "Recursos Humanos",
+    updatedAt: "2026-04-10",
+    indexingState: "Indexado",
+    allowedRoles: ["admin", "manager", "user"],
+    content: "O presente Manual de Integração consolida os propósitos e diretrizes de acolhimento. Férias e Descanso: Todo colaborador tem direito a 22 dias úteis de férias por ano civil trabalhado. O pedido deve ser submetido com no mínimo 30 dias de antecedência no Portal de Recursos Humanos (MyHR). O expediente padrão é das 09:00 às 18:00 com 1 hora de almoço flexível a ser usufruída entre as 12:00 e as 14:30. Horas extraordinárias necessitam de aprovação direta da chefia.",
+    highlightedClasue: "Férias e Descanso: Todo colaborador tem direito a 22 dias úteis de férias por ano civil trabalhado. Solicitação com mínimo 30 dias de antecedência.",
+    source: "Google Drive"
+  },
+  {
+    id: "doc-ti-02",
+    name: "Política de Segurança de TI e Acessos VPN.docx",
+    type: "DOCX",
+    department: "Tecnologia e Segurança",
+    updatedAt: "2026-05-18",
+    indexingState: "Indexado",
+    allowedRoles: ["admin", "manager"],
+    content: "Segurança de Acessos: Contas empresariais exigem MFA. VPN Corporativa: O acesso aos servidores produtivos e dados sigilosos exige conexão ativa via cliente VPN FortiClient configurado. Credenciais: É proibido compartilhar passcodes ou chaves criptográficas entre funcionários. Ecrãs ociosos por mais de 5 minutos acionarão bloqueio automático de segurança.",
+    highlightedClasue: "Acesso aos servidores produtivos e dados sigilosos exige conexão ativa via cliente VPN FortiClient configurado. Travas automáticas pós 5 min.",
+    source: "Local Upload"
+  },
+  {
+    id: "doc-comp-03",
+    name: "Código de Ética e Compliance 2026.txt",
+    type: "TXT",
+    department: "Compliance",
+    updatedAt: "2026-01-15",
+    indexingState: "Indexado",
+    allowedRoles: ["admin", "manager", "user"],
+    content: "Políticas Anticorrupção e Transparência: É terminantemente proibido aceitar ou dar presentes de valoração mercantil superior a 50€ de clientes ou parceiros. Lembranças de baixo peso financeiro podem ser declarada de boa-fé. Linha de Denúncia: Quaisquer assédios ou abusos profissionais devem ser informados confidencialmente em etica@empresa.com.",
+    highlightedClasue: "Proibido aceitar ou dar presentes de valoração mercantil superior a 50€ de fornecedores ativos na carteira corporal.",
+    source: "Gmail Sync"
+  },
+  {
+    id: "doc-sup-04",
+    name: "Manual de Operações e SLAs de Suporte.pdf",
+    type: "PDF",
+    department: "Suporte e Operações",
+    updatedAt: "2026-03-22",
+    indexingState: "Indexado",
+    allowedRoles: ["admin", "manager", "user"],
+    content: "Diretrizes de Suporte: SLAs para ocorrências críticas de nível P1 exigem resposta preliminar em 15 minutos e reversão garantida do incidente em até 4 horas. Incidentes P2 de alta relevância dispõem de 1 hora. O vocabulário deve ser polido e cortês: 'Olá, agradecemos o contacto. O meu nome é Rui, como poderei ajudar?'.",
+    highlightedClasue: "SLAs críticos P1 exigem resposta preliminar em 15 minutos e reversão garantida do incidente em até 4 horas.",
+    source: "Slack Integration"
+  },
+  {
+    id: "doc-fin-05",
+    name: "Diretrizes de Reembolso de Despesas de Viagem.xlsx",
+    type: "XLSX",
+    department: "Financeiro",
+    updatedAt: "2026-02-28",
+    indexingState: "Indexado",
+    allowedRoles: ["admin", "manager"],
+    content: "Mapeamento Financeiro: Despesas em serviço necessitam de recibo comercial contendo o NIF da organização. Diárias de Refeições: Limite de 35€ em voos nacionais e 70€ em viagens multinacionais. Deslocação com veículo privado: É outorgado 0,40€ por quilómetro mediante boletim preenchido.",
+    highlightedClasue: "Refeições: Limite de 35€ em serviço nacional e 70€ em missão internacional. Reembolso de km a 0,40€.",
+    source: "Google Drive"
+  }
+];
+
+export const DocumentsView: React.FC = () => {
+  const { profile } = useAuth();
+  
+  const [documents, setDocuments] = useState<DocBase[]>(INITIAL_DOCS);
+  const [selectedDoc, setSelectedDoc] = useState<DocBase | null>(null);
+  
+  // Modals status
+  const [permissionsModalDoc, setPermissionsModalDoc] = useState<DocBase | null>(null);
+  const [updatingPermsRole, setUpdatingPermsRole] = useState<('admin' | 'manager' | 'user')[]>([]);
+
+  // Filtering controls
+  const [searchTerm, setSearchTerm] = useState('');
+  const [typeFilter, setTypeFilter] = useState('Todos');
+  const [deptFilter, setDeptFilter] = useState('Todos');
+  const [sourceFilter, setSourceFilter] = useState('Todos');
+
+  // RBAC Permissions check
+  const canDelete = profile?.permissions.includes('doc:delete') || profile?.role === 'admin';
+  const canManagePerms = profile?.permissions.includes('doc:manage_perms') || profile?.role === 'admin';
+
+  // Filters application
+  const filteredDocs = documents.filter(doc => {
+    // Audit document access with RBAC
+    const userRole = profile?.role || 'user';
+    const isAllowed = doc.allowedRoles.includes(userRole as any) || userRole === 'admin';
+    if (!isAllowed) return false;
+
+    const matchesSearch = doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          doc.content.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = typeFilter === 'Todos' || doc.type === typeFilter;
+    const matchesDept = deptFilter === 'Todos' || doc.department === deptFilter;
+    const matchesSource = sourceFilter === 'Todos' || doc.source === sourceFilter;
+
+    return matchesSearch && matchesType && matchesDept && matchesSource;
+  });
+
+  const handleDeleteDoc = (id: string, name: string) => {
+    if (!window.confirm(`Confirma a exclusão irrevogável do documento "${name}" de toda a base de inteligência?`)) return;
+    setDocuments(prev => prev.filter(d => d.id !== id));
+    if (selectedDoc?.id === id) {
+      setSelectedDoc(null);
+    }
+  };
+
+  const handleReindex = (id: string) => {
+    // Simulate updating index
+    setDocuments(prev => prev.map(d => {
+      if (d.id === id) {
+        return { ...d, indexingState: 'Em Processamento' };
+      }
+      return d;
+    }));
+
+    setTimeout(() => {
+      setDocuments(prev => prev.map(d => {
+        if (d.id === id) {
+          return { ...d, indexingState: 'Indexado', updatedAt: new Date().toISOString().split('T')[0] };
+        }
+        return d;
+      }));
+    }, 2000);
+  };
+
+  const handleOpenPermissionsEditor = (doc: DocBase) => {
+    setPermissionsModalDoc(doc);
+    setUpdatingPermsRole(doc.allowedRoles);
+  };
+
+  const handleSavePermissions = () => {
+    if (!permissionsModalDoc) return;
+    setDocuments(prev => prev.map(d => {
+      if (d.id === permissionsModalDoc.id) {
+        return { ...d, allowedRoles: updatingPermsRole };
+      }
+      return d;
+    }));
+    setPermissionsModalDoc(null);
+  };
+
+  const toggleAuthRoleInModal = (role: 'admin' | 'manager' | 'user') => {
+    if (role === 'admin') return; // Admin is always allowed
+    setUpdatingPermsRole(prev => 
+      prev.includes(role) ? prev.filter(r => r !== role) : [...prev, role]
+    );
+  };
+
+  return (
+    <div className="space-y-6 relative">
+      
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between pb-4 border-b border-slate-200">
+        <div>
+          <h1 id="docs-title" className="text-2xl font-semibold text-slate-900 tracking-tight">Base Documental Organizacional</h1>
+          <p className="text-sm text-slate-500 mt-1">
+            Gira permissões, audite estados de indexação de arquivos integrados e configure restrições com base em departamentos.
+          </p>
+        </div>
+      </div>
+
+      {/* Primary Split View (Table + PDF Viewer Column) */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        
+        {/* Table list */}
+        <div className="xl:col-span-2 space-y-4">
+          
+          {/* Advanced Filter Panel */}
+          <div className="bg-white p-4 border border-slate-200 rounded-lg grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
+            <div className="sm:col-span-1 space-y-1">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Filtro por Tipo</label>
+              <select
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+                className="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded focus:outline-none bg-slate-50"
+              >
+                <option value="Todos">Todos (PDF, DOC, TXT...)</option>
+                <option value="PDF">PDF</option>
+                <option value="DOCX">DOCX</option>
+                <option value="TXT">TXT</option>
+                <option value="XLSX">Spreadsheet (XLSX)</option>
+              </select>
+            </div>
+
+            <div className="sm:col-span-1 space-y-1">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Departamento</label>
+              <select
+                value={deptFilter}
+                onChange={(e) => setDeptFilter(e.target.value)}
+                className="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded focus:outline-none bg-slate-50"
+              >
+                <option value="Todos">Todas as Áreas</option>
+                <option value="Recursos Humanos">Recursos Humanos</option>
+                <option value="Tecnologia e Segurança">TI e Segurança</option>
+                <option value="Financeiro">Financeiro</option>
+                <option value="Compliance">Compliance</option>
+                <option value="Suporte e Operações">Suporte</option>
+              </select>
+            </div>
+
+            <div className="sm:col-span-1 space-y-1">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block font-medium">Origem do Arquivo</label>
+              <select
+                value={sourceFilter}
+                onChange={(e) => setSourceFilter(e.target.value)}
+                className="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded focus:outline-none bg-slate-50"
+              >
+                <option value="Todos">Todas as Origens</option>
+                <option value="Local Upload">Upload Local</option>
+                <option value="Slack Integration">Canais Slack</option>
+                <option value="Gmail Sync">Mensagens Gmail</option>
+                <option value="Google Drive">Google Drive</option>
+              </select>
+            </div>
+
+            <div className="sm:col-span-1 relative">
+              <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-400" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Filtrar nesta lista..."
+                className="w-full text-xs pl-8 pr-3 py-1.5 border border-slate-300 rounded focus:outline-none bg-slate-50/50"
+              />
+            </div>
+          </div>
+
+          {/* Table Element */}
+          <div className="bg-white border border-slate-200 rounded-lg overflow-x-auto shadow-3xs">
+            <table className="w-full border-collapse text-left text-xs text-slate-600">
+              <thead className="bg-[#f8fafc] text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-200">
+                <tr>
+                  <th scope="col" className="px-4 py-3">Nome do Ficheiro</th>
+                  <th scope="col" className="px-4 py-3">Área / Origem</th>
+                  <th scope="col" className="px-4 py-3">Indexação IA</th>
+                  <th scope="col" className="px-4 py-3">Acessibilidade RBAC</th>
+                  <th scope="col" className="px-4 py-3 text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 font-medium">
+                {filteredDocs.length > 0 ? (
+                  filteredDocs.map((doc) => (
+                    <tr
+                      id={`doc-row-${doc.id}`}
+                      key={doc.id}
+                      className={`hover:bg-slate-50/70 transition-colors ${selectedDoc?.id === doc.id ? 'bg-blue-50/30' : ''}`}
+                    >
+                      {/* Name & Type */}
+                      <td className="px-4 py-3.5 max-w-[200px]">
+                        <div className="flex items-center gap-2">
+                          <FileText className={`h-4.5 w-4.5 shrink-0 ${doc.type === 'PDF' ? 'text-red-500' : doc.type === 'DOCX' ? 'text-blue-500' : doc.type === 'XLSX' ? 'text-emerald-500' : 'text-slate-400'}`} />
+                          <div className="truncate">
+                            <button
+                              onClick={() => setSelectedDoc(doc)}
+                              className="font-bold text-slate-900 hover:text-blue-600 transition-colors text-left block truncate cursor-pointer"
+                            >
+                              {doc.name}
+                            </button>
+                            <span className="text-[10px] text-slate-400 block mt-0.5">Sincronizado em: {doc.updatedAt}</span>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Department & Source */}
+                      <td className="px-4 py-3.5">
+                        <span className="text-[10px] font-semibold text-slate-700 block">{doc.department}</span>
+                        <span className="text-[10px] text-slate-400 block mt-0.5">{doc.source}</span>
+                      </td>
+
+                      {/* Indexing Status */}
+                      <td className="px-4 py-3.5">
+                        {doc.indexingState === 'Indexado' ? (
+                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                            <span className="w-1 h-1 rounded-full bg-emerald-500" />
+                            Sincronizado
+                          </span>
+                        ) : doc.indexingState === 'Em Processamento' ? (
+                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-100">
+                            <RefreshCw className="w-2.5 h-2.5 animate-spin" />
+                            Pensando...
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-600">
+                            <AlertCircle className="w-2.5 h-2.5" />
+                            Pendente
+                          </span>
+                        )}
+                      </td>
+
+                      {/* RBAC constraints badges */}
+                      <td className="px-4 py-3.5">
+                        <div className="flex flex-wrap gap-1">
+                          {doc.allowedRoles.map(role => (
+                            <span key={role} className="inline-block text-[9px] font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-500 uppercase tracking-wide">
+                              {role}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+
+                      {/* Action buttons */}
+                      <td className="px-4 py-3.5 text-right space-x-1.5">
+                        <button
+                          onClick={() => setSelectedDoc(doc)}
+                          className="p-1 text-slate-400 hover:text-slate-700 rounded transition-colors inline-block cursor-pointer"
+                          title="Visualizar documento"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </button>
+                        {canManagePerms && (
+                          <button
+                            onClick={() => handleOpenPermissionsEditor(doc)}
+                            className="p-1 text-slate-400 hover:text-blue-600 rounded transition-colors inline-block cursor-pointer"
+                            title="Alterar acessibilidade"
+                          >
+                            <Shield className="h-4 w-4" />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleReindex(doc.id)}
+                          className="p-1 text-slate-400 hover:text-indigo-600 rounded transition-colors inline-block cursor-pointer"
+                          title="Forçar Reindexamento IA"
+                          disabled={doc.indexingState === 'Em Processamento'}
+                        >
+                          <RefreshCw className={`h-4 w-4 ${doc.indexingState === 'Em Processamento' ? 'animate-spin text-slate-300' : ''}`} />
+                        </button>
+                        {canDelete && (
+                          <button
+                            onClick={() => handleDeleteDoc(doc.id, doc.name)}
+                            className="p-1 text-slate-400 hover:text-red-500 rounded transition-colors inline-block cursor-pointer"
+                            title="Eliminar permanentemente"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-12 text-center text-slate-450 bg-slate-50/50">
+                      Nenhum arquivo encontrado de acordo com os critérios de segurança ou filtragem definidos.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Column representing simulated PDF Reader */}
+        <div className="xl:col-span-1">
+          {selectedDoc ? (
+            /* --- Actual Document Viewer UI --- */
+            <div id="document-viewer-container" className="bg-white border border-slate-200 rounded-lg overflow-hidden flex flex-col h-full shadow-xs animate-in slide-in-from-right duration-150">
+              
+              {/* Header */}
+              <div className="bg-white px-4 py-3 border-b border-slate-200 text-slate-800 flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-2 truncate">
+                  <FileText className="h-4 w-4 text-blue-600 shrink-0" />
+                  <span className="text-xs font-semibold truncate text-slate-700">{selectedDoc.name}</span>
+                </div>
+                <button
+                  onClick={() => setSelectedDoc(null)}
+                  className="text-slate-400 hover:text-slate-600 cursor-pointer"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              {/* PDF style sheet */}
+              <div className="p-5 flex-1 bg-slate-50 min-h-[300px] border-b border-slate-200">
+                <div className="bg-white border border-slate-200 rounded p-5 shadow-2xs space-y-4">
+                  
+                  {/* Internal file Header */}
+                  <div className="flex items-center justify-between border-b pb-3 text-[10px] text-slate-400 font-semibold font-mono">
+                    <span>MANUAL INTERNO</span>
+                    <span>NIF: 509200192</span>
+                  </div>
+
+                  {/* Highlighter section */}
+                  <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded">
+                    <span className="text-[10px] font-bold text-yellow-800 uppercase tracking-wider block mb-1">Cláusula Destacada por Relevância RAG:</span>
+                    <p className="text-[11px] text-yellow-950 font-medium leading-relaxed font-sans italic">
+                      &ldquo;{selectedDoc.highlightedClasue}&rdquo;
+                    </p>
+                  </div>
+
+                  {/* Body Content */}
+                  <div className="text-xs text-slate-700 leading-relaxed space-y-2 whitespace-pre-wrap font-sans">
+                    {selectedDoc.content}
+                  </div>
+                </div>
+              </div>
+
+              {/* Linked topics footnote */}
+              <div className="p-4 bg-slate-50/50 space-y-2.5">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Metadados de conformidade:</span>
+                <div className="space-y-1.5 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Origem:</span>
+                    <span className="font-semibold text-slate-800">{selectedDoc.source}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Acesso:</span>
+                    <span className="font-bold text-slate-800 uppercase tracking-widest text-[9px]">{selectedDoc.allowedRoles.join(' | ')}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* --- Empty State --- */
+            <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-lg p-10 text-center h-full flex flex-col items-center justify-center text-slate-400 min-h-[350px]">
+              <FileText className="h-8 w-8 stroke-[1.5] text-slate-300 mb-2" />
+              <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Leitor PDF Corporativo</h4>
+              <p className="text-[10px] text-slate-500 max-w-[200px] mt-1 line-clamp-3 leading-relaxed">
+                Clique sobre o título de qualquer documento na tabela avançada para carregar a pré-visualização, com as devidas cláusulas de relevância em destaque.
+              </p>
+            </div>
+          )}
+        </div>
+
+      </div>
+
+      {/* ACCESS LEVEL MODAL DIALOG */}
+      {permissionsModalDoc && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-100">
+          <div id="permissions-edit-modal" className="bg-white rounded-lg border border-slate-200 w-full max-w-md shadow-xl overflow-hidden animate-in zoom-in-95 duration-150">
+            <div className="p-5 border-b border-slate-100 bg-white flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="h-4.5 w-4.5 text-blue-600" />
+                <h3 className="text-sm font-bold uppercase tracking-wider text-slate-850">Controlo de Acesso RBAC</h3>
+              </div>
+              <button
+                onClick={() => setPermissionsModalDoc(null)}
+                className="text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-4">
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Configurar Permissões para:</span>
+                <p className="text-sm font-bold text-[#1e293b] leading-snug">{permissionsModalDoc.name}</p>
+              </div>
+
+              <hr className="border-slate-150" />
+
+              <div className="space-y-2.5">
+                <span className="text-xs font-bold text-slate-700 block">Selecione quais os cargos outorgados a acessar esta pasta:</span>
+                
+                {/* Admin Row */}
+                <div className="flex items-center justify-between p-2.5 bg-slate-50 rounded border border-slate-150 text-xs">
+                  <div>
+                    <span className="font-bold text-slate-800 block">Administradores (admin)</span>
+                    <span className="text-[10px] text-slate-400">Permissão global incondicional de escrita e deleção.</span>
+                  </div>
+                  <input type="checkbox" checked disabled className="rounded text-blue-600 focus:ring-0 cursor-not-allowed h-4 w-4" />
+                </div>
+
+                {/* Manager Row */}
+                <div
+                  onClick={() => toggleAuthRoleInModal('manager')}
+                  className="flex items-center justify-between p-2.5 hover:bg-slate-50 rounded border border-slate-150 text-xs cursor-pointer transition-colors"
+                >
+                  <div>
+                    <span className="font-bold text-slate-800 block">Coordenadores / Gestores (manager)</span>
+                    <span className="text-[10px] text-slate-400">Upload de documentos e compilação de novas Wikis.</span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={updatingPermsRole.includes('manager')}
+                    onChange={() => {}}
+                    className="rounded text-blue-600 focus:ring-0 h-4 w-4 cursor-pointer"
+                  />
+                </div>
+
+                {/* Staff Row */}
+                <div
+                  onClick={() => toggleAuthRoleInModal('user')}
+                  className="flex items-center justify-between p-2.5 hover:bg-slate-50 rounded border border-slate-150 text-xs cursor-pointer transition-colors"
+                >
+                  <div>
+                    <span className="font-bold text-slate-800 block">Colaborador Geral (user)</span>
+                    <span className="text-[10px] text-slate-400">Direito padrão de consulta no motor de Pesquisa RAG.</span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={updatingPermsRole.includes('user')}
+                    onChange={() => {}}
+                    className="rounded text-blue-600 focus:ring-0 h-4 w-4 cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-slate-150 flex items-center justify-end gap-2">
+                <button
+                  onClick={() => setPermissionsModalDoc(null)}
+                  className="px-3.5 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 border border-slate-200 rounded cursor-pointer transition-all"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleSavePermissions}
+                  className="px-4 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded shadow-3xs cursor-pointer transition-all"
+                >
+                  Salvar Restrições
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+};

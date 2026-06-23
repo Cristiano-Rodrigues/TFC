@@ -1,0 +1,6 @@
+{
+  "name": "Enterprise Knowledge Base & RAG",
+  "description": "Sistema corporativo de gestão, pesquisa inteligente (RAG) e Wiki automatizada por inteligência artificial, integrado com autenticação e controlo de acessos (RBAC).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

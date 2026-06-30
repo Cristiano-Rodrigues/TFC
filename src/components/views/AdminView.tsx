@@ -1,30 +1,59 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth, UserProfile } from '@/lib/auth-context';
+import { supabase } from '@/lib/supabase';
 import { ShieldCheck, UserPlus, FileEdit, Trash2, CheckCircle2, X, ShieldAlert, KeyRound, Search, Filter } from 'lucide-react';
 
 export const AdminView: React.FC = () => {
-  const { profile, allProfiles, updateUserProfile, createUserProfile, dbSynced } = useAuth();
+  const { profile } = useAuth();
   
-  // Modals status
+  const [allProfiles, setAllProfiles] = useState<UserProfile[]>([]);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+  
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingUser, setEditingUser] = useState<UserProfile | null>(null);
 
-  // Filters state
   const [searchEmail, setSearchEmail] = useState('');
   const [roleFilter, setRoleFilter] = useState('Todas');
   const [deptFilter, setDeptFilter] = useState('Todas');
 
-  // Invitation fields
   const [addEmail, setAddEmail] = useState('');
   const [addName, setAddName] = useState('');
   const [addRole, setAddRole] = useState<'admin' | 'manager' | 'user'>('user');
   const [addDept, setAddDept] = useState('Recursos Humanos');
   const [isSubmitInvite, setIsSubmitInvite] = useState(false);
 
-  // Checking Admin RBAC permission
   const isAdmin = profile?.role === 'admin';
+
+  const fetchUsers = async () => {
+    setIsLoadingUsers(true);
+    try {
+      const { data, error } = await supabase.from('users').select('*');
+      if (!error && data) {
+        const users: UserProfile[] = data.map(u => ({
+          id: u.id,
+          email: u.email || '',
+          fullName: u.full_name || (u.email ? u.email.split('@')[0] : 'Colaborador'),
+          role: u.role || 'user',
+          department: u.department || 'Geral',
+          active: u.active !== false,
+          permissions: []
+        }));
+        setAllProfiles(users);
+      }
+    } catch (e) {
+      console.warn("Failed to fetch users", e);
+    } finally {
+      setIsLoadingUsers(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isAdmin) {
+      fetchUsers();
+    }
+  }, [isAdmin]);
 
   if (!isAdmin) {
     return (
@@ -55,43 +84,86 @@ export const AdminView: React.FC = () => {
 
     setIsSubmitInvite(true);
     
-    // Simulate Supabase Invitation flow & register Profile metadata
-    const success = await createUserProfile({
-      id: `user-${Date.now()}`,
-      email: addEmail,
-      fullName: addName,
-      role: addRole,
-      department: addDept,
-      active: true
-    });
+    // role mapping
+    const ROLE_IDS = {
+      admin: 'c01a2079-12e5-409c-8675-90bf04eb10a1',
+      manager: '5f65ff3f-cfb8-4b5a-9314-eeb2cc4b19b2',
+      user: '9a8ed43a-141c-4996-8d79-5777ae3872d4'
+    };
+    
+    try {
+      // In a real environment, this should trigger an edge function to invite via Supabase Auth Admin.
+      // Here we simulate the insertion into the users table.
+      const { error } = await supabase.from('users').insert({
+        id: crypto.randomUUID(),
+        email: addEmail,
+        full_name: addName,
+        role: addRole,
+        role_id: ROLE_IDS[addRole] || ROLE_IDS.user,
+        department: addDept,
+        active: true
+      });
 
-    if (success) {
-      setShowAddModal(false);
-      setAddEmail('');
-      setAddName('');
-      setAddRole('user');
+      if (!error) {
+        await fetchUsers();
+        setShowAddModal(false);
+        setAddEmail('');
+        setAddName('');
+        setAddRole('user');
+      } else {
+        console.warn("Could not insert user directly.", error);
+      }
+    } catch (e) {
+      console.error("Invite error", e);
+    } finally {
+      setIsSubmitInvite(false);
     }
-    setIsSubmitInvite(false);
   };
 
   const handleUpdateUserSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingUser) return;
 
-    const success = await updateUserProfile(editingUser.id, {
-      fullName: editingUser.fullName,
-      role: editingUser.role,
-      department: editingUser.department,
-      active: editingUser.active
-    });
+    const ROLE_IDS = {
+      admin: 'c01a2079-12e5-409c-8675-90bf04eb10a1',
+      manager: '5f65ff3f-cfb8-4b5a-9314-eeb2cc4b19b2',
+      user: '9a8ed43a-141c-4996-8d79-5777ae3872d4'
+    };
 
-    if (success) {
-      setEditingUser(null);
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({
+          full_name: editingUser.fullName,
+          role: editingUser.role,
+          role_id: ROLE_IDS[editingUser.role as keyof typeof ROLE_IDS] || ROLE_IDS.user,
+          department: editingUser.department,
+          active: editingUser.active
+        })
+        .eq('id', editingUser.id);
+
+      if (!error) {
+        await fetchUsers();
+        setEditingUser(null);
+      }
+    } catch (err) {
+      console.error("Update failed", err);
     }
   };
 
   const handleToggleActiveState = async (u: UserProfile) => {
-    await updateUserProfile(u.id, { active: !u.active });
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ active: !u.active })
+        .eq('id', u.id);
+        
+      if (!error) {
+        await fetchUsers();
+      }
+    } catch (e) {
+      console.error("Toggle active state failed", e);
+    }
   };
 
   return (

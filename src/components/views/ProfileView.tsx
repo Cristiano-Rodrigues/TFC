@@ -5,7 +5,7 @@ import { useAuth } from '@/lib/auth-context';
 import { Shield, Info, Landmark, CheckCircle, Mail } from 'lucide-react';
 
 export const ProfileView: React.FC = () => {
-  const { profile, signOut, changeMockRole } = useAuth();
+  const { profile, signOut } = useAuth();
 
   if (!profile) return null;
 
@@ -96,52 +96,6 @@ export const ProfileView: React.FC = () => {
             </div>
           </div>
 
-        </div>
-      </div>
-
-      {/* TESTING SWITCH PILL */}
-      <div className="bg-slate-900 border border-slate-950 p-5 rounded-lg text-white space-y-4 shadow-sm">
-        <div className="flex items-start gap-3">
-          <Info className="h-5 w-5 text-blue-400 mt-0.5 shrink-0" />
-          <div className="text-xs space-y-1">
-            <span className="font-bold text-blue-300 block uppercase">Sandbox - Simulador de Perfis RBAC</span>
-            <p className="text-slate-300 leading-relaxed">
-              O sistema possui restrição de rotas real de acordo com as permissões do utilizador logado no Supabase. Para validar todas as vistas corporativas sem precisar de criar novas credenciais de login no banco de dados, utilize estes botões de Sandbox para alternar temporariamente o seu cargo:
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-3 gap-3 border-t border-slate-800 pt-4">
-          <button
-            onClick={() => changeMockRole('user')}
-            className={`text-xs py-2 rounded font-bold uppercase transition-all tracking-wider cursor-pointer ${
-              profile.role === 'user'
-                ? 'bg-white text-slate-900 shadow-3xs'
-                : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
-            }`}
-          >
-            Mudar para USER
-          </button>
-          <button
-            onClick={() => changeMockRole('manager')}
-            className={`text-xs py-2 rounded font-bold uppercase transition-all tracking-wider cursor-pointer ${
-              profile.role === 'manager'
-                ? 'bg-blue-600 text-white shadow-3xs'
-                : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
-            }`}
-          >
-            Mudar para MANAGER
-          </button>
-          <button
-            onClick={() => changeMockRole('admin')}
-            className={`text-xs py-2 rounded font-bold uppercase transition-all tracking-wider cursor-pointer ${
-              profile.role === 'admin'
-                ? 'bg-red-600 text-white shadow-3xs'
-                : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
-            }`}
-          >
-            Mudar para ADMIN
-          </button>
         </div>
       </div>
 

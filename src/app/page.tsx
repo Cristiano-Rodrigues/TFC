@@ -36,7 +36,7 @@ import {
 } from 'lucide-react';
 
 export default function Home() {
-  const { user, profile, loading, signOut, allProfiles } = useAuth();
+  const { user, profile, loading, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(() => {

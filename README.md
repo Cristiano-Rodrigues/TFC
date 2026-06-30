@@ -7,7 +7,7 @@ Este guia explica passo a passo como  colocar este projeto em funcionamento, inc
 ## Estrutura de Ficheiros
 
 No repositório, foram criadas duas pastas principais que contêm as definições necessárias:
-1. **`supabase/schema.sql`**: Contém todo o esquema de tabelas, funções (como `match_chunks`) e dados iniciais (roles, permissões e departamentos).
+1. **`supabase/schema.sql`**: Contém todo o esquema de tabelas para o modelo SaaS Multi-Tenant com suporte a empresas, cargos dinâmicos, permissões globais e funções (como `match_chunks`).
 2. **`n8n/minimal_ai_ingestion_pipeline.json`**: Contém o fluxo completo do pipeline RAG pronto a ser importado para o n8n (com placeholders para as chaves secretas).
 
 ---
@@ -19,7 +19,7 @@ A pessoa que vai testar o projeto deve seguir estes passos:
 1. Criar um projeto gratuito no [Supabase](https://supabase.com/).
 2. No painel do projeto Supabase, aceder ao **SQL Editor** (no menu lateral esquerdo).
 3. Criar uma nova query, colar todo o conteúdo do ficheiro `supabase/schema.sql` e clicar em **Run**.
-   * *Isto ativará a extensão `vector`, criará todas as tabelas necessárias, a função `match_chunks` para a pesquisa inteligente e inserirá os cargos (roles) e permissões por defeito.*
+   * *Isto ativará a extensão `vector`, criará todas as tabelas necessárias para o modelo SaaS Multi-Tenant e inserirá as permissões por defeito.*
 4. Aceder a **Project Settings > API** e recolher o **Project URL** e a **anon public / publishable key**.
 
 > [!WARNING]
@@ -83,6 +83,7 @@ O n8n é o motor que processa os uploads de ficheiros, gera os embeddings com a 
 
 ## Passo 4: Como Testar a Integração
 
-1. **Criar Utilizador**: Aceder à aplicação Next.js e criar uma conta de teste (irá registar no Supabase Auth e criar o utilizador correspondente na tabela `public.users`).
+1. **Registo de Empresa (SaaS)**: Aceder à aplicação Next.js e criar uma **Empresa**. Isto irá registar o primeiro administrador e inicializar automaticamente os cargos (roles) e departamentos da empresa.
+2. **Criação de Utilizadores**: Aceder ao painel de administração (apenas para o admin da empresa) para criar outros utilizadores (não é necessário que eles se registem por si próprios). Eles farão o login com as credenciais provisórias e poderão alterá-las futuramente.
 2. **Upload de Documentos**: Fazer o upload de um ficheiro (ex: um documento de texto ou PDF) no menu correspondente. A aplicação enviará o ficheiro para o n8n (`/upload`), que fará a extração de texto, chunking, geração de embeddings na Cohere e gravação na tabela `chunks` do Supabase.
 3. **Chat Inteligente**: Enviar uma pergunta no Chat. A aplicação chamará a rota do Next.js que envia o pedido ao n8n (`/query`). O n8n gerará o embedding da pergunta, procurará os trechos mais semelhantes no Supabase através do RPC `match_chunks` e enviará a resposta final produzida pela Cohere.

@@ -23,10 +23,9 @@ export async function POST(req: NextRequest) {
 
     const data = await response.json();
     
-    // O n8n deverá devolver { answer: "..." }
     return NextResponse.json({
       answer: data.answer || "Resposta não fornecida pelo modelo.",
-      sources: [], // Sem sources diretas do RAG atual
+      sources: [],
     });
   } catch (error: any) {
     console.error("Erro RAG Chat:", error);

@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { Login } from '@/components/Login';
 
-// Dynamic sub views
 import { DashboardView } from '@/components/views/DashboardView';
 import { IntelligentSearchView } from '@/components/views/IntelligentSearchView';
 import { WikiView } from '@/components/views/WikiView';
@@ -14,7 +13,6 @@ import { IntegrationsView } from '@/components/views/IntegrationsView';
 import { AdminView } from '@/components/views/AdminView';
 import { ProfileView } from '@/components/views/ProfileView';
 
-// Icons
 import {
   LayoutDashboard,
   Search,
@@ -46,7 +44,6 @@ export default function Home() {
     return '';
   });
 
-  // Sincronizar relógio
   useEffect(() => {
     const t = setInterval(() => {
       setCurrentTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
@@ -63,12 +60,10 @@ export default function Home() {
     );
   }
 
-  // If session is absent, display secure login form
   if (!user || !profile) {
     return <Login />;
   }
 
-  // Define sidebar links filtered by RBAC permissions dynamically
   const sidebarLinks = [
     {
       id: "dashboard",
@@ -102,21 +97,21 @@ export default function Home() {
       id: "upload",
       label: "Carregar Arquivos",
       icon: UploadCloud,
-      roles: ["admin", "manager"], // Conditional link
+      roles: ["admin", "manager"],
       badge: null
     },
     {
       id: "integrations",
       label: "Sincronizadores",
       icon: Network,
-      roles: ["admin", "manager"], // Conditional link
+      roles: ["admin", "manager"],
       badge: "Active"
     },
     {
       id: "admin",
       label: "Cargos e Permissões",
       icon: Users,
-      roles: ["admin"], // Admin only linked
+      roles: ["admin"],
       badge: "RBAC"
     },
     {
@@ -128,20 +123,16 @@ export default function Home() {
     }
   ];
 
-  // Restrict tabs if accessed illegally
   const activeLinkConfig = sidebarLinks.find(s => s.id === activeTab);
   const isAuthorizedTab = activeLinkConfig?.roles.includes(profile.role) || profile.role === 'admin';
 
-  // Fallback to profile view if activeTab is unauthorized
   const targetTab = isAuthorizedTab ? activeTab : 'profile';
 
   return (
     <div id="master-shell" className="min-h-screen flex bg-[#F9FAFB] text-slate-900 font-sans">
       
-      {/* 1. FIXED SIDEBAR ON LEFT (Desktop scale) */}
       <aside className="hidden lg:flex flex-col w-64 bg-white border-r border-slate-200 text-slate-800 h-screen sticky top-0 shrink-0">
         
-        {/* Brand Header */}
         <div className="p-6 flex items-center gap-3 border-b border-slate-100 shrink-0">
           <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-white font-bold font-sans text-sm">K</div>
           <div className="truncate">
@@ -150,10 +141,8 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Dynamic Nav list */}
         <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
           {sidebarLinks.map((item) => {
-            // Check roles conditions
             const matchesRole = item.roles.includes(profile.role);
             if (!matchesRole) return null;
 
@@ -185,7 +174,6 @@ export default function Home() {
           })}
         </nav>
 
-        {/* Bottom profile / logout rail inside Sidebar */}
         <div className="p-4 border-t border-slate-100 space-y-3 shrink-0 bg-slate-50/50">
           <div className="flex items-center gap-3 px-1.5 py-1">
             <div className="bg-blue-600 text-white font-black h-8 w-8 rounded flex items-center justify-center text-xs tracking-wider shrink-0">
@@ -206,13 +194,10 @@ export default function Home() {
         </div>
       </aside>
 
-      {/* 2. MAIN APP CONTENT CONTAINER AREA (Top Header + Dynamic views) */}
       <div className="flex-1 flex flex-col min-w-0 min-h-screen">
         
-        {/* TOP HEADER */}
         <header className="bg-white border-b border-slate-200 h-14 px-6 flex items-center justify-between sticky top-0 z-30 shadow-2xs">
           
-          {/* Mobile hamburger button */}
           <div className="flex items-center gap-3 lg:hidden">
             <button
               onClick={() => { setMobileMenuOpen(true); }}
@@ -227,7 +212,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Desktop organization badge info */}
           <div className="hidden lg:flex items-center gap-3 text-xs">
             <div className="flex items-center gap-1 text-[#475569] font-medium bg-slate-50 border border-slate-200/80 px-3 py-1 rounded-md">
               <Building className="h-3.5 w-3.5 text-slate-450" />
@@ -248,7 +232,6 @@ export default function Home() {
           </div>
         </header>
 
-        {/* REAL-TIME TAB ROUTING COMPILING VIEW */}
         <main className="flex-1 p-5 md:p-6 overflow-y-auto">
           {targetTab === 'dashboard' && <DashboardView onNavigate={(tab) => { setActiveTab(tab); }} />}
           {targetTab === 'search' && <IntelligentSearchView />}
@@ -261,12 +244,10 @@ export default function Home() {
         </main>
       </div>
 
-      {/* 3. MOBILE RESPONSIVE SLIDE NAVIGATION DRAWER */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-50 flex lg:hidden bg-slate-900/40 backdrop-blur-3xs transition-opacity animate-in fade-in duration-200">
           <div className="w-64 bg-white border-r border-slate-200 flex flex-col h-full text-slate-800 animate-in slide-in-from-left duration-200">
             
-            {/* Mobile Header Drawer */}
             <div className="p-6 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 bg-blue-600 rounded flex items-center justify-center text-white font-semibold text-xs shrink-0">K</div>
@@ -281,10 +262,8 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Nav list inside Drawer */}
             <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
               {sidebarLinks.map((item) => {
-                // Check roles conditions
                 const matchesRole = item.roles.includes(profile.role);
                 if (!matchesRole) return null;
 
@@ -311,7 +290,6 @@ export default function Home() {
               })}
             </nav>
 
-            {/* Bottom session action inside Drawer */}
             <div className="p-4 border-t border-slate-100 space-y-3 bg-slate-50/50">
               <div className="flex items-center gap-3 p-1 text-xs">
                 <div className="bg-blue-600 text-white font-bold h-6 w-6 rounded flex items-center justify-center text-[10px] tracking-wider shrink-0">

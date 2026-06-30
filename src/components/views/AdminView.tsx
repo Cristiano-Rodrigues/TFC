@@ -2,13 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth, UserProfile } from '@/lib/auth-context';
-import { supabase } from '@/lib/supabase';
 import { ShieldCheck, UserPlus, FileEdit, Trash2, CheckCircle2, X, ShieldAlert, KeyRound, Search, Filter } from 'lucide-react';
 
 export const AdminView: React.FC = () => {
   const { profile } = useAuth();
   
   const [allProfiles, setAllProfiles] = useState<UserProfile[]>([]);
+  const [availableRoles, setAvailableRoles] = useState<{id: string, name: string}[]>([]);
+  const [availableDepts, setAvailableDepts] = useState<{id: string, name: string}[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   
   const [showAddModal, setShowAddModal] = useState(false);
@@ -20,8 +21,9 @@ export const AdminView: React.FC = () => {
 
   const [addEmail, setAddEmail] = useState('');
   const [addName, setAddName] = useState('');
-  const [addRole, setAddRole] = useState<'admin' | 'manager' | 'user'>('user');
-  const [addDept, setAddDept] = useState('Recursos Humanos');
+  const [addPassword, setAddPassword] = useState('');
+  const [addRoleId, setAddRoleId] = useState('');
+  const [addDeptId, setAddDeptId] = useState('');
   const [isSubmitInvite, setIsSubmitInvite] = useState(false);
 
   const isAdmin = profile?.role === 'admin';
@@ -29,18 +31,26 @@ export const AdminView: React.FC = () => {
   const fetchUsers = async () => {
     setIsLoadingUsers(true);
     try {
-      const { data, error } = await supabase.from('users').select('*');
-      if (!error && data) {
-        const users: UserProfile[] = data.map(u => ({
+      const res = await fetch('/api/users');
+      const data = await res.json();
+      if (res.ok && data.users) {
+        const users: UserProfile[] = data.users.map((u: any) => ({
           id: u.id,
           email: u.email || '',
           fullName: u.full_name || (u.email ? u.email.split('@')[0] : 'Colaborador'),
           role: u.role || 'user',
           department: u.department || 'Geral',
+          role_id: u.role_id,
+          department_id: u.department_id,
           active: u.active !== false,
           permissions: []
         }));
         setAllProfiles(users);
+        if (data.roles) setAvailableRoles(data.roles);
+        if (data.departments) setAvailableDepts(data.departments);
+        
+        if (data.roles?.length && !addRoleId) setAddRoleId(data.roles[0].id);
+        if (data.departments?.length && !addDeptId) setAddDeptId(data.departments[0].id);
       }
     } catch (e) {
       console.warn("Failed to fetch users", e);
@@ -51,8 +61,10 @@ export const AdminView: React.FC = () => {
 
   useEffect(() => {
     if (isAdmin) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchUsers();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAdmin]);
 
   if (!isAdmin) {
@@ -61,15 +73,14 @@ export const AdminView: React.FC = () => {
         <div className="p-3 bg-red-50 border border-red-100 rounded-full w-12 h-12 flex items-center justify-center mx-auto text-red-500">
           <ShieldAlert className="h-6 w-6" />
         </div>
-        <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Acesso Negado - Apenas Administradores</h2>
+        <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Acesso Negado</h2>
         <p className="text-xs text-slate-500 leading-relaxed font-sans">
-          A sua credencial atual diz respeito a um perfil de <strong>{profile?.role || "standard"}</strong>. Esta secção administrativa permite o controlo sobre convites do Supabase e atribuição de permissões da equipa, estando restrita apenas à equipa de administração global de sistemas.
+          A sua credencial atual diz respeito a um perfil de <strong>{profile?.role || "standard"}</strong>. Esta secção administrativa permite o controlo e atribuição de permissões da equipa, estando restrita apenas à equipa de administração.
         </p>
       </div>
     );
   }
 
-  // Apply listing filters
   const filteredUsers = allProfiles.filter(u => {
     const matchesEmail = u.email.toLowerCase().includes(searchEmail.toLowerCase()) ||
                          u.fullName.toLowerCase().includes(searchEmail.toLowerCase());
@@ -80,38 +91,31 @@ export const AdminView: React.FC = () => {
 
   const handleCreateUserSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!addEmail.trim() || !addName.trim()) return;
+    if (!addEmail.trim() || !addName.trim() || !addPassword) return;
 
     setIsSubmitInvite(true);
     
-    // role mapping
-    const ROLE_IDS = {
-      admin: 'c01a2079-12e5-409c-8675-90bf04eb10a1',
-      manager: '5f65ff3f-cfb8-4b5a-9314-eeb2cc4b19b2',
-      user: '9a8ed43a-141c-4996-8d79-5777ae3872d4'
-    };
-    
     try {
-      // In a real environment, this should trigger an edge function to invite via Supabase Auth Admin.
-      // Here we simulate the insertion into the users table.
-      const { error } = await supabase.from('users').insert({
-        id: crypto.randomUUID(),
-        email: addEmail,
-        full_name: addName,
-        role: addRole,
-        role_id: ROLE_IDS[addRole] || ROLE_IDS.user,
-        department: addDept,
-        active: true
+      const res = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: addEmail,
+          fullName: addName,
+          role_id: addRoleId,
+          department_id: addDeptId,
+          password: addPassword
+        })
       });
 
-      if (!error) {
+      if (res.ok) {
         await fetchUsers();
         setShowAddModal(false);
         setAddEmail('');
         setAddName('');
-        setAddRole('user');
-      } else {
-        console.warn("Could not insert user directly.", error);
+        setAddPassword('');
+        setAddRoleId(availableRoles[0]?.id || '');
+        setAddDeptId(availableDepts[0]?.id || '');
       }
     } catch (e) {
       console.error("Invite error", e);
@@ -124,25 +128,19 @@ export const AdminView: React.FC = () => {
     e.preventDefault();
     if (!editingUser) return;
 
-    const ROLE_IDS = {
-      admin: 'c01a2079-12e5-409c-8675-90bf04eb10a1',
-      manager: '5f65ff3f-cfb8-4b5a-9314-eeb2cc4b19b2',
-      user: '9a8ed43a-141c-4996-8d79-5777ae3872d4'
-    };
-
     try {
-      const { error } = await supabase
-        .from('users')
-        .update({
-          full_name: editingUser.fullName,
-          role: editingUser.role,
-          role_id: ROLE_IDS[editingUser.role as keyof typeof ROLE_IDS] || ROLE_IDS.user,
-          department: editingUser.department,
+      const res = await fetch(`/api/users/${editingUser.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName: editingUser.fullName,
+          role_id: editingUser.role_id,
+          department_id: editingUser.department_id,
           active: editingUser.active
         })
-        .eq('id', editingUser.id);
+      });
 
-      if (!error) {
+      if (res.ok) {
         await fetchUsers();
         setEditingUser(null);
       }
@@ -153,12 +151,18 @@ export const AdminView: React.FC = () => {
 
   const handleToggleActiveState = async (u: UserProfile) => {
     try {
-      const { error } = await supabase
-        .from('users')
-        .update({ active: !u.active })
-        .eq('id', u.id);
+      const res = await fetch(`/api/users/${u.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName: u.fullName,
+          role: u.role,
+          department: u.department,
+          active: !u.active
+        })
+      });
         
-      if (!error) {
+      if (res.ok) {
         await fetchUsers();
       }
     } catch (e) {
@@ -169,12 +173,11 @@ export const AdminView: React.FC = () => {
   return (
     <div className="space-y-6">
       
-      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between pb-4 border-b border-slate-200">
         <div>
           <h1 id="admin-title" className="text-2xl font-semibold text-slate-900 tracking-tight">Utilizadores & Permissões RBAC</h1>
           <p className="text-sm text-slate-500 mt-1">
-            Gira permissões funcionais, altere acessos e convide novos membros da organização integrados no Supabase Auth.
+            Gira permissões funcionais e adicione novos membros da sua organização.
           </p>
         </div>
         <div className="mt-4 md:mt-0">
@@ -184,12 +187,11 @@ export const AdminView: React.FC = () => {
             className="inline-flex items-center gap-1.5 bg-[#1e293b] hover:bg-slate-800 text-white text-xs font-semibold px-4 py-2 rounded-md shadow-2xs cursor-pointer transition-all"
           >
             <UserPlus className="h-4 w-4" />
-            Convidar Utilizador
+            Adicionar Utilizador
           </button>
         </div>
       </div>
 
-      {/* Advanced Filter Pane */}
       <div className="bg-white p-4 border border-slate-200 rounded-lg grid grid-cols-1 sm:grid-cols-3 gap-3 items-end shadow-3xs">
         <div className="space-y-1">
           <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Pesquisar Utilizador</label>
@@ -213,9 +215,9 @@ export const AdminView: React.FC = () => {
             className="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded focus:outline-none bg-slate-50"
           >
             <option value="Todas">Todas as Roles</option>
-            <option value="admin">Administrador (admin)</option>
-            <option value="manager">Gestor / Coordenador (manager)</option>
-            <option value="user">Colaborador Geral (user)</option>
+            {availableRoles.map(r => (
+              <option key={r.id} value={r.name}>{r.name}</option>
+            ))}
           </select>
         </div>
 
@@ -227,16 +229,13 @@ export const AdminView: React.FC = () => {
             className="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded focus:outline-none bg-slate-50"
           >
             <option value="Todas">Todos os Departamentos</option>
-            <option value="Tecnologia e Segurança">TI & Segurança</option>
-            <option value="Recursos Humanos">Recursos Humanos</option>
-            <option value="Financeiro">Financeiro</option>
-            <option value="Compliance">Compliance & Legal</option>
-            <option value="Suporte e Operações">Suporte e Operações</option>
+            {availableDepts.map(d => (
+              <option key={d.id} value={d.name}>{d.name}</option>
+            ))}
           </select>
         </div>
       </div>
 
-      {/* Main Admin Data Table */}
       <div className="bg-white border border-slate-200 rounded-lg overflow-x-auto shadow-3xs">
         <table className="w-full border-collapse text-left text-xs text-slate-600">
           <thead className="bg-[#f8fafc] text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-200">
@@ -252,18 +251,15 @@ export const AdminView: React.FC = () => {
             {filteredUsers.length > 0 ? (
               filteredUsers.map((u) => (
                 <tr id={`user-row-${u.id}`} key={u.id} className="hover:bg-slate-50/70 transition-colors">
-                  {/* Name & Email */}
                   <td className="px-5 py-3.5">
                     <span className="font-bold text-slate-900 block">{u.fullName}</span>
                     <span className="text-[10px] text-slate-450 block font-mono mt-0.5">{u.email}</span>
                   </td>
 
-                  {/* Department */}
                   <td className="px-5 py-3.5 text-slate-700 font-semibold">
                     {u.department}
                   </td>
 
-                  {/* Access tag */}
                   <td className="px-5 py-3.5">
                     <span className={`inline-block text-[9px] font-bold tracking-wider px-2 py-0.5 rounded uppercase ${
                       u.role === 'admin'
@@ -276,7 +272,6 @@ export const AdminView: React.FC = () => {
                     </span>
                   </td>
 
-                  {/* Active/Inactive slider */}
                   <td className="px-5 py-3.5">
                     <span
                       onClick={() => handleToggleActiveState(u)}
@@ -291,7 +286,6 @@ export const AdminView: React.FC = () => {
                     </span>
                   </td>
 
-                  {/* Actions buttons */}
                   <td className="px-5 py-3.5 text-right space-x-2">
                     <button
                       id={`edit-user-btn-${u.id}`}
@@ -307,7 +301,7 @@ export const AdminView: React.FC = () => {
             ) : (
               <tr>
                 <td colSpan={5} className="px-5 py-12 text-center text-slate-450 bg-slate-50/50 leading-relaxed font-sans">
-                  Nenhum colaborador foi identificado correspondendo aos filtros de roles ou departamentos acionados.
+                  Nenhum colaborador foi identificado.
                 </td>
               </tr>
             )}
@@ -315,12 +309,11 @@ export const AdminView: React.FC = () => {
         </table>
       </div>
 
-      {/* INVITATION NEW USER MODAL POPUP */}
       {showAddModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-100">
           <div id="add-user-modal" className="bg-white rounded-lg border border-slate-200 w-full max-w-md shadow-xl overflow-hidden animate-in zoom-in-95 duration-150">
             <div className="px-5 py-4 bg-slate-900 text-white flex items-center justify-between">
-              <h3 className="text-sm font-bold uppercase tracking-wider">Registrar Novo Membro</h3>
+              <h3 className="text-sm font-bold uppercase tracking-wider">Adicionar Novo Membro</h3>
               <button
                 onClick={() => setShowAddModal(false)}
                 className="text-slate-400 hover:text-white cursor-pointer"
@@ -331,9 +324,8 @@ export const AdminView: React.FC = () => {
 
             <form onSubmit={handleCreateUserSubmit} className="p-5 space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Nome Completo</label>
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Nome Completo *</label>
                 <input
-                  id="add-user-name"
                   type="text"
                   required
                   value={addName}
@@ -344,9 +336,8 @@ export const AdminView: React.FC = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Email Corporativo</label>
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Email Corporativo *</label>
                 <input
-                  id="add-user-email"
                   type="email"
                   required
                   value={addEmail}
@@ -357,38 +348,42 @@ export const AdminView: React.FC = () => {
               </div>
 
               <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Senha Provisória *</label>
+                <input
+                  type="text"
+                  required
+                  value={addPassword}
+                  onChange={(e) => setAddPassword(e.target.value)}
+                  placeholder="Senha para o utilizador iniciar sessão"
+                  className="w-full text-xs px-3 py-2 border border-slate-300 rounded focus:outline-none focus:border-slate-500 text-slate-800"
+                />
+              </div>
+
+              <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Departamento Organizacional</label>
                 <select
-                  id="add-user-dept"
-                  value={addDept}
-                  onChange={(e) => setAddDept(e.target.value)}
+                  value={addDeptId}
+                  onChange={(e) => setAddDeptId(e.target.value)}
                   className="w-full text-xs px-3 py-2 border border-slate-300 rounded focus:outline-none bg-white text-slate-850"
                 >
-                  <option value="Recursos Humanos">Recursos Humanos (RH)</option>
-                  <option value="Tecnologia e Segurança">Tecnologia e Segurança (TI)</option>
-                  <option value="Financeiro">Financeiro</option>
-                  <option value="Compliance">Compliance & Legal</option>
-                  <option value="Suporte e Operações">Suporte e Operações</option>
+                  {availableDepts.map(d => (
+                    <option key={d.id} value={d.id}>{d.name}</option>
+                  ))}
                 </select>
               </div>
 
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Carga de Autorização (Role)</label>
                 <select
-                  id="add-user-role"
-                  value={addRole}
-                  onChange={(e) => setAddRole(e.target.value as any)}
+                  value={addRoleId}
+                  onChange={(e) => setAddRoleId(e.target.value)}
                   className="w-full text-xs px-3 py-2 border border-slate-300 rounded focus:outline-none bg-white text-slate-850"
                 >
-                  <option value="user">Colaborador Geral (user)</option>
-                  <option value="manager">Coordenador / Gestor (manager)</option>
-                  <option value="admin">Administrador global (admin)</option>
+                  {availableRoles.map(r => (
+                    <option key={r.id} value={r.id}>{r.name}</option>
+                  ))}
                 </select>
               </div>
-
-              <p className="text-[10px] text-slate-400 leading-relaxed leading-[14px]">
-                O utilizador receberá um email do Supabase Auth para parametrizar a sua senha oficial (senha corporativa por padrão: <strong>senha123</strong> para simulações).
-              </p>
 
               <div className="pt-3 border-t border-slate-150 flex items-center justify-end gap-2">
                 <button
@@ -399,12 +394,11 @@ export const AdminView: React.FC = () => {
                   Cancelar
                 </button>
                 <button
-                  id="add-user-submit-btn"
                   type="submit"
                   disabled={isSubmitInvite}
                   className="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded shadow-3xs flex items-center gap-1 transition-colors cursor-pointer"
                 >
-                  Confirmar Convite
+                  Criar Utilizador
                 </button>
               </div>
             </form>
@@ -412,7 +406,6 @@ export const AdminView: React.FC = () => {
         </div>
       )}
 
-      {/* EDIT USER SPECIFIC ROLE/DEPT MODAL */}
       {editingUser && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-100">
           <div id="edit-user-modal" className="bg-white rounded-lg border border-slate-200 w-full max-w-sm shadow-xl overflow-hidden animate-in zoom-in-95 duration-150">
@@ -439,33 +432,36 @@ export const AdminView: React.FC = () => {
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wide block">Nível de Role</label>
                   <select
-                    value={editingUser.role}
-                    onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value as any })}
+                    value={editingUser.role_id || ''}
+                    onChange={(e) => {
+                      const name = availableRoles.find(r => r.id === e.target.value)?.name || '';
+                      setEditingUser({ ...editingUser, role_id: e.target.value, role: name as 'admin' | 'manager' | 'user' });
+                    }}
                     className="w-full text-xs px-2 py-1.5 border border-slate-300 rounded focus:outline-none bg-white text-slate-800"
                   >
-                    <option value="user">User</option>
-                    <option value="manager">Manager</option>
-                    <option value="admin">Admin</option>
+                    {availableRoles.map(r => (
+                      <option key={r.id} value={r.id}>{r.name}</option>
+                    ))}
                   </select>
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wide block">Área de Atuação</label>
                   <select
-                    value={editingUser.department}
-                    onChange={(e) => setEditingUser({ ...editingUser, department: e.target.value })}
+                    value={editingUser.department_id || ''}
+                    onChange={(e) => {
+                      const name = availableDepts.find(d => d.id === e.target.value)?.name || '';
+                      setEditingUser({ ...editingUser, department_id: e.target.value, department: name });
+                    }}
                     className="w-full text-xs px-2 py-1.5 border border-slate-300 rounded focus:outline-none bg-white text-slate-850"
                   >
-                    <option value="Recursos Humanos">Recursos Humanos (RH)</option>
-                    <option value="Tecnologia e Segurança">TI & Segurança</option>
-                    <option value="Financeiro">Financeiro</option>
-                    <option value="Compliance">Compliance & Legal</option>
-                    <option value="Suporte e Operações">Suporte e Operações</option>
+                    {availableDepts.map(d => (
+                      <option key={d.id} value={d.id}>{d.name}</option>
+                    ))}
                   </select>
                 </div>
               </div>
 
-              {/* Status active/inactive checkbox */}
               <div className="flex items-center gap-2 p-1 pt-2">
                 <input
                   id="edit-user-active-checkbox"
@@ -477,15 +473,10 @@ export const AdminView: React.FC = () => {
                 <label htmlFor="edit-user-active-checkbox" className="text-xs font-bold text-slate-700 uppercase tracking-wider cursor-pointer">Definir como Utilizador Ativo</label>
               </div>
 
-              {/* Display respective simulated privileges */}
               <div className="p-3 bg-slate-50 rounded border border-slate-200 space-y-1">
                 <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">Privilégios da Role Selecionada:</span>
                 <p className="text-[10px] text-slate-500 leading-normal">
-                  {editingUser.role === 'admin' 
-                    ? 'Acesso irrestrito total para leitura, adição, deleção e painel de utilizadores.' 
-                    : editingUser.role === 'manager' 
-                      ? 'Capacidade total de leitura de arquivos RAG, uploads de novos manuais e alteração de canais integrados.' 
-                      : 'Direito padrão de leitura e discussões no chat GPT Enterprise do Workspace RAG.'}
+                  Permissões atribuídas a este perfil na base de dados.
                 </p>
               </div>
 

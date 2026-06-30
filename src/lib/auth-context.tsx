@@ -1,14 +1,6 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from './supabase';
-
-export interface Permission {
-  id: string;
-  name: string;
-  code: string;
-  description: string;
-}
 
 export interface UserProfile {
   id: string;
@@ -18,6 +10,9 @@ export interface UserProfile {
   department: string;
   active: boolean;
   permissions: string[];
+  company_id?: string;
+  role_id?: string;
+  department_id?: string;
 }
 
 interface AuthContextType {
@@ -26,6 +21,7 @@ interface AuthContextType {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any; profile?: UserProfile }>;
   signOut: () => Promise<void>;
+  refreshSession: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -35,124 +31,73 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const fetchProfile = async (userId: string, email: string) => {
+  const refreshSession = async () => {
     try {
-      const { data: storedUser, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      if (!error && storedUser) {
-        const permissionsMap: Record<'admin' | 'manager' | 'user', string[]> = {
-          admin: ["doc:view", "doc:upload", "doc:delete", "doc:manage_perms", "wiki:view", "wiki:generate", "integrations:manage", "users:manage"],
-          manager: ["doc:view", "doc:upload", "wiki:view", "wiki:generate", "integrations:manage"],
-          user: ["doc:view", "wiki:view"]
-        };
-
-        const activeRole = storedUser.role as 'admin' | 'manager' | 'user' || 'user';
+      setLoading(true);
+      const res = await fetch('/api/auth/me');
+      const data = await res.json();
+      
+      if (res.ok && data.user) {
+        const activeRole = data.user.role as 'admin' | 'manager' | 'user' || 'user';
+        const dynamicPermissions = Array.isArray(data.user.permissions) ? data.user.permissions : [];
 
         const loadedProfile: UserProfile = {
-          id: userId,
-          email: email,
-          fullName: storedUser.full_name || storedUser.email?.split('@')[0] || "Colaborador",
+          id: data.user.id,
+          email: data.user.email,
+          fullName: data.user.full_name || data.user.email?.split('@')[0] || "Colaborador",
           role: activeRole,
-          department: storedUser.department || "Geral",
-          active: storedUser.active !== false,
-          permissions: permissionsMap[activeRole] || ["doc:view"]
+          department: data.user.department || "Geral",
+          active: data.user.active !== false,
+          permissions: dynamicPermissions,
+          company_id: data.user.company_id,
+          role_id: data.user.role_id,
+          department_id: data.user.department_id
         };
         
+        setUser(data.user);
         setProfile(loadedProfile);
-      } else {
-        // Fallback for new users that might not have a profile generated yet
-        const defaultProfile: UserProfile = {
-          id: userId,
-          email: email,
-          fullName: email.split('@')[0],
-          role: 'user',
-          department: 'Suporte',
-          active: true,
-          permissions: ["doc:view", "wiki:view"]
-        };
-        setProfile(defaultProfile);
-      }
-    } catch (e) {
-      console.warn("Database profiles query error:", e);
-    }
-  };
-
-  useEffect(() => {
-    async function loadSession() {
-      try {
-        setLoading(true);
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (session?.user) {
-          setUser(session.user);
-          await fetchProfile(session.user.id, session.user.email || '');
-        } else {
-          setUser(null);
-          setProfile(null);
-        }
-      } catch (err) {
-        console.warn("Supabase Auth not available", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadSession();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
-        setUser(session.user);
-        await fetchProfile(session.user.id, session.user.email || '');
       } else {
         setUser(null);
         setProfile(null);
       }
+    } catch (err) {
+      setUser(null);
+      setProfile(null);
+    } finally {
       setLoading(false);
-    });
+    }
+  };
 
-    return () => {
-      subscription.unsubscribe();
-    };
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    refreshSession();
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
       });
-
-      if (error) {
-        throw error;
+      const data = await res.json();
+      
+      if (!res.ok) {
+        return { error: data.error || "Email ou palavra-passe incorretos" };
       }
 
-      if (data.user) {
-        setUser(data.user);
-        await fetchProfile(data.user.id, data.user.email || '');
-        // Profile will be available via state, but we return early
-        return { error: null };
-      }
-      return { error: "Sem utilizador retornado" };
+      await refreshSession();
+      return { error: null };
     } catch (err: any) {
-      console.error("Autenticação falhou:", err);
       return { error: err.message || "Email ou palavra-passe incorretos" };
-    } finally {
-      setLoading(false);
     }
   };
 
   const signOut = async () => {
     setLoading(true);
     try {
-      await supabase.auth.signOut();
-    } catch (e) {
-      console.warn("SignOut Supabase failed:", e);
-    }
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (e) {}
     setUser(null);
     setProfile(null);
     setLoading(false);
@@ -165,7 +110,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         profile,
         loading,
         signIn,
-        signOut
+        signOut,
+        refreshSession
       }}
     >
       {children}

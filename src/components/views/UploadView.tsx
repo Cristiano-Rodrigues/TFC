@@ -31,7 +31,6 @@ export const UploadView: React.FC = () => {
   const [uploadHistory, setUploadHistory] = useState<UploadHistoryItem[]>([]);
   const [selectedDept, setSelectedDept] = useState('Recursos Humanos');
 
-  // Verify RBAC permission (Can upload documents)
   const canUpload = profile?.permissions.includes('doc:upload') || profile?.role === 'admin' || profile?.role === 'manager';
 
   if (!canUpload) {
@@ -81,9 +80,9 @@ export const UploadView: React.FC = () => {
       const sizeStr = file.size > 1024 * 1024
         ? (file.size / (1024 * 1024)).toFixed(1) + " MB"
         : (file.size / 1024).toFixed(0) + " KB";
-      
+
       arr.push({
-        id: `file-${Date.now()}-${i}`,
+        id: `file-${crypto.randomUUID()}-${i}`,
         name: file.name,
         size: sizeStr,
         type: file.name.split('.').pop()?.toUpperCase() || 'TXT',
@@ -96,9 +95,7 @@ export const UploadView: React.FC = () => {
     setQueuedFiles(prev => [...prev, ...arr]);
   };
 
-  // Triggering ingestion vector simulation
   const startIngestionPipeline = async (id: string) => {
-    // 1. Updating State visually
     setQueuedFiles(prev => prev.map(f => {
       if (f.id === id) return { ...f, status: 'Enviando', progress: 50 };
       return f;
@@ -125,9 +122,8 @@ export const UploadView: React.FC = () => {
         return f;
       }));
 
-      // Adicionar ao histórico
       const hist: UploadHistoryItem = {
-        id: `hist-${Date.now()}`,
+        id: `hist-${crypto.randomUUID()}`,
         name: fileObj.name,
         size: fileObj.size,
         category: fileObj.department,
@@ -150,8 +146,7 @@ export const UploadView: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      
-      {/* Header */}
+
       <div className="pb-4 border-b border-slate-200">
         <h1 id="upload-title" className="text-2xl font-semibold text-slate-900 tracking-tight">Ingestão de Documentos</h1>
         <p className="text-sm text-slate-500 mt-1">
@@ -160,12 +155,10 @@ export const UploadView: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* Main drop zone and queue */}
+
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white p-5 border border-slate-200 rounded-lg space-y-4">
-            
-            {/* Dept tag selection before drag */}
+
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 border-b border-slate-100 gap-3">
               <div>
                 <span className="text-xs font-bold text-[#1e293b] uppercase tracking-wider block">Área de Indexação Destino</span>
@@ -185,18 +178,16 @@ export const UploadView: React.FC = () => {
               </select>
             </div>
 
-            {/* Drag or choose box visual stage */}
             <div
               id="upload-dropzone"
               onDragEnter={handleDrag}
               onDragOver={handleDrag}
               onDragLeave={handleDrag}
               onDrop={handleDrop}
-              className={`border-2 border-dashed rounded-lg p-12 text-center transition-all ${
-                dragActive
-                  ? 'border-blue-500 bg-blue-50/20'
-                  : 'border-slate-300 hover:border-slate-400 bg-slate-50/25'
-              }`}
+              className={`border-2 border-dashed rounded-lg p-12 text-center transition-all ${dragActive
+                ? 'border-blue-500 bg-blue-50/20'
+                : 'border-slate-300 hover:border-slate-400 bg-slate-50/25'
+                }`}
             >
               <input
                 id="file-input-manual"
@@ -221,11 +212,10 @@ export const UploadView: React.FC = () => {
             </div>
           </div>
 
-          {/* Upload Queue list representing vectors parser */}
           {queuedFiles.length > 0 && (
             <div className="bg-white border border-slate-200 rounded-lg p-5 space-y-4">
               <h3 className="text-xs font-bold text-[#1e293b] uppercase tracking-wider">Fila de Registro de IA</h3>
-              
+
               <div className="divide-y divide-slate-100">
                 {queuedFiles.map((file) => (
                   <div key={file.id} className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 first:pt-0 last:pb-0">
@@ -241,7 +231,6 @@ export const UploadView: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Simulating process layout */}
                     <div className="flex items-center gap-3 shrink-0">
                       {file.status === 'Pendente' && (
                         <button
@@ -291,7 +280,6 @@ export const UploadView: React.FC = () => {
           )}
         </div>
 
-        {/* Right margin panel upload history logs */}
         <div className="space-y-4">
           <div className="bg-white border border-slate-200 rounded-lg p-4">
             <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider pb-2 border-b border-slate-100 mb-3 flex items-center gap-2">

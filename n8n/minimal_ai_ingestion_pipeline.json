@@ -99,6 +99,10 @@
             {
               "fieldId": "embedding",
               "fieldValue": "={{ $json.embeddings[0] }}"
+            },
+            {
+              "fieldId": "document_id",
+              "fieldValue": "={{ $('Upload webhook').first().json.body.document_id }}"
             }
           ]
         }
@@ -225,7 +229,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nlet context = \"\";\n\nif (items.length > 0) {\n  context = items.map((item, index) => {\n    let text = \"\";\n    if (typeof item.json === 'string') text = item.json;\n    else text = item.json.value || item.json.content || JSON.stringify(item.json);\n    return `[Trecho ${index + 1}]:\\n${text}`;\n  }).join('\\n\\n---\\n\\n');\n}\n\nconst query = $(\"Format_Data_For_Search_Final\").first().json.query;\n\nreturn [{\n  cohereBody: {\n    model: \"command-a-03-2025\",\n    message: `Pergunta: ${query}`,\n    preamble: `És um assistente preciso e analítico. Responde APENAS com base no contexto fornecido abaixo. Se a resposta não estiver no contexto, diz que não sabes.\\n\\nATENÇÃO: O contexto abaixo é formado por múltiplos fragmentos de documentos completamente diferentes e independentes (ex: apontamentos de aulas vs. estudos religiosos). NÃO mistures os temas nem assumas que pertencem ao mesmo texto. Lê atentamente e separa os conceitos.\\n\\nContexto:\\n${context || \"Nenhum documento relevante encontrado.\"}`,\n    temperature: 0.2\n  }\n}];"
+        "jsCode": "const items = $input.all();\nlet context = \"\";\n\nif (items.length > 0) {\n  context = items.map((item, index) => {\n    let text = item.json.content || \"\";\n    let filename = item.json.filename || \"Desconhecido\";\n    return `[Fonte: ${filename}]:\\n${text}`;\n  }).join('\\n\\n---\\n\\n');\n}\n\nconst query = $(\"Format_Data_For_Search_Final\").first().json.query;\n\nreturn [{\n  cohereBody: {\n    model: \"command-a-03-2025\",\n    message: `Pergunta: ${query}`,\n    preamble: `És um assistente preciso e analítico. Responde APENAS com base no contexto fornecido abaixo. Se a resposta não estiver no contexto, diz que não sabes.\\n\\nATENÇÃO: O contexto abaixo é formado por múltiplos fragmentos de documentos. Cada fragmento começa com [Fonte: Nome_do_Ficheiro]. Na tua resposta, deves sempre referenciar as fontes utilizadas indicando o nome do ficheiro (ex: \"De acordo com o ficheiro X...\").\\n\\nContexto:\\n${context || \"Nenhum documento relevante encontrado.\"}`,\n    temperature: 0.2\n  }\n}];"
       },
       "id": "a6a920e7-b6ff-4b35-b2a9-621302206fec",
       "name": "Final_Context_Assembler",

@@ -102,15 +102,24 @@ CREATE TABLE IF NOT EXISTS public.ai_chat_messages (
 );
 
 -- 3. Create Search Function (match_chunks)
-CREATE OR REPLACE FUNCTION public.match_chunks(p_embedding vector, p_threshold double precision, p_count integer)
- RETURNS SETOF text
+DROP FUNCTION IF EXISTS public.match_chunks(vector, double precision, integer);
+
+CREATE FUNCTION public.match_chunks(p_embedding vector, p_threshold double precision, p_count integer)
+ RETURNS TABLE (
+   content text,
+   filename text,
+   document_id uuid
+ )
  LANGUAGE plpgsql
 AS $function$
 begin
   return query
   select
-    chunks.content
+    chunks.content,
+    documents.filename,
+    documents.id as document_id
   from chunks
+  join documents on documents.id = chunks.document_id
   where 1 - (chunks.embedding <=> p_embedding) > p_threshold
   order by (1 - (chunks.embedding <=> p_embedding)) desc
   limit p_count;

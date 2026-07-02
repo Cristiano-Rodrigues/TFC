@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { UploadCloud, FileText, CheckCircle2, AlertCircle, RefreshCw, Trash2, ShieldAlert, History, FolderKanban, FileSpreadsheet, Loader2, Play } from 'lucide-react';
+import { UploadCloud, FileText, CheckCircle2, AlertCircle, RefreshCw, Trash2, ShieldAlert, History, Loader2, Play } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 
 interface QueuedFile {
@@ -107,20 +107,34 @@ export const UploadView: React.FC = () => {
     try {
       const formData = new FormData();
       formData.append('file', fileObj.file);
+      formData.append('department', fileObj.department);
 
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
       });
 
+      const result = await response.json();
+
       if (!response.ok) {
-        throw new Error("Upload failed");
+        throw new Error(result.details || result.error || "Upload falhou");
       }
 
+      const finalStatus = result.n8n_triggered ? 'Processando IA' : 'Concluído';
+
       setQueuedFiles(prev => prev.map(f => {
-        if (f.id === id) return { ...f, status: 'Concluído', progress: 100 };
+        if (f.id === id) return { ...f, status: finalStatus, progress: 100 };
         return f;
       }));
+
+      if (result.n8n_triggered) {
+        setTimeout(() => {
+          setQueuedFiles(prev => prev.map(f => {
+            if (f.id === id) return { ...f, status: 'Concluído' };
+            return f;
+          }));
+        }, 8000);
+      }
 
       const hist: UploadHistoryItem = {
         id: `hist-${crypto.randomUUID()}`,
@@ -132,7 +146,8 @@ export const UploadView: React.FC = () => {
       };
       setUploadHistory(historyPrev => [hist, ...historyPrev]);
 
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Upload error:', error);
       setQueuedFiles(prev => prev.map(f => {
         if (f.id === id) return { ...f, status: 'Falhado', progress: 0 };
         return f;

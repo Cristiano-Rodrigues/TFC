@@ -58,6 +58,11 @@ CREATE TABLE IF NOT EXISTS public.users (
 
 CREATE TABLE IF NOT EXISTS public.documents (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    filename TEXT NOT NULL,
+    storage_path TEXT,
+    file_size BIGINT,
+    mime_type TEXT,
+    n8n_status TEXT DEFAULT 'pending',
     created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now(),
     uploaded_by UUID REFERENCES public.users(id) ON DELETE SET NULL,
     department_id UUID REFERENCES public.departments(id) ON DELETE SET NULL,

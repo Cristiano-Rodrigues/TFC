@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Search, FileText, Download, Trash2, Shield, RefreshCw, Eye, X, Filter, FileCode, CheckCircle2, AlertCircle, ShieldCheck, ChevronRight, HelpCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, FileText, Trash2, Shield, RefreshCw, Eye, X, AlertCircle, ShieldCheck } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 
 interface DocBase {
@@ -17,31 +17,66 @@ interface DocBase {
   source: 'Local Upload' | 'Slack Integration' | 'Gmail Sync' | 'Google Drive';
 }
 
-const INITIAL_DOCS: DocBase[] = [];
-
 export const DocumentsView: React.FC = () => {
   const { profile } = useAuth();
-  
-  const [documents, setDocuments] = useState<DocBase[]>(INITIAL_DOCS);
+
+  const [documents, setDocuments] = useState<DocBase[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedDoc, setSelectedDoc] = useState<DocBase | null>(null);
+
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch('/api/documents');
+        if (!res.ok) return;
+        const { documents: rawDocs } = await res.json();
+
+        const mapped: DocBase[] = (rawDocs || []).map((d: any) => {
+          const ext = d.filename?.split('.').pop()?.toUpperCase() || 'TXT';
+          const type = (['PDF', 'DOCX', 'TXT', 'XLSX'].includes(ext) ? ext : 'TXT') as DocBase['type'];
+          const indexState: DocBase['indexingState'] =
+            d.n8n_status === 'done' ? 'Indexado'
+            : d.n8n_status === 'processing' ? 'Em Processamento'
+            : 'Não Indexado';
+
+          return {
+            id: d.id,
+            name: d.filename,
+            type,
+            department: d.metadata?.department || 'Geral',
+            updatedAt: d.created_at?.split('T')[0] || '',
+            indexingState: indexState,
+            allowedRoles: ['admin', 'manager', 'user'],
+            content: '',
+            highlightedClasue: '',
+            source: 'Local Upload' as const,
+          };
+        });
+
+        setDocuments(mapped);
+      } catch (err) {
+        console.error('Failed to load documents:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDocuments();
+  }, []);
   
-  // Modals status
   const [permissionsModalDoc, setPermissionsModalDoc] = useState<DocBase | null>(null);
   const [updatingPermsRole, setUpdatingPermsRole] = useState<('admin' | 'manager' | 'user')[]>([]);
 
-  // Filtering controls
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('Todos');
   const [deptFilter, setDeptFilter] = useState('Todos');
   const [sourceFilter, setSourceFilter] = useState('Todos');
 
-  // RBAC Permissions check
   const canDelete = profile?.permissions.includes('doc:delete') || profile?.role === 'admin';
   const canManagePerms = profile?.permissions.includes('doc:manage_perms') || profile?.role === 'admin';
 
-  // Filters application
   const filteredDocs = documents.filter(doc => {
-    // Audit document access with RBAC
     const userRole = profile?.role || 'user';
     const isAllowed = doc.allowedRoles.includes(userRole as any) || userRole === 'admin';
     if (!isAllowed) return false;
@@ -64,7 +99,6 @@ export const DocumentsView: React.FC = () => {
   };
 
   const handleReindex = (id: string) => {
-    // Simulate updating index
     setDocuments(prev => prev.map(d => {
       if (d.id === id) {
         return { ...d, indexingState: 'Em Processamento' };
@@ -99,7 +133,7 @@ export const DocumentsView: React.FC = () => {
   };
 
   const toggleAuthRoleInModal = (role: 'admin' | 'manager' | 'user') => {
-    if (role === 'admin') return; // Admin is always allowed
+    if (role === 'admin') return;
     setUpdatingPermsRole(prev => 
       prev.includes(role) ? prev.filter(r => r !== role) : [...prev, role]
     );
@@ -197,7 +231,14 @@ export const DocumentsView: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-medium">
-                {filteredDocs.length > 0 ? (
+                {loading ? (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-12 text-center text-slate-400 bg-slate-50/50">
+                      <RefreshCw className="h-4 w-4 animate-spin mx-auto mb-2" />
+                      <span className="text-xs">A carregar documentos...</span>
+                    </td>
+                  </tr>
+                ) : filteredDocs.length > 0 ? (
                   filteredDocs.map((doc) => (
                     <tr
                       id={`doc-row-${doc.id}`}

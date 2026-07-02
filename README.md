@@ -20,7 +20,8 @@ A pessoa que vai testar o projeto deve seguir estes passos:
 2. No painel do projeto Supabase, aceder ao **SQL Editor** (no menu lateral esquerdo).
 3. Criar uma nova query, colar todo o conteúdo do ficheiro `supabase/schema.sql` e clicar em **Run**.
    * *Isto ativará a extensão `vector`, criará todas as tabelas necessárias para o modelo SaaS Multi-Tenant e inserirá as permissões por defeito.*
-4. Aceder a **Project Settings > API** e recolher o **Project URL** e a **anon public / publishable key**.
+4. Aceder a **Project Settings > API** e recolher o **Project URL**, a **anon public / publishable key** e a **service_role secret**. Esta última é vital para que o nosso backend consiga fazer upload de ficheiros para a cloud contornando as restrições normais de segurança (RLS).
+5. Aceder ao menu **Storage** (no menu lateral esquerdo), e criar um novo bucket chamado `rag_documents` (pode deixá-lo público ou privado, conforme a necessidade). Sem isto os uploads de documentos irão falhar.
 
 > [!WARNING]
 > **Nota de Segurança sobre RLS (Row Level Security):**
@@ -70,6 +71,7 @@ O n8n é o motor que processa os uploads de ficheiros, gera os embeddings com a 
    ```env
    NEXT_PUBLIC_SUPABASE_URL=https://<NOVO_PROJECT_REF>.supabase.co
    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
+   SUPABASE_SERVICE_ROLE_KEY=sua_service_role_key...
    N8N_WEBHOOK_URL=http://localhost:5678/webhook
    ```
    *(Nota: Se o n8n estiver a correr localmente, manter `http://localhost:5678/webhook`. Se estiver online, usar o URL de produção do n8n sem a parte do `/upload` ou `/query`, já que o código concatena estes caminhos dinamicamente).*

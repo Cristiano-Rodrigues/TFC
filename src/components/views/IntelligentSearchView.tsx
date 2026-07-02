@@ -1,32 +1,76 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Sparkles, Send, FileText, Info, ArrowRight, ExternalLink, HelpCircle, CornerDownLeft, Eye, RefreshCcw } from 'lucide-react';
+import { Sparkles, Send, FileText, Info, Eye } from 'lucide-react';
+
+interface Source {
+  category: string;
+  title: string;
+  updatedAt: string;
+  snippet: string;
+}
 
 interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
   content: string;
-  sources?: any[];
+  sources?: Source[];
+  is_error?: boolean;
   timestamp: string;
 }
 
-export const IntelligentSearchView: React.FC = () => {
+interface IntelligentSearchViewProps {
+  sessionId?: string | null;
+  onSessionChange?: (id: string) => void;
+  onSessionCreated?: () => void;
+}
+
+export const IntelligentSearchView: React.FC<IntelligentSearchViewProps> = ({ sessionId, onSessionChange, onSessionCreated }) => {
   const [query, setQuery] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: "welcome",
-      role: "assistant",
-      content: "Olá! Eu sou o assistente de pesquisa inteligente corporativo (RAG). Procuro respostas concretas diretamente nas vossas diretrizes organizacionais, regulamentos de TI, códigos de ética e manuais cadastrados.\n\nExperimente fazer uma pergunta para iniciar a pesquisa.",
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    }
-  ]);
-  const [selectedSource, setSelectedSource] = useState<any | null>(null);
+  const welcomeMessage: ChatMessage = React.useMemo(() => ({
+    id: "welcome",
+    role: "assistant",
+    content: "Olá! Eu sou o assistente de pesquisa inteligente corporativo (RAG). Procuro respostas concretas diretamente nas vossas diretrizes organizacionais, regulamentos de TI, códigos de ética e manuais cadastrados.\n\nExperimente fazer uma pergunta para iniciar a pesquisa.",
+    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  }), []);
+
+  const [messages, setMessages] = useState<ChatMessage[]>([welcomeMessage]);
+  const [selectedSource, setSelectedSource] = useState<Source | null>(null);
+
+  useEffect(() => {
+    const fetchSessionMessages = async () => {
+      if (sessionId) {
+        setIsSubmitting(true);
+        try {
+          const res = await fetch(`/api/chat/messages?sessionId=${sessionId}`);
+          const data = await res.json();
+          if (res.ok && data.messages && data.messages.length > 0) {
+            setMessages(data.messages.map((m: Record<string, unknown>) => ({
+              id: m.id,
+              role: m.role,
+              content: m.content,
+              sources: m.sources,
+              is_error: m.is_error,
+              timestamp: new Date(m.created_at as string).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            })));
+          } else {
+            setMessages([welcomeMessage]);
+          }
+        } catch (err) {
+          console.error("Erro ao buscar mensagens", err);
+        } finally {
+          setIsSubmitting(false);
+        }
+      } else {
+        setMessages([welcomeMessage]);
+      }
+    };
+    fetchSessionMessages();
+  }, [sessionId, welcomeMessage]);
 
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
-  // Auto scroll
   useEffect(() => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
@@ -43,15 +87,43 @@ export const IntelligentSearchView: React.FC = () => {
     setQuery('');
     setIsSubmitting(true);
 
-    const userMsg: ChatMessage = {
-      id: `user-${Date.now()}`,
-      role: "user",
-      content: userText,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
-    setMessages(prev => [...prev, userMsg]);
+    let currentSessionId = sessionId;
 
     try {
+      if (!currentSessionId) {
+        const titleRes = await fetch('/api/chat/sessions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: userText.substring(0, 40) + (userText.length > 40 ? '...' : '') })
+        });
+        const titleData = await titleRes.json();
+        if (titleData.session) {
+          currentSessionId = titleData.session.id as string;
+          if (onSessionChange) onSessionChange(currentSessionId as string);
+          if (onSessionCreated) onSessionCreated();
+        }
+      }
+
+      if (currentSessionId) {
+        await fetch('/api/chat/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId: currentSessionId,
+            role: 'user',
+            content: userText
+          })
+        });
+      }
+
+      const userMsg: ChatMessage = {
+        id: `user-${Date.now()}`,
+        role: "user",
+        content: userText,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      setMessages(prev => [...prev, userMsg]);
+
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -59,22 +131,55 @@ export const IntelligentSearchView: React.FC = () => {
       });
 
       const data = await response.json();
+      const isError = !response.ok;
+      const finalContent = data.answer || (isError ? "Desculpe, tive dificuldades para formular uma resposta no momento." : "Sem resposta.");
+
+      if (currentSessionId) {
+        await fetch('/api/chat/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId: currentSessionId,
+            role: 'assistant',
+            content: finalContent,
+            sources: data.sources || [],
+            is_error: isError
+          })
+        });
+      }
 
       const assistantMsg: ChatMessage = {
         id: `ai-${Date.now()}`,
         role: "assistant",
-        content: data.answer || "Desculpe, tive dificuldades para formular uma resposta no momento.",
+        content: finalContent,
         sources: data.sources || [],
+        is_error: isError,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
 
       setMessages(prev => [...prev, assistantMsg]);
     } catch (err) {
       console.error("RAG Error:", err);
+      const errorContent = "Lamento, ocorreu um erro de comunicação com o servidor de Inteligência Artificial de retaguarda. Por favor, tente novamente de seguida.";
+      
+      if (currentSessionId) {
+        await fetch('/api/chat/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId: currentSessionId,
+            role: 'assistant',
+            content: errorContent,
+            is_error: true
+          })
+        });
+      }
+
       const errorMsg: ChatMessage = {
         id: `ai-err-${Date.now()}`,
         role: "assistant",
-        content: "Lamento, ocorreu um erro de comunicação com o servidor de Inteligência Artificial de retaguarda. Por favor, tente novamente de seguida.",
+        content: errorContent,
+        is_error: true,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, errorMsg]);
@@ -83,16 +188,14 @@ export const IntelligentSearchView: React.FC = () => {
     }
   };
 
-  const handleViewSourcePreview = (source: any) => {
+  const handleViewSourcePreview = (source: Source) => {
     setSelectedSource(source);
   };
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-4 h-[calc(100vh-140px)] border border-slate-200 rounded-lg overflow-hidden bg-white shadow-xs">
       
-      {/* Left Chat/Results Panel */}
       <div className="xl:col-span-3 flex flex-col h-full bg-slate-50/50 border-r border-slate-200 relative overflow-hidden">
-        {/* Toggle Mode */}
         <div className="flex items-center justify-between px-5 py-3.5 bg-white border-b border-slate-200 shrink-0">
           <div className="flex items-center gap-2">
             <Sparkles className="h-4.5 w-4.5 text-blue-600" />
@@ -100,7 +203,6 @@ export const IntelligentSearchView: React.FC = () => {
           </div>
         </div>
 
-        {/* Dynamic Mode Area */}
         <div id="workspace-search-container" ref={messagesContainerRef} className="flex-1 overflow-y-auto p-5 space-y-4 min-h-0">
             <div className="space-y-6">
               {messages.map((message) => (
@@ -113,19 +215,16 @@ export const IntelligentSearchView: React.FC = () => {
                       ? 'bg-slate-100 border-slate-200 text-slate-800 rounded-br-none'
                       : 'bg-white border-slate-100 text-slate-800 rounded-bl-none'
                   }`}>
-                    {/* Role Header */}
                     <div className="flex items-center gap-2 mb-2 text-[10px] font-bold tracking-wider uppercase opacity-60">
                       {message.role === 'user' ? "O Seu Pedido" : "Resposta RAG Intel"}
                       <span>•</span>
                       <span>{message.timestamp}</span>
                     </div>
 
-                    {/* Rich text markdown answer */}
-                    <div className="text-xs md:text-sm leading-relaxed space-y-2 whitespace-pre-line text-slate-800">
+                    <div className={`text-xs md:text-sm leading-relaxed space-y-2 whitespace-pre-line ${message.is_error ? 'text-red-600 font-medium' : 'text-slate-800'}`}>
                       {message.content}
                     </div>
 
-                    {/* Cited sources row if prompt is by assistant */}
                     {message.role === 'assistant' && message.sources && message.sources.length > 0 && (
                       <div className="mt-4 pt-3.5 border-t border-slate-100 space-y-2">
                         <span className="text-[10px] font-bold text-slate-450 uppercase tracking-widest block">
@@ -165,7 +264,6 @@ export const IntelligentSearchView: React.FC = () => {
             </div>
         </div>
 
-        {/* Input box docked below */}
         <div className="p-4 bg-white border-t border-slate-205 shrink-0">
           <form id="search-input-form" onSubmit={handleSearchSubmit} className="relative flex items-center bg-slate-50 border border-slate-205 focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/10 rounded-lg p-1 transition-all">
             <input
@@ -192,7 +290,6 @@ export const IntelligentSearchView: React.FC = () => {
         </div>
       </div>
 
-      {/* Right Drawer Panel with Context Preview */}
       <div className="hidden xl:flex flex-col h-full bg-white relative">
         <div className="px-4 py-4 border-b border-slate-200">
           <h3 className="text-xs font-extrabold text-slate-900 uppercase tracking-widest">Documento e Contexto RAG</h3>

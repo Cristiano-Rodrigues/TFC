@@ -19,37 +19,50 @@ import {
   BookOpen,
   FileText,
   UploadCloud,
-  Layers,
   Users,
   UserCircle,
   Menu,
   X,
   Network,
   LogOut,
-  ShieldCheck,
   Building,
-  Loader2,
-  RefreshCw,
-  Clock
+  Loader2
 } from 'lucide-react';
 
 export default function Home() {
   const { user, profile, loading, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [currentTime, setCurrentTime] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const [chatSessions, setChatSessions] = useState<any[]>([]);
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+
+  const fetchChatSessions = async () => {
+    try {
+      const res = await fetch('/api/chat/sessions');
+      const data = await res.json();
+      if (res.ok && data.sessions) {
+        setChatSessions(data.sessions);
+      }
+    } catch (err) {
+      console.error("Erro ao carregar sessões de chat", err);
     }
-    return '';
-  });
+  };
 
   useEffect(() => {
-    const t = setInterval(() => {
-      setCurrentTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-    }, 30000);
-    return () => clearInterval(t);
-  }, []);
+    if (user && activeTab === 'search') {
+      const load = async () => { await fetchChatSessions(); };
+      load();
+    }
+  }, [user, activeTab]);
+
+  useEffect(() => {
+    if (!user) {
+      setChatSessions([]);
+      setActiveSessionId(null);
+      setIsSearchExpanded(false);
+    }
+  }, [user]);
 
   if (loading) {
     return (
@@ -147,29 +160,78 @@ export default function Home() {
             if (!matchesRole) return null;
 
             const isSelected = targetTab === item.id;
+            const isSearch = item.id === 'search';
             return (
-              <button
-                id={`sidebar-link-${item.id}`}
-                key={item.id}
-                onClick={() => { setActiveTab(item.id); }}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-md text-xs font-medium cursor-pointer transition-all ${
-                  isSelected
-                    ? 'bg-blue-50 text-blue-700 font-semibold shadow-2xs'
-                    : 'hover:bg-slate-50 text-slate-600 hover:text-slate-800'
-                }`}
-              >
-                <div className="flex items-center gap-2.5">
-                  <item.icon className={`h-4.5 w-4.5 ${isSelected ? 'text-blue-600' : 'text-slate-400'}`} />
-                  <span>{item.label}</span>
-                </div>
-                {item.badge && (
-                  <span className={`inline-block text-[8px] font-bold px-1.5 py-0.2 rounded uppercase tracking-wider ${
-                    isSelected ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-500'
-                  }`}>
-                    {item.badge}
-                  </span>
+              <div key={item.id} className="w-full">
+                <button
+                  id={`sidebar-link-${item.id}`}
+                  onClick={() => { 
+                    if (isSearch) {
+                      if (targetTab === item.id) {
+                        setIsSearchExpanded(!isSearchExpanded);
+                      } else {
+                        setActiveTab(item.id);
+                        setIsSearchExpanded(true);
+                      }
+                    } else {
+                      setActiveTab(item.id); 
+                    }
+                  }}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-md text-xs font-medium cursor-pointer transition-all ${
+                    isSelected && !isSearch
+                      ? 'bg-blue-50 text-blue-700 font-semibold shadow-2xs'
+                      : isSelected && isSearch
+                      ? 'bg-blue-50 text-blue-700 font-semibold shadow-2xs'
+                      : 'hover:bg-slate-50 text-slate-600 hover:text-slate-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <item.icon className={`h-4.5 w-4.5 ${isSelected ? 'text-blue-600' : 'text-slate-400'}`} />
+                    <span>{item.label}</span>
+                  </div>
+                  {item.badge && (
+                    <span className={`inline-block text-[8px] font-bold px-1.5 py-0.2 rounded uppercase tracking-wider ${
+                      isSelected ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-500'
+                    }`}>
+                      {item.badge}
+                    </span>
+                  )}
+                </button>
+                {isSearch && isSearchExpanded && (
+                  <div className="mt-1 ml-4 border-l-2 border-slate-100 pl-2 space-y-1 mb-2">
+                    <button
+                      onClick={() => {
+                         setActiveTab('search');
+                         setActiveSessionId(null);
+                      }}
+                      className={`w-full text-left px-2 py-1.5 rounded-md text-[11px] font-medium transition-colors ${
+                        activeSessionId === null 
+                          ? 'bg-slate-100 text-blue-600 font-semibold' 
+                          : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      + Nova Conversa
+                    </button>
+                    {chatSessions.map((session) => (
+                      <button
+                        key={session.id}
+                        onClick={() => {
+                           setActiveTab('search');
+                           setActiveSessionId(session.id);
+                        }}
+                        className={`w-full text-left px-2 py-1.5 rounded-md text-[11px] truncate transition-colors block ${
+                          activeSessionId === session.id
+                            ? 'bg-slate-100 text-blue-600 font-semibold'
+                            : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+                        }`}
+                        title={session.title}
+                      >
+                        {session.title || 'Conversa sem título'}
+                      </button>
+                    ))}
+                  </div>
                 )}
-              </button>
+              </div>
             );
           })}
         </nav>
@@ -234,7 +296,7 @@ export default function Home() {
 
         <main className="flex-1 p-5 md:p-6 overflow-y-auto">
           {targetTab === 'dashboard' && <DashboardView onNavigate={(tab) => { setActiveTab(tab); }} />}
-          {targetTab === 'search' && <IntelligentSearchView />}
+          {targetTab === 'search' && <IntelligentSearchView sessionId={activeSessionId} onSessionChange={setActiveSessionId} onSessionCreated={fetchChatSessions} />}
           {targetTab === 'wiki' && <WikiView />}
           {targetTab === 'documents' && <DocumentsView />}
           {targetTab === 'upload' && <UploadView />}
@@ -268,24 +330,71 @@ export default function Home() {
                 if (!matchesRole) return null;
 
                 const isSelected = targetTab === item.id;
+                const isSearch = item.id === 'search';
                 return (
-                  <button
-                    key={item.id}
-                    onClick={() => {
-                      setActiveTab(item.id);
-                      setMobileMenuOpen(false);
-                    }}
-                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-md text-xs font-medium cursor-pointer transition-all ${
-                      isSelected
-                        ? 'bg-blue-50 text-blue-700 font-semibold'
-                        : 'hover:bg-slate-50 text-slate-600 hover:text-slate-800'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <item.icon className={`h-4.5 w-4.5 ${isSelected ? 'text-blue-600' : 'text-slate-400'}`} />
-                      <span>{item.label}</span>
-                    </div>
-                  </button>
+                  <div key={item.id} className="w-full">
+                    <button
+                      onClick={() => {
+                        if (isSearch) {
+                          if (targetTab === item.id) {
+                            setIsSearchExpanded(!isSearchExpanded);
+                          } else {
+                            setActiveTab(item.id);
+                            setIsSearchExpanded(true);
+                          }
+                        } else {
+                          setActiveTab(item.id);
+                          setMobileMenuOpen(false);
+                        }
+                      }}
+                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-md text-xs font-medium cursor-pointer transition-all ${
+                        isSelected
+                          ? 'bg-blue-50 text-blue-700 font-semibold'
+                          : 'hover:bg-slate-50 text-slate-600 hover:text-slate-800'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <item.icon className={`h-4.5 w-4.5 ${isSelected ? 'text-blue-600' : 'text-slate-400'}`} />
+                        <span>{item.label}</span>
+                      </div>
+                    </button>
+                    {isSearch && isSearchExpanded && (
+                      <div className="mt-1 ml-4 border-l-2 border-slate-100 pl-2 space-y-1 mb-2">
+                        <button
+                          onClick={() => {
+                            setActiveTab('search');
+                            setActiveSessionId(null);
+                            setMobileMenuOpen(false);
+                          }}
+                          className={`w-full text-left px-2 py-1.5 rounded-md text-[11px] font-medium transition-colors ${
+                            activeSessionId === null 
+                              ? 'bg-slate-100 text-blue-600 font-semibold' 
+                              : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+                          }`}
+                        >
+                          + Nova Conversa
+                        </button>
+                        {chatSessions.map((session) => (
+                          <button
+                            key={session.id}
+                            onClick={() => {
+                              setActiveTab('search');
+                              setActiveSessionId(session.id);
+                              setMobileMenuOpen(false);
+                            }}
+                            className={`w-full text-left px-2 py-1.5 rounded-md text-[11px] truncate transition-colors block ${
+                              activeSessionId === session.id
+                                ? 'bg-slate-100 text-blue-600 font-semibold'
+                                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+                            }`}
+                            title={session.title}
+                          >
+                            {session.title || 'Conversa sem título'}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 );
               })}
             </nav>

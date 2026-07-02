@@ -78,6 +78,24 @@ CREATE TABLE IF NOT EXISTS public.chunks (
     embedding vector(1024)
 );
 
+CREATE TABLE IF NOT EXISTS public.ai_chat_sessions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+    title TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS public.ai_chat_messages (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    session_id UUID REFERENCES public.ai_chat_sessions(id) ON DELETE CASCADE,
+    role TEXT NOT NULL CHECK (role IN ('user', 'assistant')),
+    content TEXT NOT NULL,
+    sources JSONB,
+    is_error BOOLEAN DEFAULT false,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
 -- 3. Create Search Function (match_chunks)
 CREATE OR REPLACE FUNCTION public.match_chunks(p_embedding vector, p_threshold double precision, p_count integer)
  RETURNS SETOF text

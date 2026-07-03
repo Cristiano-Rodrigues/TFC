@@ -1,12 +1,12 @@
 {
-  "name": "Minimal AI Ingestion Pipeline",
+  "name": "Minimal AI Ingestion Pipeline (v2)",
   "nodes": [
     {
       "parameters": {
         "operation": "text",
         "options": {}
       },
-      "id": "extract-1",
+      "id": "c999cce5-ec7a-4886-ad21-f93786db1fed",
       "name": "Extract Text",
       "position": [
         208,
@@ -20,7 +20,7 @@
         "mode": "runOnceForEachItem",
         "jsCode": "const text = $json.data || JSON.stringify($json);\nreturn { text };"
       },
-      "id": "code-1",
+      "id": "e2ebb4d1-8765-4be7-a679-e9b0669e7bdf",
       "name": "Normalize Text",
       "position": [
         400,
@@ -31,9 +31,9 @@
     },
     {
       "parameters": {
-        "jsCode": "const text = $json.text;\nconst size = 500;\n\nlet chunks = [];\n\nfor (let i = 0; i < text.length; i += size) {\n  chunks.push({\n    pageContent: text.slice(i, i + size)\n  });\n}\n\nreturn chunks;"
+        "jsCode": "const text = $json.text || '';\nconst webhookData = $('Upload webhook').first().json || {};\nconst document_id = webhookData.body?.document_id || webhookData.document_id || null;\n// The file name is usually in binary metadata, but let's try to get it if passed or default to Desconhecido\nconst filename = webhookData.body?.filename || webhookData.filename || 'Desconhecido';\n\nconst size = 500;\nlet chunks = [];\n\nfor (let i = 0; i < text.length; i += size) {\n  chunks.push({\n    pageContent: text.slice(i, i + size),\n    document_id: document_id,\n    metadata: {\n      filename: filename\n    }\n  });\n}\n\nreturn chunks;"
       },
-      "id": "code-2",
+      "id": "2cf21e6c-26df-4ef0-9c1c-0f38c7003014",
       "name": "Chunking Node",
       "position": [
         608,
@@ -47,7 +47,7 @@
         "batchSize": 1,
         "options": {}
       },
-      "id": "split-1",
+      "id": "c1d35f90-e467-4d8c-98c9-f464af9388f5",
       "name": "Split In Batches",
       "position": [
         816,
@@ -65,7 +65,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer YOUR_COHERE_API_KEY"
+              "value": "Bearer lNKEGwRiOGNC2zaKOHIpCzz0IDiOPzUOIYq3VTiG"
             },
             {
               "name": "Content-Type",
@@ -78,7 +78,7 @@
         "jsonBody": "={{ JSON.stringify({ texts: [$json.pageContent], model: \"embed-multilingual-v3.0\", input_type: \"search_document\" }) }}\n\n",
         "options": {}
       },
-      "id": "cohere-1",
+      "id": "cb3ecfdb-d037-407a-a312-f1a6c46399a5",
       "name": "Cohere Embeddings",
       "position": [
         1008,
@@ -102,12 +102,12 @@
             },
             {
               "fieldId": "document_id",
-              "fieldValue": "={{ $('Upload webhook').first().json.body.document_id }}"
+              "fieldValue": "={{ $('Split In Batches').item.json.document_id }}"
             }
           ]
         }
       },
-      "id": "supabase-1",
+      "id": "7a44cbcb-5d67-490c-ade3-a77462bb7ea4",
       "name": "Supabase Vector Store Node",
       "position": [
         1216,
@@ -117,6 +117,7 @@
       "typeVersion": 1,
       "credentials": {
         "supabaseApi": {
+          "id": "jcqfDFakXYfgxzlv",
           "name": "Supabase account"
         }
       }
@@ -127,7 +128,7 @@
         "responseBody": "{\n  \"status\": \"stored\"\n}",
         "options": {}
       },
-      "id": "respond-1",
+      "id": "ddac94dc-516f-47eb-b740-a8200cb0abc2",
       "name": "Respond to Webhook",
       "position": [
         1136,
@@ -139,10 +140,10 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={{ JSON.stringify({ answer: $json.text }) }}",
+        "responseBody": "={{ JSON.stringify({ answer: $json.text, sources: $(\"Final_Context_Assembler\").first().json.sources || [] }) }}",
         "options": {}
       },
-      "id": "36bb6b18-e289-4a24-970f-c4e21237266d",
+      "id": "ddd16ca6-d2c5-43f4-a1a8-21cee553c932",
       "name": "Respond_to_Webhook",
       "position": [
         1584,
@@ -158,14 +159,15 @@
         "responseMode": "responseNode",
         "options": {}
       },
-      "id": "webhook-1",
+      "id": "e26d4d55-d616-4d4e-8978-55f102bef9e7",
       "name": "Upload webhook",
       "position": [
         0,
         0
       ],
       "type": "n8n-nodes-base.webhook",
-      "typeVersion": 1
+      "typeVersion": 1,
+      "webhookId": "bf6b6995-fa9b-456e-9f14-cb6dcd21d319"
     },
     {
       "parameters": {
@@ -174,14 +176,15 @@
         "responseMode": "responseNode",
         "options": {}
       },
-      "id": "131a5daf-225d-4f98-a9f0-3891c36884cd",
+      "id": "8c8e088f-b024-4e83-a880-f296f2de0122",
       "name": "Search webhook",
       "position": [
         -80,
         512
       ],
       "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2.1
+      "typeVersion": 2.1,
+      "webhookId": "7784fdda-b222-41f4-9c58-d1ada07f7e92"
     },
     {
       "parameters": {
@@ -192,7 +195,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer YOUR_COHERE_API_KEY"
+              "value": "Bearer lNKEGwRiOGNC2zaKOHIpCzz0IDiOPzUOIYq3VTiG"
             },
             {
               "name": "Content-Type",
@@ -202,10 +205,10 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"texts\": [\"{{ $json.query }}\"],\n  \"model\": \"embed-multilingual-v3.0\",\n  \"input_type\": \"search_query\"\n}",
+        "jsonBody": "={{ JSON.stringify({ texts: [ typeof $json.body === \"string\" ? JSON.parse($json.body).query : $json.body.query ], model: 'embed-multilingual-v3.0', input_type: 'search_query' }) }}",
         "options": {}
       },
-      "id": "ea688db7-71ea-419f-ada0-ff6f6fa77671",
+      "id": "bb28492a-284e-40cd-81ea-62d3b43b44b8",
       "name": "Cohere Embedding Node",
       "position": [
         176,
@@ -218,7 +221,7 @@
       "parameters": {
         "jsCode": "const webhookData = $(\"Search webhook\").first().json;\nconst currentData = $json;\n\nlet finalQuery = \"\";\n\nif (webhookData.query && typeof webhookData.query === 'string') {\n  finalQuery = webhookData.query;\n} else if (webhookData.body && webhookData.body.query) {\n  finalQuery = webhookData.body.query;\n} else if (currentData.query && typeof currentData.query === 'string') {\n  finalQuery = currentData.query;\n} else {\n  const values = Object.values(webhookData);\n  finalQuery = values.find(v => typeof v === 'string') || \"Pergunta não detectada\";\n}\n\nreturn [{\n  body: {\n    p_embedding: $json.embeddings[0],\n    p_threshold: 0.1,\n    p_count: 15\n  },\n  query: finalQuery\n}];"
       },
-      "id": "3d83eafd-c570-4f41-9514-28a923181e47",
+      "id": "37e1b0ef-3627-432e-929b-f0cddacb5d9b",
       "name": "Format_Data_For_Search_Final",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -229,9 +232,9 @@
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nlet context = \"\";\n\nif (items.length > 0) {\n  context = items.map((item, index) => {\n    let text = item.json.content || \"\";\n    let filename = item.json.filename || \"Desconhecido\";\n    return `[Fonte: ${filename}]:\\n${text}`;\n  }).join('\\n\\n---\\n\\n');\n}\n\nconst query = $(\"Format_Data_For_Search_Final\").first().json.query;\n\nreturn [{\n  cohereBody: {\n    model: \"command-a-03-2025\",\n    message: `Pergunta: ${query}`,\n    preamble: `És um assistente preciso e analítico. Responde APENAS com base no contexto fornecido abaixo. Se a resposta não estiver no contexto, diz que não sabes.\\n\\nATENÇÃO: O contexto abaixo é formado por múltiplos fragmentos de documentos. Cada fragmento começa com [Fonte: Nome_do_Ficheiro]. Na tua resposta, deves sempre referenciar as fontes utilizadas indicando o nome do ficheiro (ex: \"De acordo com o ficheiro X...\").\\n\\nContexto:\\n${context || \"Nenhum documento relevante encontrado.\"}`,\n    temperature: 0.2\n  }\n}];"
+        "jsCode": "const items = $input.all();\nlet context = \"\";\nlet sources = [];\nconst uniqueSources = new Map();\n\nif (items.length > 0) {\n  context = items.map((item, index) => {\n    let text = item.json.content || item.json.text || \"\";\n    let filename = item.json.metadata?.filename || item.json.filename || \"Desconhecido\";\n    let docId = item.json.document_id;\n    let category = item.json.metadata?.category || \"Regulamentos\";\n    \n    // Create source button data\n    if (docId && !uniqueSources.has(docId)) {\n        uniqueSources.set(docId, true);\n        sources.push({ \n            title: filename, \n            category: category,\n            updatedAt: new Date().toLocaleDateString('pt-PT'),\n            snippet: text.substring(0, 800) + (text.length > 800 ? \"...\" : \"\")\n        });\n    }\n    return `[Fonte: ${filename}]:\\n${text}`;\n  }).join('\\n\\n---\\n\\n');\n}\n\nconst query = $(\"Format_Data_For_Search_Final\").first().json.query;\n\nreturn [{\n  cohereBody: {\n    model: \"command-r-plus-08-2024\",\n    message: `Pergunta: ${query}`,\n    preamble: `És um assistente preciso e analítico. Responde APENAS com base no contexto fornecido abaixo. Se a resposta não estiver no contexto, diz que não sabes.\\n\\nATENÇÃO: O contexto abaixo é formado por múltiplos fragmentos de documentos. Cada fragmento começa com [Fonte: Nome_do_Ficheiro]. Na tua resposta, deves sempre referenciar as fontes utilizadas indicando o nome do ficheiro (ex: \"De acordo com o ficheiro X...\").\\n\\nContexto:\\n${context || \"Nenhum documento relevante encontrado.\"}`,\n    temperature: 0.2\n  },\n  sources: sources\n}];"
       },
-      "id": "a6a920e7-b6ff-4b35-b2a9-621302206fec",
+      "id": "f19974fb-7d32-48c7-a080-7ee7338e66b2",
       "name": "Final_Context_Assembler",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -246,7 +249,7 @@
         "combineBy": "combineByPosition",
         "options": {}
       },
-      "id": "81dc6764-aab7-4bd3-b666-17055d7b83b7",
+      "id": "354d1fdf-bbb0-4aa2-bea4-eabb338e684b",
       "name": "Merge_Query_Embedding_v2",
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
@@ -258,17 +261,17 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://YOUR_SUPABASE_PROJECT_REF.supabase.co/rest/v1/rpc/match_chunks",
+        "url": "https://gcxqjjbeobrmbuwdnvwy.supabase.co/rest/v1/rpc/match_chunks",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
               "name": "apikey",
-              "value": "YOUR_SUPABASE_PUBLISHABLE_KEY"
+              "value": "sb_publishable_LaKnyhFolHEkCtp1kJxp7Q_O8DwCkqO"
             },
             {
               "name": "Authorization",
-              "value": "Bearer YOUR_SUPABASE_PUBLISHABLE_KEY"
+              "value": "Bearer sb_publishable_LaKnyhFolHEkCtp1kJxp7Q_O8DwCkqO"
             },
             {
               "name": "Content-Type",
@@ -281,14 +284,15 @@
         "jsonBody": "={{ $json.body }}",
         "options": {}
       },
-      "id": "8afd0b15-e76b-4a65-8893-3e6257541192",
+      "id": "aa252d57-c29e-470d-9e3a-ccb82917e344",
       "name": "Supabase_RPC_Search_Manual",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [
         912,
         528
-      ]
+      ],
+      "alwaysOutputData": true
     },
     {
       "parameters": {
@@ -299,7 +303,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer YOUR_COHERE_API_KEY"
+              "value": "Bearer lNKEGwRiOGNC2zaKOHIpCzz0IDiOPzUOIYq3VTiG"
             },
             {
               "name": "Content-Type",
@@ -312,7 +316,7 @@
         "jsonBody": "={{ $json.cohereBody }}",
         "options": {}
       },
-      "id": "2edbcee5-a69c-43bb-a076-13d961a80ce1",
+      "id": "c786c358-2500-44de-a18c-0486169b9496",
       "name": "Cohere_Chat_Node",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
@@ -322,14 +326,15 @@
       ]
     }
   ],
+  "pinData": {},
   "connections": {
     "Chunking Node": {
       "main": [
         [
           {
-            "index": 0,
             "node": "Split In Batches",
-            "type": "main"
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -338,9 +343,9 @@
       "main": [
         [
           {
-            "index": 0,
             "node": "Normalize Text",
-            "type": "main"
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -349,9 +354,9 @@
       "main": [
         [
           {
-            "index": 0,
             "node": "Chunking Node",
-            "type": "main"
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -360,16 +365,14 @@
       "main": [
         [
           {
-            "index": 0,
             "node": "Cohere Embeddings",
-            "type": "main"
-          }
-        ],
-        [
+            "type": "main",
+            "index": 0
+          },
           {
-            "index": 0,
             "node": "Respond to Webhook",
-            "type": "main"
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -378,9 +381,9 @@
       "main": [
         [
           {
-            "index": 0,
             "node": "Split In Batches",
-            "type": "main"
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -400,9 +403,9 @@
       "main": [
         [
           {
-            "index": 0,
             "node": "Extract Text",
-            "type": "main"
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -490,17 +493,23 @@
       ]
     }
   },
+  "active": true,
   "settings": {
     "executionOrder": "v1",
-    "saveDataErrorExecution": "all",
-    "saveDataSuccessExecution": "all",
-    "saveManualExecutions": true,
-    "saveExecutionProgress": true,
     "binaryMode": "separate"
   },
-  "staticData": null,
+  "versionId": "4cd35d97-73a9-4619-984f-328d93a0a04c",
   "meta": {
-    "templateCredsSetupCompleted": true
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b8f395193caa3bc39aade7d6e74488229f6d7de80e7d77fba56cfa96f42a6551"
   },
-  "pinData": {}
+  "id": "wzsspG0RNXdfbVqQ",
+  "tags": [
+    {
+      "updatedAt": "2026-07-02T21:06:38.009Z",
+      "createdAt": "2026-07-02T21:06:38.009Z",
+      "id": "F5YQmRxL47YafnJa",
+      "name": "test_version"
+    }
+  ]
 }

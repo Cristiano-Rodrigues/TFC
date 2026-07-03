@@ -21,11 +21,18 @@ export async function POST(req: NextRequest) {
       throw new Error(`n8n webhook responded with status: ${response.status}`);
     }
 
-    const data = await response.json();
-    
+    const textResponse = await response.text();
+    let data;
+    try {
+      data = textResponse ? JSON.parse(textResponse) : {};
+    } catch (parseError) {
+      console.error("n8n retornou uma resposta inválida:", textResponse);
+      throw new Error(`O n8n devolveu uma resposta não-JSON ou vazia: ${textResponse.slice(0, 100)}...`);
+    }
+
     return NextResponse.json({
       answer: data.answer || "Resposta não fornecida pelo modelo.",
-      sources: [],
+      sources: data.sources || [],
     });
   } catch (error: any) {
     console.error("Erro RAG Chat:", error);

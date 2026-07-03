@@ -25,6 +25,9 @@ export async function GET() {
         full_name, 
         active, 
         company_id,
+        companies (
+          name
+        ),
         roles (
           id,
           name,
@@ -61,6 +64,7 @@ export async function GET() {
       full_name: userRecord.full_name,
       active: userRecord.active,
       company_id: userRecord.company_id,
+      companyName: userRecord.companies?.name || 'A Minha Organização',
       role_id: userRecord.roles?.id,
       role: userRecord.roles?.name || 'user',
       department_id: userRecord.departments?.id,

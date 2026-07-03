@@ -11,6 +11,7 @@ export interface UserProfile {
   active: boolean;
   permissions: string[];
   company_id?: string;
+  companyName?: string;
   role_id?: string;
   department_id?: string;
 }
@@ -50,6 +51,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           active: data.user.active !== false,
           permissions: dynamicPermissions,
           company_id: data.user.company_id,
+          companyName: data.user.companyName,
           role_id: data.user.role_id,
           department_id: data.user.department_id
         };

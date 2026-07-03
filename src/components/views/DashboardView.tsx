@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FileText, Users, Network, Search, ArrowUpRight, TrendingUp, RefreshCw, Layers } from 'lucide-react';
 
 interface DashboardViewProps {
@@ -8,14 +8,38 @@ interface DashboardViewProps {
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
-  // Mock metrics mirroring typical enterprise distributions
+  const [statsData, setStatsData] = useState({
+    documents: 0,
+    activeUsers: 0,
+    searches: 0
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch('/api/dashboard/stats');
+        const data = await res.json();
+        if (res.ok && data.stats) {
+          setStatsData(data.stats);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar estatísticas:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
   const stats = [
     {
       id: "stat-docs",
       title: "Documentos Totais",
-      value: "0",
-      change: "Sem dados",
-      trend: "stable",
+      value: loading ? "..." : statsData.documents.toString(),
+      change: "Sincronizado",
+      trend: "up",
       icon: FileText,
       color: "text-blue-600 bg-blue-50 border-blue-100",
       targetTab: "documents"
@@ -23,9 +47,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
     {
       id: "stat-users",
       title: "Utilizadores Ativos",
-      value: "0",
-      change: "Sem dados",
-      trend: "stable",
+      value: loading ? "..." : statsData.activeUsers.toString(),
+      change: "Sincronizado",
+      trend: "up",
       icon: Users,
       color: "text-emerald-600 bg-emerald-50 border-emerald-100",
       targetTab: "admin"
@@ -43,9 +67,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
     {
       id: "stat-searches",
       title: "Pesquisas RAG (IA)",
-      value: "0",
-      change: "Sem dados",
-      trend: "stable",
+      value: loading ? "..." : statsData.searches.toString(),
+      change: "Sincronizado",
+      trend: "up",
       icon: Search,
       color: "text-amber-600 bg-amber-50 border-amber-100",
       targetTab: "search"

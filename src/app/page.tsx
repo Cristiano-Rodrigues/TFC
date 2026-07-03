@@ -69,7 +69,7 @@ export default function Home() {
     return (
       <div id="loading-stage" className="min-h-screen bg-slate-900 flex flex-col items-center justify-center text-white space-y-4">
         <Loader2 className="h-10 w-10 text-blue-500 animate-spin" />
-        <p className="text-xs font-bold uppercase tracking-widest text-slate-400 font-mono">Iniciando canais corporativos...</p>
+        <p className="text-xs font-bold uppercase tracking-widest text-slate-400 font-mono">A carregar...</p>
       </div>
     );
   }
@@ -91,21 +91,21 @@ export default function Home() {
       label: "Pesquisa Inteligente",
       icon: Search,
       roles: ["admin", "manager", "user"],
-      badge: "RAG"
+      badge: "IA"
     },
     {
       id: "wiki",
       label: "Wiki Corporativa",
       icon: BookOpen,
       roles: ["admin", "manager", "user"],
-      badge: "AI"
+      badge: "Auto"
     },
     {
       id: "documents",
       label: "Base Documental",
       icon: FileText,
       roles: ["admin", "manager", "user"],
-      badge: "148"
+      badge: null
     },
     {
       id: "upload",
@@ -119,14 +119,14 @@ export default function Home() {
       label: "Sincronizadores",
       icon: Network,
       roles: ["admin", "manager"],
-      badge: "Active"
+      badge: null
     },
     {
       id: "admin",
       label: "Cargos e Permissões",
       icon: Users,
       roles: ["admin"],
-      badge: "RBAC"
+      badge: null
     },
     {
       id: "profile",
@@ -278,7 +278,7 @@ export default function Home() {
           <div className="hidden lg:flex items-center gap-3 text-xs">
             <div className="flex items-center gap-1 text-[#475569] font-medium bg-slate-50 border border-slate-200/80 px-3 py-1 rounded-md">
               <Building className="h-3.5 w-3.5 text-slate-450" />
-              <span>Organização: <strong>Organização de teste</strong></span>
+              <span>Organização: <strong>{profile.companyName || 'A Minha Organização'}</strong></span>
             </div>
           </div>
 

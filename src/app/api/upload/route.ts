@@ -25,8 +25,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Nenhum ficheiro recebido" }, { status: 400 });
     }
 
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${crypto.randomUUID()}.${fileExt}`;
+    const originalName = file.name || 'document';
+    const lastDotIndex = originalName.lastIndexOf('.');
+    let fileExt = '';
+    if (lastDotIndex !== -1 && lastDotIndex !== 0) {
+      fileExt = originalName.slice(lastDotIndex + 1);
+    }
+    
+    if (fileExt && !/^[a-zA-Z0-9]+$/.test(fileExt)) {
+      fileExt = '';
+    }
+
+    const fileName = fileExt ? `${crypto.randomUUID()}.${fileExt}` : crypto.randomUUID();
     const storagePath = `${payload.sub}/${fileName}`;
 
     const { error: storageError } = await supabaseAdmin

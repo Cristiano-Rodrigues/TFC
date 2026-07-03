@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { UploadCloud, FileText, CheckCircle2, AlertCircle, RefreshCw, Trash2, ShieldAlert, History, Loader2, Play } from 'lucide-react';
+import { UploadCloud, FileText, CheckCircle2, Trash2, ShieldAlert, History, Loader2, Play } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 
 interface QueuedFile {

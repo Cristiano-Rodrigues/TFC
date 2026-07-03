@@ -31,7 +31,7 @@ export const IntelligentSearchView: React.FC<IntelligentSearchViewProps> = ({ se
   const welcomeMessage: ChatMessage = React.useMemo(() => ({
     id: "welcome",
     role: "assistant",
-    content: "Olá! Eu sou o assistente de pesquisa inteligente corporativo (RAG). Procuro respostas concretas diretamente nas vossas diretrizes organizacionais, regulamentos de TI, códigos de ética e manuais cadastrados.\n\nExperimente fazer uma pergunta para iniciar a pesquisa.",
+    content: "Olá! Tenho muito prazer em ajudar. Vamos começar?.",
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   }), []);
 
@@ -199,7 +199,7 @@ export const IntelligentSearchView: React.FC<IntelligentSearchViewProps> = ({ se
         <div className="flex items-center justify-between px-5 py-3.5 bg-white border-b border-slate-200 shrink-0">
           <div className="flex items-center gap-2">
             <Sparkles className="h-4.5 w-4.5 text-blue-600" />
-            <h2 className="text-sm font-semibold text-slate-900">Workspace de Pesquisa Inteligente</h2>
+            <h2 className="text-sm font-semibold text-slate-900">Agente de pesquisa</h2>
           </div>
         </div>
 
@@ -216,7 +216,7 @@ export const IntelligentSearchView: React.FC<IntelligentSearchViewProps> = ({ se
                       : 'bg-white border-slate-100 text-slate-800 rounded-bl-none'
                   }`}>
                     <div className="flex items-center gap-2 mb-2 text-[10px] font-bold tracking-wider uppercase opacity-60">
-                      {message.role === 'user' ? "O Seu Pedido" : "Resposta RAG Intel"}
+                      {message.role === 'user' ? "Você" : "IA"}
                       <span>•</span>
                       <span>{message.timestamp}</span>
                     </div>
@@ -292,8 +292,8 @@ export const IntelligentSearchView: React.FC<IntelligentSearchViewProps> = ({ se
 
       <div className="hidden xl:flex flex-col h-full bg-white relative">
         <div className="px-4 py-4 border-b border-slate-200">
-          <h3 className="text-xs font-extrabold text-slate-900 uppercase tracking-widest">Documento e Contexto RAG</h3>
-          <p className="text-[10px] text-slate-500 mt-0.5">Analise o documento bruto selecionado ao clicar nas citações.</p>
+          <h3 className="text-xs font-extrabold text-slate-900 uppercase tracking-widest">Documentos citados</h3>
+          <p className="text-[10px] text-slate-500 mt-0.5">Analise o documento selecionado ao clicar nas citações.</p>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -309,8 +309,8 @@ export const IntelligentSearchView: React.FC<IntelligentSearchViewProps> = ({ se
 
               <div className="rounded border border-slate-200 shadow-2xs">
                 <div className="bg-slate-100 px-3 py-1.5 border-b border-slate-200 flex items-center justify-between text-[10px] font-bold text-slate-500">
-                  <span>CONTEÚDO DA BASE DE DADOS</span>
-                  <span className="text-slate-400">Highlight Ativo</span>
+                  <span>CONTEÚDO DA BAS DE FONTES</span>
+                  <span className="text-slate-400">Destaque</span>
                 </div>
                 <div className="p-3 text-xs leading-relaxed text-slate-700 bg-amber-50/20 font-mono whitespace-pre-wrap">
                   {selectedSource.snippet}
@@ -318,7 +318,7 @@ export const IntelligentSearchView: React.FC<IntelligentSearchViewProps> = ({ se
               </div>
 
               <div className="text-[10px] text-slate-400 leading-relaxed">
-                Este excerto foi vetorizado e interpretado como contexto autêntico e fidedigno pela IA para elaborar a resposta final de auditoria.
+                Este excerto foi vetorizado e interpretado como contexto autêntico e fidedigno pela IA para elaborar a resposta final.
               </div>
               
               <button

@@ -30,8 +30,6 @@ export async function POST(req: NextRequest) {
       throw new Error(`O n8n devolveu uma resposta não-JSON ou vazia: ${textResponse.slice(0, 100)}...`);
     }
 
-    console.log("data: ", data)
-
     return NextResponse.json({
       answer: data.answer || "Resposta não fornecida pelo modelo.",
       sources: data.sources || [],

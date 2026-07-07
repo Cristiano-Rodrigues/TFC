@@ -1,7 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from 'next/headers';
+import { verifyToken } from '@/lib/jwt';
+import { supabaseAdmin } from '@/lib/supabase';
 
 export async function POST(req: NextRequest) {
   try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('auth_token')?.value;
+
+    if (!token) {
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
+    }
+
+    const payload = verifyToken(token);
+    if (!payload || !payload.sub) {
+      return NextResponse.json({ error: 'Sessão inválida' }, { status: 401 });
+    }
+
+    const { data: user } = await supabaseAdmin
+      .from('users')
+      .select('id, department_id, role_id')
+      .eq('id', payload.sub)
+      .single();
+
     const { message } = await req.json();
 
     if (!message) {
@@ -14,7 +35,12 @@ export async function POST(req: NextRequest) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ query: message }),
+      body: JSON.stringify({ 
+        query: message,
+        user_id: user?.id,
+        department_id: user?.department_id,
+        role_id: user?.role_id
+      }),
     });
 
     if (!response.ok) {

@@ -10,7 +10,19 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     
     if (!token) return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     const payload = verifyToken(token);
-    if (!payload || payload.role !== 'admin') return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
+    if (!payload || !payload.sub) return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
+
+    const { data: userRecord } = await supabase
+      .from('users')
+      .select('role, roles(role_permissions(permissions(code)))')
+      .eq('id', payload.sub)
+      .single();
+
+    const hasPermission = userRecord?.role === 'admin' || (userRecord as any)?.roles?.role_permissions?.some(
+      (rp: any) => rp.permissions?.code === 'users:manage'
+    );
+
+    if (!hasPermission) return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
 
     const { id } = await params;
     const body = await req.json();
@@ -37,6 +49,54 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
     if (updateError) {
       return NextResponse.json({ error: 'Erro ao atualizar utilizador' }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('auth_token')?.value;
+    
+    if (!token) return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
+    const payload = verifyToken(token);
+    if (!payload || !payload.sub) return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
+
+    const { data: userRecord } = await supabase
+      .from('users')
+      .select('role, roles(role_permissions(permissions(code)))')
+      .eq('id', payload.sub)
+      .single();
+
+    const hasPermission = userRecord?.role === 'admin' || (userRecord as any)?.roles?.role_permissions?.some(
+      (rp: any) => rp.permissions?.code === 'users:manage'
+    );
+
+    if (!hasPermission) return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
+
+    const { id } = await params;
+
+    const { data: userToDelete, error: fetchError } = await supabase
+      .from('users')
+      .select('company_id')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !userToDelete || userToDelete.company_id !== payload.company_id) {
+      return NextResponse.json({ error: 'Utilizador não encontrado ou sem permissão' }, { status: 404 });
+    }
+
+    const { error: deleteError } = await supabase
+      .from('users')
+      .delete()
+      .eq('id', id);
+
+    if (deleteError) {
+      return NextResponse.json({ error: 'Erro ao apagar utilizador' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });

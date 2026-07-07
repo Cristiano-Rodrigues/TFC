@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { UploadCloud, FileText, CheckCircle2, Trash2, ShieldAlert, History, Loader2, Play } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 
@@ -12,6 +12,9 @@ interface QueuedFile {
   progress: number;
   status: 'Pendente' | 'Enviando' | 'Processando IA' | 'Concluído' | 'Falhado';
   department: string;
+  departmentIds: string[];
+  roles: string[];
+  accessLogic: 'AND' | 'OR';
   file?: File;
 }
 
@@ -29,9 +32,29 @@ export const UploadView: React.FC = () => {
   const [dragActive, setDragActive] = useState(false);
   const [queuedFiles, setQueuedFiles] = useState<QueuedFile[]>([]);
   const [uploadHistory, setUploadHistory] = useState<UploadHistoryItem[]>([]);
-  const [selectedDept, setSelectedDept] = useState('Recursos Humanos');
+  
+  const [departments, setDepartments] = useState<{id: string, name: string}[]>([]);
+  const [roles, setRoles] = useState<{id: string, name: string}[]>([]);
+  
+  const [selectedDepts, setSelectedDepts] = useState<string[]>([]);
+  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+  const [accessLogic, setAccessLogic] = useState<'AND' | 'OR'>('AND');
 
   const canUpload = profile?.permissions.includes('doc:upload') || profile?.role === 'admin' || profile?.role === 'manager';
+
+  useEffect(() => {
+    if (canUpload) {
+      Promise.all([
+        fetch('/api/departments').then(res => res.json()),
+        fetch('/api/roles').then(res => res.json())
+      ]).then(([deptData, roleData]) => {
+        if (deptData.departments) {
+          setDepartments(deptData.departments);
+        }
+        if (roleData.roles) setRoles(roleData.roles);
+      }).catch(err => console.error(err));
+    }
+  }, [canUpload]);
 
   if (!canUpload) {
     return (
@@ -74,6 +97,13 @@ export const UploadView: React.FC = () => {
   };
 
   const handleFiles = (files: FileList) => {
+    if (selectedDepts.length === 0) {
+      alert("Por favor, selecione pelo menos um departamento.");
+      return;
+    }
+    
+    const deptNames = departments.filter(d => selectedDepts.includes(d.id)).map(d => d.name).join(', ') || 'Desconhecido';
+    
     const arr: QueuedFile[] = [];
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
@@ -88,11 +118,26 @@ export const UploadView: React.FC = () => {
         type: file.name.split('.').pop()?.toUpperCase() || 'TXT',
         progress: 0,
         status: 'Pendente',
-        department: selectedDept,
+        department: deptNames,
+        departmentIds: [...selectedDepts],
+        roles: [...selectedRoles],
+        accessLogic: accessLogic,
         file: file
       });
     }
     setQueuedFiles(prev => [...prev, ...arr]);
+  };
+
+  const toggleRole = (roleId: string) => {
+    setSelectedRoles(prev => 
+      prev.includes(roleId) ? prev.filter(r => r !== roleId) : [...prev, roleId]
+    );
+  };
+
+  const toggleDept = (deptId: string) => {
+    setSelectedDepts(prev => 
+      prev.includes(deptId) ? prev.filter(r => r !== deptId) : [...prev, deptId]
+    );
   };
 
   const startIngestionPipeline = async (id: string) => {
@@ -107,7 +152,9 @@ export const UploadView: React.FC = () => {
     try {
       const formData = new FormData();
       formData.append('file', fileObj.file);
-      formData.append('department', fileObj.department);
+      formData.append('department_ids', JSON.stringify(fileObj.departmentIds));
+      formData.append('role_ids', JSON.stringify(fileObj.roles));
+      formData.append('access_logic', fileObj.accessLogic);
 
       const response = await fetch('/api/upload', {
         method: 'POST',
@@ -161,7 +208,6 @@ export const UploadView: React.FC = () => {
 
   return (
     <div className="space-y-6">
-
       <div className="pb-4 border-b border-slate-200">
         <h1 id="upload-title" className="text-2xl font-semibold text-slate-900 tracking-tight">Ingestão de Documentos</h1>
         <p className="text-sm text-slate-500 mt-1">
@@ -170,27 +216,60 @@ export const UploadView: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white p-5 border border-slate-200 rounded-lg space-y-4">
-
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 border-b border-slate-100 gap-3">
-              <div>
-                <span className="text-xs font-bold text-[#1e293b] uppercase tracking-wider block">Área de Indexação Destino</span>
-                <span className="text-[10px] text-slate-400">Classifique a documentação para limitar o seu acesso RBAC por área.</span>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4 border-b border-slate-100">
+              <div className="space-y-1.5 md:col-span-2">
+                <span className="text-xs font-bold text-[#1e293b] uppercase tracking-wider block">1. Departamentos Destino</span>
+                <div className="flex flex-wrap gap-2 p-3 border border-slate-200 rounded bg-slate-50">
+                  {departments.length === 0 && <span className="text-[10px] text-slate-400 p-1">A carregar...</span>}
+                  {departments.map(d => (
+                    <label key={d.id} className="flex items-center gap-1.5 cursor-pointer bg-white px-2.5 py-1.5 border border-slate-200 rounded shadow-3xs hover:border-blue-400 transition-colors">
+                      <input 
+                        type="checkbox" 
+                        checked={selectedDepts.includes(d.id)} 
+                        onChange={() => toggleDept(d.id)}
+                        className="rounded text-blue-600 focus:ring-0"
+                      />
+                      <span className="text-[10px] font-bold text-slate-700">{d.name}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
-              <select
-                id="upload-dept-select"
-                value={selectedDept}
-                onChange={(e) => setSelectedDept(e.target.value)}
-                className="text-xs px-3 py-1.5 border border-slate-300 rounded focus:outline-none bg-white text-slate-800 font-medium"
-              >
-                <option value="Recursos Humanos">Recursos Humanos (RH)</option>
-                <option value="Tecnologia e Segurança">Tecnologia e Segurança (TI)</option>
-                <option value="Financeiro">Financeiro</option>
-                <option value="Compliance">Compliance & Legal</option>
-                <option value="Suporte e Operações">Suporte e Operações</option>
-              </select>
+              
+              <div className="space-y-1.5">
+                <span className="text-xs font-bold text-[#1e293b] uppercase tracking-wider block">2. Lógica de Acesso Restrito</span>
+                <select
+                  value={accessLogic}
+                  onChange={(e) => setAccessLogic(e.target.value as 'AND' | 'OR')}
+                  className="w-full text-xs px-3 py-2 border border-slate-300 rounded focus:outline-none bg-white text-slate-800 font-medium"
+                >
+                  <option value="AND">Exigir Cargo E Departamento (AND)</option>
+                  <option value="OR">Exigir Cargo OU Departamento (OR)</option>
+                </select>
+              </div>
+
+              <div className="md:col-span-2 space-y-1.5">
+                <span className="text-xs font-bold text-[#1e293b] uppercase tracking-wider block flex justify-between">
+                  3. Restringir a Cargos (Opcional)
+                  <span className="text-slate-400 font-normal">Se não selecionar nenhum, qualquer membro do departamento tem acesso.</span>
+                </span>
+                <div className="flex flex-wrap gap-2 p-3 border border-slate-200 rounded bg-slate-50">
+                  {roles.map(r => (
+                    <label key={r.id} className="flex items-center gap-1.5 cursor-pointer bg-white px-2.5 py-1.5 border border-slate-200 rounded shadow-3xs hover:border-blue-400 transition-colors">
+                      <input 
+                        type="checkbox" 
+                        checked={selectedRoles.includes(r.id)} 
+                        onChange={() => toggleRole(r.id)}
+                        className="rounded text-blue-600 focus:ring-0"
+                      />
+                      <span className="text-[10px] font-bold text-slate-700">{r.name}</span>
+                    </label>
+                  ))}
+                  {roles.length === 0 && <span className="text-[10px] text-slate-400 p-1">Sem cargos configurados</span>}
+                </div>
+              </div>
             </div>
 
             <div
@@ -242,6 +321,9 @@ export const UploadView: React.FC = () => {
                           <span>{file.size}</span>
                           <span>•</span>
                           <span className="bg-slate-100 text-slate-600 px-1 py-0.2 rounded font-semibold text-[9px] uppercase">{file.department}</span>
+                          {file.roles.length > 0 && (
+                            <span className="text-blue-500 font-bold ml-1">+{file.roles.length} roles ({file.accessLogic})</span>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -323,7 +405,6 @@ export const UploadView: React.FC = () => {
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );

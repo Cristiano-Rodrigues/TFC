@@ -19,7 +19,7 @@ export async function GET() {
 
     const { data, error } = await supabaseAdmin
       .from('documents')
-      .select('id, filename, storage_path, file_size, mime_type, n8n_status, metadata, created_at, uploaded_by')
+      .select('id, filename, storage_path, file_size, mime_type, n8n_status, metadata, created_at, uploaded_by, document_permissions(roles(id, name)), document_departments(departments(id, name))')
       .order('created_at', { ascending: false });
 
     if (error) {

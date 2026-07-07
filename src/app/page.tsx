@@ -83,62 +83,64 @@ export default function Home() {
       id: "dashboard",
       label: "Painel de Controlo",
       icon: LayoutDashboard,
-      roles: ["admin", "manager", "user"],
+      permissions: [],
       badge: null
     },
     {
       id: "search",
       label: "Pesquisa Inteligente",
       icon: Search,
-      roles: ["admin", "manager", "user"],
+      permissions: [],
       badge: "IA"
     },
     {
       id: "wiki",
       label: "Wiki Corporativa",
       icon: BookOpen,
-      roles: ["admin", "manager", "user"],
+      permissions: ["wiki:view"],
       badge: "Auto"
     },
     {
       id: "documents",
       label: "Base Documental",
       icon: FileText,
-      roles: ["admin", "manager", "user"],
+      permissions: ["doc:view"],
       badge: null
     },
     {
       id: "upload",
       label: "Carregar Arquivos",
       icon: UploadCloud,
-      roles: ["admin", "manager"],
+      permissions: ["doc:upload"],
       badge: null
     },
     {
       id: "integrations",
       label: "Sincronizadores",
       icon: Network,
-      roles: ["admin", "manager"],
+      permissions: ["integrations:manage"],
       badge: null
     },
     {
       id: "admin",
-      label: "Cargos e Permissões",
+      label: "Administração",
       icon: Users,
-      roles: ["admin"],
+      permissions: ["roles:manage", "users:manage", "departments:manage"],
       badge: null
     },
     {
       id: "profile",
       label: "O Meu Perfil",
       icon: UserCircle,
-      roles: ["admin", "manager", "user"],
+      permissions: [],
       badge: null
     }
   ];
 
   const activeLinkConfig = sidebarLinks.find(s => s.id === activeTab);
-  const isAuthorizedTab = activeLinkConfig?.roles.includes(profile.role) || profile.role === 'admin';
+  const isAuthorizedTab = activeLinkConfig?.permissions.length === 0 || 
+                          profile.role === 'admin' || 
+                          activeLinkConfig?.permissions.some(p => profile.permissions?.includes(p));
 
   const targetTab = isAuthorizedTab ? activeTab : 'profile';
 
@@ -157,8 +159,8 @@ export default function Home() {
 
         <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
           {sidebarLinks.map((item) => {
-            const matchesRole = item.roles.includes(profile.role);
-            if (!matchesRole) return null;
+            const isAllowed = item.permissions.length === 0 || profile.role === 'admin' || item.permissions.some(p => profile.permissions?.includes(p));
+            if (!isAllowed) return null;
 
             const isSelected = targetTab === item.id;
             const isSearch = item.id === 'search';
@@ -327,8 +329,8 @@ export default function Home() {
 
             <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
               {sidebarLinks.map((item) => {
-                const matchesRole = item.roles.includes(profile.role);
-                if (!matchesRole) return null;
+                const isAllowed = item.permissions.length === 0 || profile.role === 'admin' || item.permissions.some(p => profile.permissions?.includes(p));
+                if (!isAllowed) return null;
 
                 const isSelected = targetTab === item.id;
                 const isSearch = item.id === 'search';

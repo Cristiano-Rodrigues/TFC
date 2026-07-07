@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS public.users (
     email TEXT NOT NULL UNIQUE,
     password_hash TEXT,
     role_id UUID REFERENCES public.roles(id),
-    department_id UUID REFERENCES public.departments(id),
+    department_id UUID REFERENCES public.departments(id) ON DELETE SET NULL,
     active BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
@@ -65,9 +65,14 @@ CREATE TABLE IF NOT EXISTS public.documents (
     n8n_status TEXT DEFAULT 'pending',
     created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now(),
     uploaded_by UUID REFERENCES public.users(id) ON DELETE SET NULL,
-    department_id UUID REFERENCES public.departments(id) ON DELETE SET NULL,
     source_type TEXT,
     metadata JSONB
+);
+
+CREATE TABLE IF NOT EXISTS public.document_departments (
+    document_id UUID REFERENCES public.documents(id) ON DELETE CASCADE,
+    department_id UUID REFERENCES public.departments(id) ON DELETE CASCADE,
+    PRIMARY KEY (document_id, department_id)
 );
 
 CREATE TABLE IF NOT EXISTS public.document_permissions (
@@ -103,24 +108,64 @@ CREATE TABLE IF NOT EXISTS public.ai_chat_messages (
 
 -- 3. Create Search Function (match_chunks)
 DROP FUNCTION IF EXISTS public.match_chunks(vector, double precision, integer);
+DROP FUNCTION IF EXISTS public.match_chunks(vector, double precision, integer, uuid, uuid, uuid);
 
-CREATE FUNCTION public.match_chunks(p_embedding vector, p_threshold double precision, p_count integer)
- RETURNS TABLE (
-   content text,
-   filename text,
-   document_id uuid
- )
+CREATE OR REPLACE FUNCTION public.match_chunks(
+  p_embedding vector, 
+  p_threshold double precision, 
+  p_count integer, 
+  p_user_id uuid DEFAULT NULL::uuid, 
+  p_department_id uuid DEFAULT NULL::uuid, 
+  p_role_id uuid DEFAULT NULL::uuid
+)
+ RETURNS TABLE(content text, filename text, document_id uuid)
  LANGUAGE plpgsql
 AS $function$
 begin
   return query
   select
     chunks.content,
-    documents.filename,
+    COALESCE(documents.filename, 'Desconhecido') as filename,
     documents.id as document_id
   from chunks
-  join documents on documents.id = chunks.document_id
+  left join documents on documents.id = chunks.document_id
   where 1 - (chunks.embedding <=> p_embedding) > p_threshold
+  and (
+    -- Admin bypass
+    exists(select 1 from roles where id = p_role_id and name = 'admin')
+    OR
+    -- Global fallback
+    (
+      not exists(select 1 from document_departments dd where dd.document_id = documents.id) 
+      AND 
+      not exists(select 1 from document_permissions dp where dp.document_id = documents.id)
+    )
+    OR
+    (
+      CASE 
+        WHEN COALESCE(documents.metadata->>'access_logic', 'AND') = 'OR' THEN
+          (
+            exists(select 1 from document_departments dd where dd.document_id = documents.id and dd.department_id = p_department_id) 
+            OR 
+            exists(select 1 from document_permissions dp where dp.document_id = documents.id and dp.role_id = p_role_id)
+          )
+        ELSE
+          (
+            (
+              not exists(select 1 from document_departments dd where dd.document_id = documents.id)
+              OR
+              exists(select 1 from document_departments dd where dd.document_id = documents.id and dd.department_id = p_department_id)
+            )
+            AND 
+            (
+              not exists(select 1 from document_permissions dp where dp.document_id = documents.id)
+              OR 
+              exists(select 1 from document_permissions dp where dp.document_id = documents.id and dp.role_id = p_role_id)
+            )
+          )
+      END
+    )
+  )
   order by (1 - (chunks.embedding <=> p_embedding)) desc
   limit p_count;
 end;

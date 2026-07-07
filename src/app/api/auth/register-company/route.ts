@@ -73,7 +73,7 @@ export async function POST(req: Request) {
     if (permissions && permissions.length > 0) {
       const rolePermissionsToInsert: { role_id: string, permission_id: string }[] = [];
       
-      const adminPerms = ["doc:view", "doc:upload", "doc:delete", "doc:manage_perms", "wiki:view", "wiki:generate", "integrations:manage", "users:manage"];
+      const adminPerms = ["doc:view", "doc:upload", "doc:delete", "doc:manage_perms", "wiki:view", "wiki:generate", "integrations:manage", "users:manage", "departments:manage", "roles:manage"];
       const managerPerms = ["doc:view", "doc:upload", "wiki:view", "wiki:generate", "integrations:manage"];
       const userPerms = ["doc:view", "wiki:view"];
 
@@ -99,6 +99,7 @@ export async function POST(req: Request) {
         password_hash: passwordHash,
         company_id: company.id,
         role_id: adminRole?.id,
+        role: 'admin',
         department_id: adminDept?.id,
         active: true
       });

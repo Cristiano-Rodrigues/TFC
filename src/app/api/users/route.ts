@@ -12,7 +12,19 @@ export async function POST(req: Request) {
     
     if (!token) return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     const payload = verifyToken(token);
-    if (!payload || payload.role !== 'admin') return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
+    if (!payload || !payload.sub) return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
+
+    const { data: userRecord } = await supabase
+      .from('users')
+      .select('role, roles(role_permissions(permissions(code)))')
+      .eq('id', payload.sub)
+      .single();
+
+    const hasPermission = userRecord?.role === 'admin' || (userRecord as any)?.roles?.role_permissions?.some(
+      (rp: any) => rp.permissions?.code === 'users:manage'
+    );
+
+    if (!hasPermission) return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
 
     const { email, fullName, role_id, department_id, password } = await req.json();
 
@@ -54,7 +66,19 @@ export async function GET() {
     
     if (!token) return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     const payload = verifyToken(token);
-    if (!payload || payload.role !== 'admin') return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
+    if (!payload || !payload.sub) return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
+
+    const { data: userRecord } = await supabase
+      .from('users')
+      .select('role, roles(role_permissions(permissions(code)))')
+      .eq('id', payload.sub)
+      .single();
+
+    const hasPermission = userRecord?.role === 'admin' || (userRecord as any)?.roles?.role_permissions?.some(
+      (rp: any) => rp.permissions?.code === 'users:manage'
+    );
+
+    if (!hasPermission) return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
 
     const { data: usersData, error: usersError } = await supabase
       .from('users')

@@ -19,7 +19,18 @@ export async function POST(req: NextRequest) {
 
     const formData = await req.formData();
     const file = formData.get('file') as File;
-    const department = formData.get('department') as string | null;
+    const department_ids_str = formData.get('department_ids') as string | null;
+    const role_ids_str = formData.get('role_ids') as string | null;
+    const access_logic = (formData.get('access_logic') as string) || 'AND';
+    
+    let role_ids: string[] = [];
+    if (role_ids_str) {
+      try { role_ids = JSON.parse(role_ids_str); } catch (e) {}
+    }
+    let department_ids: string[] = [];
+    if (department_ids_str) {
+      try { department_ids = JSON.parse(department_ids_str); } catch (e) {}
+    }
 
     if (!file) {
       return NextResponse.json({ error: "Nenhum ficheiro recebido" }, { status: 400 });
@@ -61,7 +72,7 @@ export async function POST(req: NextRequest) {
         mime_type: file.type,
         uploaded_by: payload.sub,
         n8n_status: 'pending',
-        metadata: department ? { department } : null,
+        metadata: { access_logic }
       })
       .select('id')
       .single();
@@ -74,6 +85,32 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (role_ids.length > 0) {
+      const permsToInsert = role_ids.map(rId => ({
+        document_id: docData.id,
+        role_id: rId
+      }));
+      const { error: permError } = await supabaseAdmin
+        .from('document_permissions')
+        .insert(permsToInsert);
+      if (permError) {
+        console.error("DB Perm Error:", permError);
+      }
+    }
+
+    if (department_ids.length > 0) {
+      const deptsToInsert = department_ids.map(dId => ({
+        document_id: docData.id,
+        department_id: dId
+      }));
+      const { error: deptError } = await supabaseAdmin
+        .from('document_departments')
+        .insert(deptsToInsert);
+      if (deptError) {
+        console.error("DB Dept Error:", deptError);
+      }
+    }
+
     let n8nTriggered = false;
     let n8nError: string | null = null;
 
@@ -83,7 +120,9 @@ export async function POST(req: NextRequest) {
       n8nFormData.append('data', file);
       n8nFormData.append('document_id', docData.id);
       n8nFormData.append('user_id', payload.sub);
-      if (department) n8nFormData.append('department', department);
+      if (department_ids.length > 0) {
+        n8nFormData.append('department_ids', JSON.stringify(department_ids));
+      }
 
       const n8nResponse = await fetch(`${n8nUrl}/upload`, {
         method: 'POST',

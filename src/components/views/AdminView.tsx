@@ -9,12 +9,12 @@ import { RolesPanel } from './admin/RolesPanel';
 export const AdminView: React.FC = () => {
   const { profile } = useAuth();
   const [activeTab, setActiveTab] = useState<'users' | 'departments' | 'roles'>('users');
-  
+
   const [allProfiles, setAllProfiles] = useState<UserProfile[]>([]);
-  const [availableRoles, setAvailableRoles] = useState<{id: string, name: string}[]>([]);
-  const [availableDepts, setAvailableDepts] = useState<{id: string, name: string}[]>([]);
+  const [availableRoles, setAvailableRoles] = useState<{ id: string, name: string }[]>([]);
+  const [availableDepts, setAvailableDepts] = useState<{ id: string, name: string }[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
-  
+
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingUser, setEditingUser] = useState<UserProfile | null>(null);
 
@@ -55,7 +55,7 @@ export const AdminView: React.FC = () => {
         setAllProfiles(users);
         if (data.roles) setAvailableRoles(data.roles);
         if (data.departments) setAvailableDepts(data.departments);
-        
+
         if (data.roles?.length && !addRoleId) setAddRoleId(data.roles[0].id);
         if (data.departments?.length && !addDeptId) setAddDeptId(data.departments[0].id);
       }
@@ -69,10 +69,12 @@ export const AdminView: React.FC = () => {
   useEffect(() => {
     if (hasAnyAdminAccess) {
       if (activeTab === 'users' && !canManageUsers) {
-        if (canManageDepts) setActiveTab('departments');
-        else if (canManageRoles) setActiveTab('roles');
+        setTimeout(() => {
+          if (canManageDepts) setActiveTab('departments');
+          else if (canManageRoles) setActiveTab('roles');
+        }, 0);
       }
-      
+
       if (canManageUsers) {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchUsers();
@@ -97,7 +99,7 @@ export const AdminView: React.FC = () => {
 
   const filteredUsers = allProfiles.filter(u => {
     const matchesEmail = u.email.toLowerCase().includes(searchEmail.toLowerCase()) ||
-                         u.fullName.toLowerCase().includes(searchEmail.toLowerCase());
+      u.fullName.toLowerCase().includes(searchEmail.toLowerCase());
     const matchesRole = roleFilter === 'Todas' || u.role === roleFilter;
     const matchesDept = deptFilter === 'Todas' || u.department === deptFilter;
     return matchesEmail && matchesRole && matchesDept;
@@ -108,7 +110,7 @@ export const AdminView: React.FC = () => {
     if (!addEmail.trim() || !addName.trim() || !addPassword) return;
 
     setIsSubmitInvite(true);
-    
+
     try {
       const res = await fetch('/api/users', {
         method: 'POST',
@@ -175,7 +177,7 @@ export const AdminView: React.FC = () => {
           active: !u.active
         })
       });
-        
+
       if (res.ok) {
         await fetchUsers();
       }
@@ -191,7 +193,7 @@ export const AdminView: React.FC = () => {
       const res = await fetch(`/api/users/${u.id}`, {
         method: 'DELETE'
       });
-        
+
       if (res.ok) {
         await fetchUsers();
       } else {
@@ -205,7 +207,7 @@ export const AdminView: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      
+
       <div className="flex flex-col md:flex-row md:items-end md:justify-between pb-4 border-b border-slate-200 gap-4">
         <div>
           <h1 id="admin-title" className="text-2xl font-semibold text-slate-900 tracking-tight">Administração RBAC</h1>
@@ -213,7 +215,7 @@ export const AdminView: React.FC = () => {
             Gira permissões funcionais, departamentos e adicione novos membros.
           </p>
         </div>
-        
+
         <div className="flex bg-slate-100 p-1 rounded-lg">
           {canManageUsers && (
             <button
@@ -331,13 +333,12 @@ export const AdminView: React.FC = () => {
                       </td>
 
                       <td className="px-5 py-3.5">
-                        <span className={`inline-block text-[9px] font-bold tracking-wider px-2 py-0.5 rounded uppercase ${
-                          u.role === 'admin'
+                        <span className={`inline-block text-[9px] font-bold tracking-wider px-2 py-0.5 rounded uppercase ${u.role === 'admin'
                             ? 'bg-red-50 text-red-700 border border-red-100'
                             : u.role === 'manager'
                               ? 'bg-blue-50 text-blue-700 border border-blue-100'
                               : 'bg-slate-100 text-slate-600'
-                        }`}>
+                          }`}>
                           {u.role}
                         </span>
                       </td>
@@ -345,11 +346,10 @@ export const AdminView: React.FC = () => {
                       <td className="px-5 py-3.5">
                         <span
                           onClick={() => handleToggleActiveState(u)}
-                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide cursor-pointer select-none ${
-                            u.active
+                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide cursor-pointer select-none ${u.active
                               ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
                               : 'bg-red-50 text-red-700 border border-red-100'
-                          }`}
+                            }`}
                         >
                           <span className={`w-1 h-1 rounded-full ${u.active ? 'bg-emerald-500' : 'bg-red-500'}`} />
                           {u.active ? 'Ativo' : 'Desativado'}

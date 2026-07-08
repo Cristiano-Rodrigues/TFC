@@ -62,11 +62,15 @@ export async function POST(req: NextRequest) {
       .eq('id', payload.sub)
       .single();
 
+    if (userErr || !user) {
+      return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+    }
+
     const hasPermission = user.role === 'admin' || (user as any)?.roles?.role_permissions?.some(
       (rp: any) => rp.permissions?.code === 'departments:manage'
     );
 
-    if (userErr || !user || !hasPermission) {
+    if (!hasPermission) {
       return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
     }
 

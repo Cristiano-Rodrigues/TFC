@@ -12,16 +12,29 @@ No repositório, foram criadas duas pastas principais que contêm as definiçõe
 
 ---
 
+## Descrição do Projeto
+
+Este projeto é um sistema **SaaS Multi-Tenant** focado na gestão inteligente de documentos e partilha de conhecimento interno, com integração avançada de Inteligência Artificial. O sistema permite que diferentes empresas criem o seu próprio espaço (tenant), efetuem a gestão da sua equipa e centralizem a sua base de conhecimento com controlos de acesso rigorosos.
+
+### Funcionalidades Implementadas (Features)
+- **Autenticação e Multi-Tenancy:** Registo de novas empresas e gestão de sessões, garantindo que os dados de cada empresa permanecem isolados.
+- **Gestão de Acessos (RBAC):** Painel administrativo completo para gestão de Utilizadores, Criação de Departamentos Organizacionais e definição de Cargos (Roles) com permissões granulares.
+- **Base Documental e Controlo de Permissões Multi-Departamentais:** Upload e gestão de documentos com a capacidade de restringir ou partilhar o acesso a ficheiros utilizando cruzamentos lógicos complexos (`AND`/`OR`) entre múltiplos departamentos e cargos.
+- **Inteligência Artificial & RAG (Retrieval-Augmented Generation):** Chat inteligente integrado com o n8n e Cohere. A IA analisa os documentos submetidos, extrai o contexto relevante (respeitando rigorosamente o nível de acesso e o departamento de quem pergunta) e fornece respostas com base exclusiva na base de conhecimento da empresa, prevenindo alucinações.
+- **Visualização de Atividade:** Possibilidade de consultar o histórico completo de interações de IA (chats passados) de cada utilizador.
+
+---
+
 ## Passo 1: Configuração do Supabase (Base de Dados)
 
 A pessoa que vai testar o projeto deve seguir estes passos:
 
 1. Criar um projeto gratuito no [Supabase](https://supabase.com/).
-2. No painel do projeto Supabase, aceder ao **SQL Editor** (no menu lateral esquerdo).
+2. No painel do projeto Supabase, aceder ao **SQL Editor**.
 3. Criar uma nova query, colar todo o conteúdo do ficheiro `supabase/schema.sql` e clicar em **Run**.
    * *Isto ativará a extensão `vector`, criará todas as tabelas necessárias para o modelo SaaS Multi-Tenant e inserirá as permissões por defeito.*
-4. Aceder a **Project Settings > API** e recolher o **Project URL**, a **anon public / publishable key** e a **service_role secret**. Esta última é vital para que o nosso backend consiga fazer upload de ficheiros para a cloud contornando as restrições normais de segurança (RLS).
-5. Aceder ao menu **Storage** (no menu lateral esquerdo), e criar um novo bucket chamado `rag_documents` (pode deixá-lo público ou privado, conforme a necessidade). Sem isto os uploads de documentos irão falhar.
+4. Aceder a **Project Settings > API** e recolher o **Project URL**, a **anon public / publishable key** e a **service_role secret**. Esta última é vital para que o backend consiga fazer upload de ficheiros para a cloud contornando as restrições normais de segurança (RLS).
+5. Aceder ao menu **Storage**, e criar um novo bucket chamado `rag_documents` (pode deixá-lo público ou privado, conforme a necessidade). Sem isto os uploads de documentos irão falhar.
 
 > [!WARNING]
 > **Nota de Segurança sobre RLS (Row Level Security):**

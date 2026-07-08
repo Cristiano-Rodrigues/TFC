@@ -65,7 +65,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer lNKEGwRiOGNC2zaKOHIpCzz0IDiOPzUOIYq3VTiG"
+              "value": "Bearer YOUR_COHERE_API_KEY"
             },
             {
               "name": "Content-Type",
@@ -195,7 +195,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer lNKEGwRiOGNC2zaKOHIpCzz0IDiOPzUOIYq3VTiG"
+              "value": "Bearer YOUR_COHERE_API_KEY"
             },
             {
               "name": "Content-Type",
@@ -219,7 +219,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const webhookData = $(\"Search webhook\").first().json;\nconst currentData = $json;\n\nlet finalQuery = \"\";\n\nif (webhookData.query && typeof webhookData.query === 'string') {\n  finalQuery = webhookData.query;\n} else if (webhookData.body && webhookData.body.query) {\n  finalQuery = webhookData.body.query;\n} else if (currentData.query && typeof currentData.query === 'string') {\n  finalQuery = currentData.query;\n} else {\n  const values = Object.values(webhookData);\n  finalQuery = values.find(v => typeof v === 'string') || \"Pergunta não detectada\";\n}\n\nreturn [{\n  body: {\n    p_embedding: $json.embeddings[0],\n    p_threshold: 0.1,\n    p_count: 15\n  },\n  query: finalQuery\n}];"
+        "jsCode": "const webhookData = $(\"Search webhook\").first().json;\nconst currentData = $json;\n\n// Data from webhook is nested under .body\nconst body = webhookData.body || webhookData;\n\nlet finalQuery = \"\";\n\nif (body.query && typeof body.query === 'string') {\n  finalQuery = body.query;\n} else if (webhookData.query && typeof webhookData.query === 'string') {\n  finalQuery = webhookData.query;\n} else {\n  const values = Object.values(body);\n  finalQuery = values.find(v => typeof v === 'string') || \"Pergunta não detectada\";\n}\n\n// Extract RBAC context - look in body first, then root\nconst userId = body.user_id || webhookData.user_id || null;\nconst departmentId = body.department_id || webhookData.department_id || null;\nconst roleId = body.role_id || webhookData.role_id || null;\n\nreturn [{\n  body: {\n    p_embedding: $json.embeddings[0],\n    p_threshold: 0.1,\n    p_count: 15,\n    p_user_id: userId,\n    p_department_id: departmentId,\n    p_role_id: roleId\n  },\n  query: finalQuery\n}];"
       },
       "id": "37e1b0ef-3627-432e-929b-f0cddacb5d9b",
       "name": "Format_Data_For_Search_Final",
@@ -261,17 +261,17 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://gcxqjjbeobrmbuwdnvwy.supabase.co/rest/v1/rpc/match_chunks",
+        "url": "https://YOUR_SUPABASE_PROJECT_REF.supabase.co/rest/v1/rpc/match_chunks",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
               "name": "apikey",
-              "value": "sb_publishable_LaKnyhFolHEkCtp1kJxp7Q_O8DwCkqO"
+              "value": "YOUR_SUPABASE_SERVICE_ROLE_KEY"
             },
             {
               "name": "Authorization",
-              "value": "Bearer sb_publishable_LaKnyhFolHEkCtp1kJxp7Q_O8DwCkqO"
+              "value": "Bearer YOUR_SUPABASE_SERVICE_ROLE_KEY"
             },
             {
               "name": "Content-Type",
@@ -303,7 +303,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer lNKEGwRiOGNC2zaKOHIpCzz0IDiOPzUOIYq3VTiG"
+              "value": "Bearer YOUR_COHERE_API_KEY"
             },
             {
               "name": "Content-Type",
@@ -496,9 +496,10 @@
   "active": true,
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": true
   },
-  "versionId": "4cd35d97-73a9-4619-984f-328d93a0a04c",
+  "versionId": "3c6b689f-3be5-4058-ba86-d4f2996564cd",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "b8f395193caa3bc39aade7d6e74488229f6d7de80e7d77fba56cfa96f42a6551"
@@ -506,10 +507,10 @@
   "id": "wzsspG0RNXdfbVqQ",
   "tags": [
     {
-      "updatedAt": "2026-07-02T21:06:38.009Z",
-      "createdAt": "2026-07-02T21:06:38.009Z",
-      "id": "F5YQmRxL47YafnJa",
-      "name": "test_version"
+      "updatedAt": "2026-07-02T20:52:42.212Z",
+      "createdAt": "2026-07-02T20:52:42.212Z",
+      "id": "XtQJ2TAdgtP8Wyj9",
+      "name": "build_version"
     }
   ]
 }

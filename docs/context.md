@@ -1,433 +1,440 @@
-# Context
+# Contexto Completo do TFC
 
-## Overview
-
-This project is evolving from a basic Retrieval-Augmented Generation (RAG) MVP into a more robust document ingestion and semantic retrieval platform.
-
-The current architecture already supports:
-
-* Document upload via webhook
-* Text extraction
-* Text normalization
-* Chunking
-* Embedding generation with Cohere
-* Storage of embeddings in Supabase/pgvector
-* Semantic retrieval through vector similarity search
-* Response generation using an LLM
-
-The next iteration focuses on robustness, extensibility, metadata enrichment, and multi-format document support.
+> **Título:** Sistema de Gestão da Informação Organizacional Baseado em Agentes de Inteligência Artificial para Organizações Angolanas
+>
+> **Autor:** Cristiano Rodrigues
+>
+> **Instituição:** ISAF (Instituto Superior de Administração e Finanças)
+>
+> **Tipo:** Trabalho Final de Curso (TFC) — componente teórica + componente prática (protótipo funcional)
+>
+> **Data de última actualização deste ficheiro:** 2026-07-14
 
 ---
 
-# Current Goals
+## 1. Visão Geral do Projecto
 
-The platform must evolve to support:
+Este TFC é composto por duas vertentes:
 
-* Multiple document types
-* Robust ingestion pipelines
-* Metadata extraction and enrichment
-* Duplicate detection
-* Empty document validation
-* Storage of original documents
-* Better separation between document storage and vector storage
-* More maintainable workflows
+1. **Vertente Teórica** — Monografia académica que fundamenta o problema, revisa a literatura, descreve a metodologia e apresenta os resultados.
+2. **Vertente Prática** — Protótipo funcional de uma plataforma SaaS Multi-Tenant para gestão inteligente de documentos com Inteligência Artificial (RAG — Retrieval-Augmented Generation).
+
+O projecto demonstra como organizações angolanas podem centralizar, classificar e recuperar informação organizacional dispersa através de agentes de IA, combinando tecnologias modernas de desenvolvimento web com pipelines de processamento de linguagem natural.
 
 ---
 
-# Architectural Direction
+## 2. Problema de Investigação
 
-The system should be organized into distinct responsibilities:
+**Pergunta central:** Como desenvolver um sistema de gestão da informação organizacional, baseado em agentes de inteligência artificial, capaz de centralizar, classificar e facilitar a recuperação inteligente da informação em organizações angolanas?
 
-```text
-UPLOAD / SOURCE
-    ↓
-Document Registry
-    ↓
-Type Detection
-    ↓
-Text Extraction
-    ↓
-Validation
-    ↓
-Deduplication
-    ↓
-Metadata Extraction / Generation
-    ↓
-Chunking + Embeddings
-    ↓
-Vector Storage
+### Contexto do Problema
+- Nas organizações angolanas, a informação encontra-se dispersa em silos (documentos, emails, plataformas isoladas).
+- Processos manuais ou sistemas legados dificultam a recuperação de dados críticos.
+- A digitalização em Angola tem priorizado hardware, negligenciando a camada de inteligência aplicacional.
+- A IA ainda é vista como ferramenta de futuro, não como necessidade operacional imediata.
+
+### Objectivos
+**Geral:** Desenvolver um sistema baseado em agentes de IA para apoiar a centralização, classificação e recuperação inteligente da informação.
+
+**Específicos:**
+1. Identificar os principais desafios na gestão da informação no contexto angolano.
+2. Analisar soluções existentes de gestão da informação e sistemas inteligentes.
+3. Modelar a arquitectura de um sistema baseado em agentes de IA.
+4. Implementar um protótipo funcional do sistema.
+5. Avaliar o desempenho quanto à eficiência na recuperação da informação.
+
+### Hipóteses
+- **H1:** A implementação de um sistema baseado em agentes de IA melhora a eficiência na recuperação da informação organizacional.
+- **H2:** A centralização inteligente da informação reduz o tempo médio de busca por documentos e conteúdos relevantes.
+
+### Variáveis
+- **Independente:** Implementação do sistema baseado em agentes de IA.
+- **Dependentes:** Tempo médio de recuperação, precisão dos resultados, grau de satisfação dos utilizadores.
+
+---
+
+## 3. Estado Actual da Monografia Teórica
+
+O documento teórico (`docs/dot docx/Trabalho oficial.docx`) contém actualmente um pré-projecto/proposta com as seguintes secções redigidas:
+
+### Secções Existentes
+1. **Problema** — Título, formulação do problema, objectivos, justificação, limitações.
+2. **Marco de Referência** — Fundamentos teóricos (breve), antecedentes, hipóteses, variáveis.
+3. **Metodologia** — Tipo de pesquisa, procedimentos, técnicas de recolha, população/amostra, guia de campo.
+4. **Aspectos Administrativos** — Recursos, orçamento, cronograma.
+5. **Bibliografia Preliminar** — 3 referências (Choo, 2003; Russell & Norvig, 2021; Lopes, 2020).
+
+### Feedback do Tutor (Alterações Necessárias)
+1. **Referências bibliográficas** — Necessidade de adicionar referências para validar afirmações feitas ao longo do texto. Muitas afirmações estão sem suporte bibliográfico.
+2. **Formatação** — Substituir listas com bullet points por texto corrido em certas secções do trabalho (especialmente na fundamentação teórica e metodologia).
+
+### Lacunas Identificadas
+- A fundamentação teórica está muito superficial (apenas bullet points sem desenvolvimento).
+- Falta uma revisão de literatura aprofundada.
+- As referências bibliográficas são insuficientes (apenas 3).
+- Não há secção de "Estado da Arte" detalhada.
+- Falta a secção de "Resultados" (descrição do protótipo, testes, avaliação).
+- O capítulo de "Considerações Finais" ainda não existe.
+
+---
+
+## 4. Estrutura Esperada da Monografia (Modelo IGF)
+
+Com base no modelo de referência (`Modelo_TFC_IGF.pdf`), a estrutura esperada é:
+
+```
+ÍNDICE GERAL
+1. INTRODUÇÃO
+   1.2. Problemática da pesquisa
+   1.3. Objectivo da pesquisa
+   1.4. Justificativa
+   1.5. Organização do Trabalho
+
+2. FUNDAMENTAÇÃO TEÓRICA
+   2.1. [Subcapítulos adaptados ao tema — ver proposta abaixo]
+   ...
+
+3. PROCEDIMENTOS METODOLÓGICOS
+   3.1. Tipo de pesquisa
+   3.2. Pesquisa bibliográfica
+   3.3. População, amostra e amostragem
+   3.4. Técnicas e instrumentos de recolha de dados
+
+4. RESULTADOS DA PESQUISA
+   4.1. Apresentação e análise dos resultados
+     4.1.1. Metodologia do desenvolvimento
+     4.1.2. Requisitos (Funcionais e Não Funcionais)
+     4.1.3. Modelagem do Sistema
+       - Diagrama de Contexto
+       - Diagrama de Casos de Usos
+       - Especificação dos casos de usos
+       - Diagrama de Classes
+       - Diagrama Entidade Relacional
+     4.1.4. Qualidade do Software
+     4.1.5. Desenho do Sistema
+       - Escopo do Sistema
+       - Descrição dos Módulos
+       - Arquitectura Física e Lógica
+       - Ferramentas e Tecnologias Utilizadas
+       - Testes Realizados
+       - Protótipo das Telas
+       - Codificação
+       - Segurança aplicada no sistema
+
+5. CONSIDERAÇÕES FINAIS
+   5.1. Conclusões
+   5.2. Sugestões e Recomendações
+
+BIBLIOGRAFIA
 ```
 
-The architecture should progressively move away from a "single workflow does everything" model.
-
----
-
-# Core Concepts
-
-## Documents
-
-Documents are the primary entities in the system.
-
-A document:
-
-* Represents an uploaded or imported source
-* Stores metadata
-* Stores extracted and normalized text
-* Owns multiple chunks
-* Tracks ingestion state
-
-Suggested fields:
-
-```sql
-create table documents (
-  id uuid primary key default gen_random_uuid(),
-
-  source_type text,
-  original_name text,
-  mime_type text,
-
-  checksum text unique,
-
-  raw_text text,
-  normalized_text text,
-
-  author text,
-  created_at_source timestamptz,
-  detected_language text,
-
-  generated_summary text,
-  generated_subject text,
-  generated_keywords text[],
-
-  status text default 'pending',
-
-  file_size bigint,
-
-  inserted_at timestamptz default now()
-);
+### Proposta de Subcapítulos para a Fundamentação Teórica (adaptada ao tema)
 ```
-
----
-
-## Chunks
-
-Chunks are secondary entities linked to documents.
-
-A document may contain many chunks.
-
-Suggested structure:
-
-```sql
-create table chunks (
-  id uuid primary key default gen_random_uuid(),
-
-  document_id uuid references documents(id),
-
-  chunk_index integer,
-  content text,
-
-  embedding vector(1024)
-);
-```
-
----
-
-# Supported Sources
-
-## Text-Based Files
-
-Examples:
-
-* TXT
-* MD
-* DOCX
-* JSON
-* CSV
-
-Pipeline:
-
-```text
-file
-  ↓
-extract text
-  ↓
-normalize text
-```
-
----
-
-## PDFs
-
-The system must support both:
-
-* Textual PDFs
-* Scanned PDFs
-
-Recommended flow:
-
-```text
-PDF
- ├─ extract text
- └─ if extraction fails or text is empty:
-       OCR
-```
-
-OCR may use:
-
-* Tesseract
-* PaddleOCR
-* Google Vision API
-* Azure OCR
-
----
-
-## Images
-
-Images should pass through OCR.
-
-Pipeline:
-
-```text
-image
-  ↓
-OCR
-  ↓
-text normalization
-```
-
-Useful metadata:
-
-* resolution
-* image format
-* EXIF data (if available)
-
----
-
-## Emails
-
-Emails should be treated as structured documents.
-
-Relevant fields:
-
-* sender
-* recipients
-* subject
-* body
-* sent_date
-* attachments
-
-Attachments may recursively enter the ingestion pipeline.
-
-Possible integrations:
-
-* IMAP
-* Gmail API
-* Outlook API
-
----
-
-# Validation
-
-## Empty Document Detection
-
-The system must reject invalid or empty documents before embedding generation.
-
-Examples:
-
-* Empty text
-* OCR failure
-* Whitespace-only content
-* Extremely short content
-
-Example validation:
-
-```js
-if (!text || text.trim().length < 30)
-```
-
-Suggested status:
-
-```text
-EMPTY_DOCUMENT
+2. FUNDAMENTAÇÃO TEÓRICA
+   2.1. Gestão da Informação Organizacional
+     2.1.1. Conceito e importância da informação nas organizações
+     2.1.2. Ciclo de vida da informação (Modelo de Choo)
+     2.1.3. Desafios da gestão da informação no contexto angolano
+   2.2. Inteligência Artificial
+     2.2.1. Conceitos fundamentais de IA
+     2.2.2. Processamento de Linguagem Natural (NLP)
+     2.2.3. Modelos de Linguagem de Grande Escala (LLMs)
+     2.2.4. Embeddings e representação vectorial de texto
+   2.3. Retrieval-Augmented Generation (RAG)
+     2.3.1. Conceito e arquitectura RAG
+     2.3.2. Processo de chunking e indexação
+     2.3.3. Busca semântica vs busca por palavras-chave
+     2.3.4. Vantagens do RAG sobre abordagens tradicionais
+   2.4. Sistemas Multiagentes (SMA)
+     2.4.1. Definição de agentes de software
+     2.4.2. Arquitecturas multiagentes
+     2.4.3. Aplicações em gestão de informação
+   2.5. Tecnologias de Desenvolvimento Web
+     2.5.1. Arquitectura SaaS Multi-Tenant
+     2.5.2. Frameworks e ferramentas modernas (React, Next.js)
+     2.5.3. Bases de dados vectoriais (pgvector)
+     2.5.4. Plataformas de automação e orquestração (n8n)
+   2.6. Controlo de Acessos Baseado em Papéis (RBAC)
+     2.6.1. Conceitos de RBAC
+     2.6.2. Aplicação em ambientes multi-tenant
+   2.7. Estado da Arte
+     2.7.1. Soluções existentes de gestão documental inteligente
+     2.7.2. Comparação com a solução proposta
 ```
 
 ---
 
-## Duplicate Detection
+## 5. Arquitectura Técnica do Protótipo (Componente Prática)
 
-Duplicate detection should happen before chunk generation.
+### 5.1. Stack Tecnológica
 
-Recommended strategy:
+| Camada | Tecnologia | Papel |
+|--------|-----------|-------|
+| **Frontend** | Next.js 15, React 19, TypeScript, TailwindCSS 4 | Interface do utilizador SPA |
+| **Backend/API** | Next.js API Routes (App Router) | Lógica de negócio, autenticação, proxy para n8n |
+| **Base de Dados** | Supabase (PostgreSQL) | Dados relacionais, metadados, autenticação |
+| **Vector Store** | pgvector (extensão PostgreSQL) | Armazenamento de embeddings para busca semântica |
+| **Storage** | Supabase Storage (bucket `rag_documents`) | Ficheiros originais uploaded |
+| **Pipeline IA** | n8n (workflow automation) | Orquestração do pipeline RAG |
+| **Embeddings** | Cohere (API) | Geração de embeddings vectoriais (1024 dimensões) |
+| **LLM** | Cohere (Chat) | Geração de respostas baseadas em contexto |
+| **Animações** | Framer Motion | Micro-animações e transições da UI |
+| **Ícones** | Lucide React | Iconografia consistente |
+| **Formulários** | React Hook Form + Zod | Validação de formulários |
 
-1. Normalize text
-2. Generate checksum/hash
-3. Verify if checksum already exists
+### 5.2. Arquitectura do Sistema
 
-Recommended algorithm:
-
-* SHA256
-
-Normalization should include:
-
-* Lowercasing
-* Unicode normalization
-* Whitespace cleanup
-
-Suggested flow:
-
-```text
-normalize text
-    ↓
-hash
-    ↓
-check existing checksum
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         UTILIZADOR                              │
+│                     (Browser / Next.js)                         │
+└──────────────┬────────────────────────────┬─────────────────────┘
+               │                            │
+               ▼                            ▼
+┌──────────────────────┐      ┌──────────────────────────┐
+│   Next.js API Routes │      │    Supabase (PostgreSQL)  │
+│   /api/auth/*        │      │    ┌──────────────────┐   │
+│   /api/documents/*   │◄────►│    │ companies        │   │
+│   /api/users/*       │      │    │ users            │   │
+│   /api/departments/* │      │    │ roles            │   │
+│   /api/roles/*       │      │    │ permissions      │   │
+│   /api/chat/*        │      │    │ documents        │   │
+│   /api/upload/*      │      │    │ chunks (vector)  │   │
+│   /api/wiki/*        │      │    │ ai_chat_sessions │   │
+│   /api/dashboard/*   │      │    │ ai_chat_messages │   │
+└──────────┬───────────┘      │    │ departments      │   │
+           │                  │    │ role_permissions  │   │
+           ▼                  │    │ document_depts   │   │
+┌──────────────────────┐      │    │ document_perms   │   │
+│    n8n Workflows     │      │    └──────────────────┘   │
+│                      │      │                           │
+│  ┌─── /upload ────┐  │      │    ┌──────────────────┐   │
+│  │ Extract Text   │  │      │    │ Supabase Storage  │   │
+│  │ Chunk Text     │  │      │    │ (rag_documents)   │   │
+│  │ Embed (Cohere) │  │◄────►│    └──────────────────┘   │
+│  │ Store Vectors  │  │      │                           │
+│  └────────────────┘  │      │    ┌──────────────────┐   │
+│                      │      │    │ pgvector          │   │
+│  ┌─── /query ─────┐  │      │    │ (embeddings)      │   │
+│  │ Embed Question │  │      │    └──────────────────┘   │
+│  │ match_chunks() │  │◄────►│                           │
+│  │ LLM Response   │  │      └───────────────────────────┘
+│  └────────────────┘  │
+└──────────────────────┘
 ```
 
-Possible outcomes:
+### 5.3. Modelo de Dados (Schema SQL)
 
-* Ignore duplicate
-* Create new version
-* Link duplicate references
+O schema da base de dados inclui:
 
----
+- **`companies`** — Tabela de empresas (tenants). Cada empresa é um espaço isolado.
+- **`departments`** — Departamentos organizacionais, ligados a uma empresa.
+- **`roles`** — Cargos/papéis dentro da empresa (ex: admin, gestor, operador).
+- **`permissions`** — Permissões globais do sistema (ex: `doc:view`, `doc:upload`, `users:manage`).
+- **`role_permissions`** — Associação N:N entre cargos e permissões.
+- **`users`** — Utilizadores, cada um associado a uma empresa, um cargo e um departamento.
+- **`documents`** — Registo de documentos uploaded (metadados, estado n8n, referência ao storage).
+- **`document_departments`** — Controlo de acesso por departamento.
+- **`document_permissions`** — Controlo de acesso por cargo.
+- **`chunks`** — Trechos de texto extraídos dos documentos com os seus embeddings vectoriais.
+- **`ai_chat_sessions`** — Sessões de conversa com a IA.
+- **`ai_chat_messages`** — Mensagens individuais (user/assistant) dentro de cada sessão.
 
-# Metadata Extraction
+**Função crítica:** `match_chunks()` — Função PL/pgSQL que realiza busca semântica por similaridade vectorial, respeitando as permissões de acesso (RBAC + departamentos) com lógica AND/OR configurável por documento.
 
-The system should support two categories of metadata.
+### 5.4. Permissões Globais Seed
 
-## Explicit Metadata
-
-Extracted directly from the source.
-
-Examples:
-
-* File type
-* File size
-* PDF author
-* Creation date
-* Email sender
-* MIME type
-
----
-
-## Generated Metadata
-
-Generated using LLMs.
-
-Examples:
-
-* Summary
-* Subject
-* Keywords
-* Category
-* Language
-
-Suggested enrichment flow:
-
-```text
-normalized_text
-    ↓
-LLM enrichment
 ```
-
-Example response structure:
-
-```json
-{
-  "summary": "...",
-  "subject": "...",
-  "keywords": ["..."],
-  "category": "...",
-  "language": "pt"
-}
+doc:view, doc:upload, doc:delete, doc:manage_perms,
+wiki:view, wiki:generate,
+integrations:manage, users:manage
 ```
 
 ---
 
-# Storage Strategy
+## 6. Funcionalidades Implementadas (Estado Actual)
 
-The architecture should separate:
+### 6.1. Módulos da Aplicação
 
-1. Binary storage
-2. Relational metadata storage
-3. Vector storage
+| Módulo | Ficheiro Principal | Descrição |
+|--------|-------------------|-----------|
+| **Login/Registo** | `Login.tsx` | Autenticação com registo de empresa (tenant) |
+| **Dashboard** | `DashboardView.tsx` | Visão geral com estatísticas |
+| **Documentos** | `DocumentsView.tsx` | Listagem e gestão de documentos |
+| **Upload** | `UploadView.tsx` | Upload de ficheiros com controlo de acesso multi-departamental |
+| **Chat IA** | `IntelligentSearchView.tsx` | Interface de chat RAG com busca semântica |
+| **Wiki** | `WikiView.tsx` | Base de conhecimento gerada por IA (Só a interface ainda) |
+| **Integrações** | `IntegrationsView.tsx` | Gestão de integrações externas (Só a interface ainda) |
+| **Perfil** | `ProfileView.tsx` | Perfil do utilizador |
+| **Administração** | `AdminView.tsx` | Painel RBAC (gestão de utilizadores) |
+| **Departamentos** | `DepartmentsPanel.tsx` | CRUD de departamentos |
+| **Cargos** | `RolesPanel.tsx` | CRUD de cargos com permissões granulares |
 
-Suggested technologies:
+### 6.2. API Routes (Backend)
 
-* Supabase Storage → original files
-* PostgreSQL → metadata and relational data
-* pgvector → embeddings
+| Endpoint | Funcionalidade |
+|----------|---------------|
+| `/api/auth/*` | Autenticação (login, registo, sessão) |
+| `/api/chat/*` | Gestão de sessões e mensagens de chat IA |
+| `/api/dashboard/*` | Dados para o dashboard |
+| `/api/documents/*` | CRUD de documentos |
+| `/api/departments/*` | CRUD de departamentos |
+| `/api/roles/*` | CRUD de cargos |
+| `/api/permissions/*` | Gestão de permissões |
+| `/api/users/*` | Gestão de utilizadores |
+| `/api/upload/*` | Proxy de upload para n8n |
+| `/api/wiki/*` | Geração de conteúdos Wiki |
+| `/api/debug-rag/*` | Debugging do pipeline RAG |
+
+### 6.3. Pipeline RAG (n8n)
+
+O pipeline `minimal_ai_ingestion_pipeline.json` implementa dois fluxos:
+
+**Fluxo de Upload (`/upload`):**
+1. Recebe ficheiro via webhook
+2. Extrai texto do documento
+3. Divide em chunks
+4. Gera embeddings com Cohere (modelo embed-multilingual-v3.0, 1024 dimensões)
+5. Armazena chunks + embeddings na tabela `chunks` via Supabase
+
+**Fluxo de Query (`/query`):**
+1. Recebe pergunta via webhook
+2. Gera embedding da pergunta com Cohere
+3. Executa `match_chunks()` via RPC do Supabase (com filtros RBAC)
+4. Envia contexto + pergunta ao LLM (Cohere Chat)
+5. Retorna resposta com referências aos documentos fonte
 
 ---
 
-# Workflow Evolution
+## 7. Infraestrutura do Repositório
 
-The current workflows are MVP-oriented.
-
-Future improvements should focus on:
-
-* Better modularity
-* Retry mechanisms
-* Error handling
-* Status tracking
-* Observability
-* Easier debugging
-
-Suggested statuses:
-
-```text
-uploaded
-extracting
-normalizing
-enriching
-embedding
-completed
-failed
-duplicate
-empty
+```
+TFC/
+├── .agents/                    # Configurações de agentes AI (skills)
+├── .gemini/                    # Configurações Gemini
+├── .git/                       # Controlo de versão
+├── design/
+│   └── specs.md                # Especificações de design
+├── dist/                       # Output compilado (PDF da monografia, builds)
+├── docs/
+│   ├── chapters/               # Capítulos da monografia em Markdown
+│   │   └── 01-test.md          # Capítulo de teste (placeholder)
+│   ├── context.md              # ← ESTE FICHEIRO
+│   ├── dot docx/               # Ficheiros .docx (gitignored)
+│   │   ├── Trabalho oficial.docx
+│   │   └── references/         # PDFs de referência (modelo IGF, TFCs exemplo)
+│   ├── references.bib          # Bibliografia em BibTeX
+│   ├── structure.txt           # Ordem dos capítulos para compilação
+│   └── styles/
+│       └── apa.csl             # Estilo de citação APA
+├── n8n/
+│   └── minimal_ai_ingestion_pipeline.json  # Workflow n8n exportado
+├── scripts/
+│   └── build-doc.sh            # Script Pandoc para compilar monografia (MD → PDF)
+├── src/                        # Código-fonte da aplicação Next.js
+│   ├── app/                    # App Router (pages + API routes)
+│   ├── assets/                 # Assets estáticos
+│   ├── components/             # Componentes React
+│   │   ├── Login.tsx
+│   │   └── views/              # Módulos/vistas da aplicação
+│   │       ├── admin/          # Painéis administrativos
+│   │       ├── AdminView.tsx
+│   │       ├── DashboardView.tsx
+│   │       ├── DocumentsView.tsx
+│   │       ├── IntelligentSearchView.tsx
+│   │       ├── IntegrationsView.tsx
+│   │       ├── ProfileView.tsx
+│   │       ├── UploadView.tsx
+│   │       └── WikiView.tsx
+│   ├── hooks/                  # Custom React hooks
+│   └── lib/                    # Utilitários e contextos
+│       ├── auth-context.tsx    # Contexto de autenticação
+│       ├── supabase.ts         # Cliente Supabase
+│       ├── gemini.ts           # Integração Gemini
+│       ├── jwt.ts              # Utilidades JWT
+│       └── hash.ts             # Funções de hash
+├── supabase/
+│   └── schema.sql              # Schema completo da base de dados
+├── package.json                # Dependências raiz (Pandoc doc tools)
+├── README.md                   # Guia de configuração e setup
+└── .gitignore
 ```
 
 ---
 
-# Retrieval Improvements (Future)
+## 8. Pipeline de Compilação da Monografia
 
-The current retrieval pipeline is semantic-only.
+O projecto inclui um pipeline para compilar a monografia a partir de ficheiros Markdown:
 
-Future improvements may include:
-
-* Hybrid search
-
-  * semantic + keyword
-* Reranking
-* Multi-query retrieval
-* Query expansion
-* Metadata-aware filtering
-
-These improvements are not yet priorities during the current MVP-hardening phase.
+- **Ferramenta:** Pandoc (instalado no sistema)
+- **Script:** `scripts/build-doc.sh`
+- **Processo:** Lê `docs/structure.txt` → concatena capítulos Markdown → aplica bibliografia (`references.bib`) → aplica estilo APA (`styles/apa.csl`) → gera PDF em `dist/output.pdf`
+- **Estado actual:** Apenas com um capítulo de teste (`01-test.md`)
 
 ---
 
-# Immediate Priorities
+## 9. Referências Bibliográficas Existentes
 
-The next implementation priorities are:
+### No documento teórico:
+1. Choo, C. W. (2003). *The Knowing Organization*. Oxford University Press.
+2. Russell, S., & Norvig, P. (2021). *Artificial Intelligence: A Modern Approach*. Pearson.
+3. Lopes, R. (2020). *Estratégias de Transformação Digital em Países da SADC: O Caso de Angola*. Revista Angolana de Computação.
 
-1. Create a proper `documents` table
-2. Store original uploaded files
-3. Implement checksum-based deduplication
-4. Extract and generate metadata
-5. Add multi-format ingestion support
-6. Improve workflow robustness and observability
+### No ficheiro BibTeX (`references.bib`):
+1. Haverbeke, M. (2024). *Eloquent Javascript*. 4th Edition.
+
+### TFCs de Referência (na pasta `references/`):
+- `TFC_ANTONIOJANUARIO.pdf`
+- `TFC_CAROLINA MENDES- versão final.pdf`
 
 ---
 
-# Long-Term Direction
+## 10. Metodologia de Investigação
 
-The long-term goal is to evolve the platform into a flexible AI-powered document understanding system capable of:
+**Natureza:** Pesquisa aplicada
+**Objectivos:** Exploratória e descritiva
+**Abordagem:** Predominantemente qualitativa com apoio quantitativo
 
-* Semantic search
-* Intelligent document ingestion
-* Automated document classification
-* Metadata enrichment
-* Cross-document retrieval
-* Enterprise-style document workflows
-* Multi-source knowledge integration
+**Procedimentos:**
+- Pesquisa bibliográfica
+- Desenvolvimento tecnológico (prototipagem)
+
+**Técnicas de recolha:**
+- Revisão bibliográfica
+- Modelagem de requisitos
+- Testes funcionais e de desempenho
+- Simulação com dados estruturados
+
+---
+
+## 11. Decisões Técnicas Relevantes
+
+- **Supabase vs Firebase:** Escolha do Supabase por ser PostgreSQL nativo, suportar pgvector, e ser open-source.
+- **n8n vs código custom:** Uso de n8n para orquestração visual do pipeline RAG, facilitando iteração rápida.
+- **Cohere vs OpenAI:** Uso do Cohere para embeddings multilíngues (suporte a português) e custo mais acessível.
+- **Next.js App Router:** Escolha do App Router para API routes server-side e SSR.
+- **RBAC granular:** Sistema de permissões com lógica AND/OR entre departamentos e cargos para máxima flexibilidade.
+- **Multi-Tenant:** Isolamento de dados por `company_id` em todas as tabelas.
+- **Pandoc para monografia:** Permite escrever em Markdown com citações BibTeX e gerar PDF formatado.
+
+---
+
+## 12. Próximos Passos
+
+### Componente Prática
+- Melhorar robustez do pipeline RAG (retry, error handling, status tracking)
+- Suporte a múltiplos formatos (PDF com OCR, imagens)
+- Detecção de duplicados (checksum SHA256)
+- Extracção e geração de metadados com LLM
+- Implementação de busca híbrida (semântica + keyword)
+- Testes de desempenho formais
+- Configuração de RLS (Row Level Security) para produção
+
+### Componente Teórica
+- Expandir fundamentação teórica com subcapítulos desenvolvidos
+- Substituir bullet points por texto corrido
+- Adicionar referências bibliográficas ao longo de todo o texto
+- Redigir capítulo de Resultados (descrição detalhada do protótipo)
+- Criar diagramas UML (Casos de Uso, Classes, ER, Contexto)
+- Redigir capítulo de Considerações Finais
+- Completar bibliografia

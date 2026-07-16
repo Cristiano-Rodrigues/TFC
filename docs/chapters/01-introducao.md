@@ -16,10 +16,6 @@
 <!-- TODO: Justificação social/económica e académica -->
 <!-- Refs sugeridas: bealGestaoEstrategicaInformacao2004, detlorInformationManagement2010 -->
 
-## 1.4. Limitações
-
-<!-- TODO: Limitações do estudo -->
-
-## 1.5. Organização do Trabalho
+## 1.4. Organização do Trabalho
 
 <!-- TODO: Breve descrição de cada capítulo -->

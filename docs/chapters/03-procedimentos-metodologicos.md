@@ -1,3 +1,5 @@
+\clearpage
+
 # 3. Procedimentos Metodológicos
 
 ## 3.1. Tipo de Pesquisa
@@ -10,7 +12,7 @@ O processo de revisão da literatura que fundamenta este trabalho seguiu uma abo
 
 ## 3.3. População, Amostra e Amostragem
 
-No contexto alargado desta investigação, a população-alvo é constituída pelas organizações a operar em Angola que lidam diariamente com volumes significativos de informação dispersa (documentos, relatórios, manuais) e que carecem de sistemas inteligentes e centralizados de gestão do conhecimento. Dado o carácter eminentemente aplicado e de desenvolvimento de software deste Trabalho Final de Curso, a amostragem utilizada para a avaliação do sistema é não-probabilística e intencional. A amostra para a fase de testes e validação do protótipo restringe-se a um ambiente controlado de simulação empresarial, implementado através da criação de um *tenant* (inquilino) de teste. Esta amostra foi definida com base na estruturação de perfis de utilizadores fictícios, alocados a diferentes níveis hierárquicos e departamentos, e num *corpus* documental que reflecte a realidade de uma organização típica (normas, despachos e relatórios técnicos). Esta configuração controlada garante as condições necessárias para testar, de forma rigorosa e exaustiva, o isolamento de dados no ambiente multi-tenant e a eficácia das regras de Controlo de Acessos Baseado em Papéis (RBAC).
+No contexto alargado desta investigação, a população-alvo é constituída pelas organizações a operar em Angola que lidam diariamente com volumes significativos de informação dispersa (documentos, relatórios, manuais) e que carecem de sistemas inteligentes e centralizados de gestão do conhecimento. Dado o carácter eminentemente aplicado e de desenvolvimento de software deste Trabalho Final de Curso, a amostragem utilizada para a avaliação do sistema é não-probabilística e intencional. A amostra para a fase de testes e validação do protótipo restringe-se a um ambiente controlado de simulação empresarial, implementado através da criação de um *tenant* (inquilino) de teste. Esta amostra foi definida com base na estruturação de perfis de utilizadores fictícios, alocados a diferentes níveis hierárquicos e departamentos, e num *corpus* documental que reflecte a realidade de uma organização típica (normas, despachos e relatórios técnicos). Esta configuração controlada garante as condições necessárias para testar, de forma rigorosa, o isolamento de dados no ambiente multi-tenant e a eficácia das regras de Controlo de Acessos Baseado em Papéis (RBAC).
 
 ## 3.4. Técnicas e Instrumentos de Recolha de Dados
 

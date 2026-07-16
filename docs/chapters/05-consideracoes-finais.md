@@ -1,3 +1,5 @@
+\clearpage
+
 # 5. Considerações Finais
 
 ## 5.1. Conclusões

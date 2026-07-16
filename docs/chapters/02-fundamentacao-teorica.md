@@ -1,3 +1,5 @@
+\clearpage
+
 # 2. Fundamentação Teórica
 
 O presente capítulo apresenta o enquadramento teórico que sustenta o desenvolvimento do sistema proposto. Abordam-se os conceitos fundamentais da gestão da informação organizacional, da inteligência artificial e das tecnologias de desenvolvimento que compõem a arquitectura da solução, estabelecendo as bases conceptuais necessárias para a compreensão do trabalho realizado.

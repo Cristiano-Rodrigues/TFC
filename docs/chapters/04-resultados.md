@@ -1,3 +1,5 @@
+\clearpage
+
 # 4. Resultados da Pesquisa
 
 ## 4.1. Apresentação e Análise dos Resultados

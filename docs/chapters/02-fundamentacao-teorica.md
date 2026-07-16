@@ -1,111 +1,266 @@
 # 2. Fundamentação Teórica
 
+O presente capítulo apresenta o enquadramento teórico que sustenta o desenvolvimento do sistema proposto. Abordam-se os conceitos fundamentais da gestão da informação organizacional, da inteligência artificial e das tecnologias de desenvolvimento que compõem a arquitectura da solução, estabelecendo as bases conceptuais necessárias para a compreensão do trabalho realizado.
+
 ## 2.1. Gestão da Informação Organizacional
+
+A gestão da informação constitui uma disciplina essencial para o funcionamento eficaz das organizações contemporâneas. À medida que o volume de dados gerados cresce exponencialmente, a capacidade de uma organização para captar, organizar, armazenar e disponibilizar informação de forma eficiente torna-se um factor diferenciador competitivo. Esta secção aborda os conceitos centrais da gestão da informação e do conhecimento organizacional, bem como os desafios específicos do contexto angolano.
 
 ### 2.1.1. Conceito e Importância da Informação nas Organizações
 
-<!-- Refs: detlorInformationManagement2010, davenportWorkingKnowledgeHow2010 -->
+A informação pode ser definida como um conjunto de dados que, quando processados e contextualizados, adquirem significado e utilidade para o receptor. Segundo @detlorInformationManagement2010, a gestão da informação abrange o conjunto de processos organizacionais relativos à criação, aquisição, organização, armazenamento, distribuição e utilização da informação, tendo como objectivo apoiar os indivíduos, os grupos e a organização no acesso eficiente e na aplicação efectiva dos seus recursos informacionais.
+
+@davenportWorkingKnowledgeHow2010 argumentam que o conhecimento organizacional representa um recurso estratégico de elevado valor, distinguindo-o claramente dos dados brutos e da informação processada. Para estes autores, o conhecimento resulta da interpretação humana da informação, enriquecida pela experiência, pelo contexto e pela reflexão. Assim, enquanto os dados constituem factos discretos sobre eventos, a informação corresponde a dados dotados de relevância e propósito, e o conhecimento emerge quando essa informação é aplicada, testada e validada na prática.
+
+Neste sentido, as organizações que conseguem gerir eficazmente os seus recursos informacionais encontram-se em melhor posição para tomar decisões fundamentadas, reduzir redundâncias operacionais e responder de forma ágil às exigências do mercado. A gestão da informação deixou de ser uma função meramente técnica para se tornar numa competência estratégica organizacional.
 
 ### 2.1.2. Ciclo de Vida da Informação e o Modelo de Choo
 
-<!-- Refs: chooKnowingOrganizationHow2006, environmentalscanningistheacquisitionanduseofinformationabouteventsEnvironmentalScanningInformation -->
+O ciclo de vida da informação nas organizações compreende um conjunto de etapas interligadas que vão desde a identificação das necessidades informacionais até à utilização e eventual descarte da informação. @chooKnowingOrganizationHow2006 propõe um modelo integrado da "organização inteligente" (*The Knowing Organization*), segundo o qual as organizações utilizam a informação de forma estratégica em três processos fundamentais: a construção de sentido (*sense making*), a criação de conhecimento (*knowledge creating*) e a tomada de decisão (*decision making*).
+
+No processo de construção de sentido, a organização interpreta sinais do ambiente externo para compreender mudanças e tendências que possam afectar a sua actuação. @chooKnowingOrganizationHow2006 descreve este processo como essencial para a adaptação organizacional, na medida em que permite reduzir a ambiguidade e construir interpretações partilhadas sobre o contexto envolvente. A recolha activa de informação do meio externo, denominada *environmental scanning*, constitui um mecanismo crucial neste processo, permitindo que a organização identifique oportunidades e ameaças de forma antecipada [@environmentalscanningistheacquisitionanduseofinformationabouteventsEnvironmentalScanningInformation].
+
+Na fase de criação de conhecimento, a informação recolhida e interpretada é transformada em novos conhecimentos através da interacção entre membros da organização. Por fim, na tomada de decisão, o conhecimento acumulado é aplicado na selecção de cursos de acção, seguindo processos que podem variar entre modelos racionais e modelos mais adaptativos, dependendo do grau de incerteza envolvido.
+
+O modelo de Choo é particularmente relevante para este trabalho porque evidencia que a gestão da informação não se limita ao armazenamento de documentos, mas envolve processos dinâmicos de interpretação e transformação que devem ser suportados por ferramentas tecnológicas adequadas.
 
 ### 2.1.3. Gestão do Conhecimento Organizacional
 
-<!-- Refs: nonakaKnowledgeCreatingCompanyHow1995, davenportWorkingKnowledgeHow2010 -->
+A gestão do conhecimento constitui uma extensão natural da gestão da informação, focando-se nos processos pelos quais o conhecimento é criado, partilhado e aplicado dentro das organizações. @nonakaKnowledgeCreatingCompanyHow1995 apresenta o modelo SECI (*Socialisation, Externalisation, Combination, Internalisation*), que descreve quatro modos de conversão do conhecimento baseados na interacção entre conhecimento tácito e conhecimento explícito.
+
+O conhecimento tácito é pessoal, difícil de formalizar e está enraizado nas experiências, competências e intuições dos indivíduos. O conhecimento explícito, por outro lado, pode ser articulado em linguagem formal, documentado e transmitido através de meios estruturados. Segundo o modelo SECI, a criação de conhecimento organizacional ocorre quando o conhecimento tácito individual é convertido em conhecimento explícito acessível a toda a organização (externalização), e quando o conhecimento explícito disponível é interiorizado pelos indivíduos sob a forma de novos conhecimentos tácitos (internalização) [@nonakaKnowledgeCreatingCompanyHow1995].
+
+@davenportWorkingKnowledgeHow2010 complementam esta perspectiva ao defenderem que a gestão do conhecimento não pode ser reduzida a um problema tecnológico. Embora as tecnologias de informação desempenhem um papel facilitador, o sucesso da gestão do conhecimento depende igualmente de factores culturais, organizacionais e humanos. Estes autores sublinham a importância de criar ambientes que promovam a partilha voluntária de conhecimento e de reconhecer que o conhecimento mais valioso reside frequentemente nas pessoas e nas suas interacções, e não apenas nos repositórios documentais.
+
+Esta perspectiva é fundamental para o presente trabalho, uma vez que o sistema proposto procura precisamente facilitar a transição entre conhecimento tácito disperso e conhecimento explícito acessível, utilizando agentes de inteligência artificial para automatizar processos de extracção, organização e recuperação de informação organizacional a partir de múltiplas fontes, incluindo documentos, emails e canais de mensagens.
 
 ### 2.1.4. Desafios da Gestão da Informação no Contexto Angolano
 
-<!-- Refs: njohRelationshipModernInformation2018, quialaGOVERNOELETRONICOUMA2023, mttiLivroBrancoTIC2019, bealGestaoEstrategicaInformacao2004 -->
+O contexto angolano apresenta desafios específicos na gestão da informação organizacional que justificam a necessidade de soluções tecnológicas adaptadas. @njohRelationshipModernInformation2018 analisa a relação entre as Tecnologias de Informação e Comunicação (TIC) e o desenvolvimento no continente africano, identificando uma disparidade significativa entre a adopção de infraestruturas tecnológicas e a efectiva utilização dessas tecnologias para a transformação organizacional. O autor argumenta que, em muitos países africanos, os investimentos em TIC têm privilegiado a conectividade e o hardware, sem uma correspondente atenção à camada de software e de inteligência aplicacional.
+
+No caso específico de Angola, @quialaGOVERNOELETRONICOUMA2023 analisam a experiência angolana na implementação do governo electrónico, identificando limitações que incluem a necessidade de investimento em recursos tecnológicos, o desenvolvimento de acções de melhoria contínua na prestação de serviços públicos e a promoção da inclusão social e digital dos cidadãos. Os autores concluem que, apesar dos avanços registados, persistem desafios significativos na modernização administrativa e na digitalização dos processos organizacionais.
+
+O Livro Branco das Tecnologias de Informação e Comunicação, publicado pelo Ministério das Telecomunicações e Tecnologias de Informação [@mttiLivroBrancoTIC2019], estabelece directrizes estratégicas para o desenvolvimento do sector das TIC em Angola, reconhecendo a importância da transformação digital como factor de desenvolvimento económico e social. Este documento governamental evidencia que existe uma política nacional orientada para a modernização tecnológica, embora a implementação prática enfrente obstáculos relacionados com infraestrutura, formação de recursos humanos e adequação de soluções ao contexto local.
+
+@bealGestaoEstrategicaInformacao2004 argumenta que a gestão estratégica da informação requer uma abordagem sistémica que considere não apenas os aspectos tecnológicos, mas também os processos organizacionais, a cultura informacional e as competências dos utilizadores. Esta perspectiva é particularmente relevante para o contexto angolano, onde a introdução de novas tecnologias deve ser acompanhada por estratégias de capacitação e de gestão da mudança.
+
+Face a estes desafios, torna-se evidente a necessidade de soluções que não apenas armazenem documentos, mas que sejam capazes de extrair, classificar e disponibilizar informação de forma inteligente a partir de diversas fontes organizacionais --- documentos, emails e canais de mensagens ---, colmatando as lacunas existentes nos processos de gestão da informação das organizações angolanas.
 
 ## 2.2. Inteligência Artificial
 
+A Inteligência Artificial (IA) constitui o pilar tecnológico central do sistema proposto neste trabalho. Esta secção apresenta os conceitos fundamentais da IA, com particular enfoque no Processamento de Linguagem Natural, nos Modelos de Linguagem de Grande Escala e nas técnicas de representação vectorial de texto que sustentam o funcionamento do pipeline de Retrieval-Augmented Generation implementado.
+
 ### 2.2.1. Conceitos Fundamentais de IA
 
-<!-- Refs: russellArtificialIntelligenceModern2021, chowdharyIntroducingArtificialIntelligence2020 -->
+A Inteligência Artificial pode ser definida como o campo da ciência da computação dedicado ao desenvolvimento de sistemas capazes de realizar tarefas que tipicamente requerem inteligência humana. @russellArtificialIntelligenceModern2021 definem IA segundo quatro abordagens possíveis: sistemas que pensam como humanos, sistemas que pensam racionalmente, sistemas que actuam como humanos e sistemas que actuam racionalmente. Os autores adoptam a perspectiva do agente racional, definindo a IA como o estudo e a construção de agentes que agem de forma a maximizar o desempenho esperado, com base no conhecimento disponível e nas percepções do ambiente.
+
+@chowdharyIntroducingArtificialIntelligence2020 apresenta uma perspectiva complementar, distinguindo entre IA fraca (*narrow AI*), que se refere a sistemas especializados numa tarefa específica, e IA forte (*general AI*), que representaria uma inteligência comparável à humana em todas as dimensões cognitivas. Os sistemas actuais de IA, incluindo os Modelos de Linguagem de Grande Escala, enquadram-se na categoria de IA fraca, embora apresentem capacidades notáveis em domínios específicos como a compreensão e geração de linguagem natural.
+
+No contexto do presente trabalho, a IA é aplicada como ferramenta de automação inteligente para o processamento de informação organizacional e a sua recuperação eficiente. O sistema proposto utiliza técnicas de IA para extrair texto de documentos, emails e canais de mensagens, segmentá-lo em unidades semânticas, gerar representações vectoriais e produzir respostas contextualizadas a consultas dos utilizadores, constituindo uma aplicação prática de IA fraca no domínio da gestão da informação organizacional.
 
 ### 2.2.2. Processamento de Linguagem Natural (NLP)
 
-<!-- Refs: chowdharyNaturalLanguageProcessing2020, minRecentAdvancesNatural2024 -->
+O Processamento de Linguagem Natural (NLP, do inglês *Natural Language Processing*) é o subcampo da IA que se ocupa da interacção entre computadores e linguagem humana. @chowdharyNaturalLanguageProcessing2020 define NLP como a área que combina linguística computacional, ciência da computação e inteligência artificial para permitir que máquinas compreendam, interpretem e gerem linguagem natural de forma útil. O NLP engloba um vasto conjunto de tarefas, incluindo a análise sintáctica, a análise semântica, a tradução automática, a sumarização de textos, a resposta a perguntas e a extracção de informação.
+
+@minRecentAdvancesNatural2024 apresentam uma revisão abrangente dos avanços recentes no NLP impulsionados por modelos de linguagem pré-treinados (*Pre-trained Language Models* — PLMs). Os autores descrevem a evolução paradigmática do campo, desde os modelos estatísticos tradicionais, passando pelos modelos neuronais baseados em redes recorrentes, até aos modelos baseados na arquitectura *Transformer*. Esta evolução resultou em melhorias substanciais em praticamente todas as tarefas de NLP, sendo que os PLMs como BERT e GPT demonstraram que uma representação genérica da linguagem, aprendida a partir de grandes volumes de texto, pode ser transferida com sucesso para diversas tarefas específicas.
+
+A relevância do NLP para o presente trabalho é directa: todo o pipeline de processamento documental depende de técnicas de NLP para extrair significado dos textos, segmentá-los em unidades coerentes (*chunks*), e gerar respostas em linguagem natural a partir do contexto recuperado. A capacidade de processar documentos em língua portuguesa, incluindo variantes angolanas, constitui um requisito fundamental que influenciou as escolhas tecnológicas adoptadas, nomeadamente a utilização de modelos de embeddings multilíngues.
 
 ### 2.2.3. Modelos de Linguagem de Grande Escala (LLMs)
 
-<!-- Refs: naveedComprehensiveOverviewLarge2023, zhaoSurveyLargeLanguage2023 -->
+Os Modelos de Linguagem de Grande Escala (*Large Language Models* — LLMs) representam uma classe de modelos de IA treinados sobre vastos corpora textuais, capazes de compreender e gerar texto com um grau de coerência e sofisticação sem precedentes. @naveedComprehensiveOverviewLarge2023 fornecem uma visão abrangente dos LLMs, descrevendo a sua evolução desde os primeiros modelos de linguagem estatísticos até às arquitecturas actuais baseadas no mecanismo de atenção (*attention mechanism*) proposto na arquitectura *Transformer*.
+
+@zhaoSurveyLargeLanguage2023 aprofundam a análise dos LLMs, focando-se em quatro aspectos fundamentais: pré-treino, ajuste fino (*adaptation tuning*), utilização e avaliação de capacidades. Os autores destacam que, quando os modelos de linguagem ultrapassam uma determinada escala de parâmetros, emergem capacidades que não estão presentes em modelos de menor dimensão, um fenómeno designado por *emergent abilities*. Estas capacidades incluem o raciocínio em cadeia (*chain-of-thought reasoning*), a aprendizagem contextual (*in-context learning*) e a capacidade de seguir instruções complexas.
+
+No entanto, apesar das suas notáveis capacidades, os LLMs apresentam limitações importantes que motivam a adopção de arquitecturas como a RAG. Entre estas limitações, destacam-se as alucinações (geração de informação factualmente incorrecta mas plausível), o conhecimento desactualizado (limitado aos dados de treino) e a dificuldade em incorporar informação proprietária ou específica de um domínio [@naveedComprehensiveOverviewLarge2023]. Estas limitações são particularmente relevantes no contexto organizacional, onde a precisão factual e a actualidade da informação são requisitos críticos.
+
+O sistema proposto neste trabalho utiliza LLMs não como fonte autónoma de conhecimento, mas como componente de geração de respostas dentro de uma arquitectura RAG, onde o contexto relevante é previamente recuperado da base documental da organização. Esta abordagem mitiga as limitações referidas, ancorando as respostas do modelo em documentos concretos e verificáveis.
 
 ### 2.2.4. Embeddings e Representação Vectorial de Texto
 
-<!-- Refs: mikolovEfficientEstimationWord2013, reimersSentenceBERTSentenceEmbeddings2019 -->
+Os embeddings constituem representações numéricas de texto em espaços vectoriais de alta dimensionalidade, nas quais a proximidade geométrica entre vectores reflecte a similaridade semântica entre os textos correspondentes. Esta técnica é fundamental para o funcionamento da busca semântica no sistema proposto.
+
+O trabalho seminal de @mikolovEfficientEstimationWord2013 introduziu os modelos Word2Vec, que demonstraram que é possível aprender representações vectoriais de palavras a partir de grandes corpora textuais, utilizando arquitecturas neuronais eficientes. Os modelos propostos — *Continuous Bag-of-Words* (CBOW) e *Skip-gram* — revelaram que os vectores resultantes capturam relações semânticas e sintácticas entre palavras, permitindo operações algébricas com significado linguístico (por exemplo, *vector*(rei) - *vector*(homem) + *vector*(mulher) = *vector*(rainha)).
+
+Embora os embeddings ao nível da palavra tenham representado um avanço significativo, a representação de frases e documentos inteiros requer abordagens mais sofisticadas. @reimersSentenceBERTSentenceEmbeddings2019 propuseram o Sentence-BERT (SBERT), uma modificação da arquitectura BERT que utiliza redes siamesas para gerar embeddings ao nível da frase de forma eficiente. O SBERT demonstrou que é possível produzir representações semânticas de frases que mantêm a qualidade dos modelos baseados em *Transformer*, com um custo computacional significativamente inferior, tornando viável a busca semântica em grandes colecções de documentos.
+
+No sistema implementado neste trabalho, a geração de embeddings é realizada através da API da Cohere, utilizando o modelo *embed-multilingual-v3.0*, que produz vectores de 1024 dimensões e suporta múltiplas línguas, incluindo o português. Os embeddings gerados são armazenados na base de dados PostgreSQL através da extensão pgvector, permitindo a realização de buscas por similaridade vectorial em tempo real.
 
 ## 2.3. Retrieval-Augmented Generation (RAG)
 
+A Retrieval-Augmented Generation (RAG) constitui o paradigma central da arquitectura do sistema proposto neste trabalho. Esta abordagem combina as capacidades generativas dos LLMs com mecanismos de recuperação de informação, permitindo que os modelos produzam respostas fundamentadas em documentos concretos e actualizados. A presente secção descreve os fundamentos conceptuais, o processo técnico e os desafios associados à implementação de sistemas RAG.
+
 ### 2.3.1. Conceito e Arquitectura RAG
 
-<!-- Refs: lewisRetrievalAugmentedGenerationKnowledgeIntensive2020, gaoRetrievalAugmentedGenerationLarge2023 -->
+O conceito de Retrieval-Augmented Generation foi introduzido por @lewisRetrievalAugmentedGenerationKnowledgeIntensive2020, que propuseram um modelo que combina uma memória paramétrica (um modelo de linguagem pré-treinado) com uma memória não-paramétrica (um índice denso de documentos) para tarefas intensivas em conhecimento. Nesta arquitectura, perante uma consulta do utilizador, o sistema primeiro recupera documentos relevantes de uma base de conhecimento externa e, em seguida, utiliza esses documentos como contexto adicional para a geração da resposta pelo LLM. Os autores demonstraram que esta abordagem supera modelos puramente paramétricos em tarefas de pergunta-resposta em domínio aberto, produzindo respostas mais precisas, diversificadas e factualmente fundamentadas.
+
+@gaoRetrievalAugmentedGenerationLarge2023 apresentam uma revisão abrangente da evolução do paradigma RAG, distinguindo três gerações: o RAG ingénuo (*Naive RAG*), o RAG avançado (*Advanced RAG*) e o RAG modular (*Modular RAG*). O RAG ingénuo segue um processo linear de indexação, recuperação e geração. O RAG avançado introduz optimizações nas fases de pré-recuperação (refinamento das consultas) e de pós-recuperação (re-ordenação e filtragem dos resultados). O RAG modular, por sua vez, permite a composição flexível de componentes especializados, incluindo módulos de busca, de reformulação de consultas, de fusão de contexto e de verificação de consistência.
+
+@asaiReliableAdaptableAttributable2024 defendem que os modelos de linguagem aumentados por recuperação devem substituir os modelos puramente paramétricos como a próxima geração de sistemas de IA linguística, uma vez que oferecem três vantagens fundamentais: fiabilidade (respostas ancoradas em fontes verificáveis), adaptabilidade (capacidade de incorporar novos dados sem re-treino) e atribuibilidade (possibilidade de rastrear as fontes utilizadas na geração). Os autores propõem um roteiro para o desenvolvimento de sistemas RAG de propósito geral, destacando a necessidade de melhorar a interacção entre os componentes de recuperação e de geração.
+
+No sistema implementado neste trabalho, adopta-se uma arquitectura RAG que segue o paradigma avançado: os documentos, emails e mensagens organizacionais são processados, segmentados em *chunks*, convertidos em embeddings vectoriais e armazenados numa base de dados vectorial. Quando o utilizador submete uma consulta, esta é igualmente convertida em embedding, e os *chunks* semanticamente mais relevantes são recuperados e fornecidos ao LLM como contexto para a geração da resposta.
 
 ### 2.3.2. Processo de Chunking e Indexação
 
-<!-- Refs: gaoRetrievalAugmentedGenerationLarge2023, barnettSevenFailurePoints2024 -->
+O processo de *chunking* (segmentação) constitui uma etapa crítica na construção de um sistema RAG, determinando a granularidade das unidades de informação que serão indexadas e recuperadas. @gaoRetrievalAugmentedGenerationLarge2023 descrevem que a fase de indexação num sistema RAG envolve tipicamente três passos: a extracção de texto dos documentos fonte, a segmentação do texto em *chunks* de dimensão adequada, e a geração de embeddings vectoriais para cada *chunk*.
+
+A escolha da dimensão e da estratégia de segmentação dos *chunks* tem um impacto significativo na qualidade da recuperação. *Chunks* demasiado pequenos podem perder o contexto necessário para a compreensão, enquanto *chunks* demasiado grandes podem diluir a informação relevante e reduzir a precisão da busca semântica. @barnettSevenFailurePoints2024 identificam a segmentação inadequada como um dos sete pontos de falha em sistemas RAG, observando que a perda de informação durante o *chunking* pode resultar na incapacidade do sistema de recuperar contexto relevante, mesmo quando este existe na base documental.
+
+As estratégias de segmentação mais comuns incluem a divisão por número fixo de caracteres ou tokens, a divisão por parágrafos ou secções do documento, e abordagens semânticas que procuram manter a coerência temática de cada *chunk*. Adicionalmente, a utilização de sobreposição (*overlap*) entre *chunks* consecutivos permite preservar o contexto nas fronteiras de segmentação, mitigando a perda de informação [@gaoRetrievalAugmentedGenerationLarge2023].
+
+No sistema proposto, o processo de *chunking* é orquestrado pelo workflow n8n, que extrai o texto dos documentos carregados, segmenta-o em unidades coerentes e gera os respectivos embeddings através da API da Cohere, armazenando-os na base de dados PostgreSQL com a extensão pgvector.
 
 ### 2.3.3. Busca Semântica e Bases de Dados Vectoriais
 
-<!-- Refs: karpukhinDensePassageRetrieval2020, panSurveyVectorDatabase2023, maComprehensiveSurveyVector2023 -->
+A busca semântica distingue-se fundamentalmente da busca tradicional por palavras-chave ao operar sobre representações vectoriais do significado, em vez de correspondências lexicais exactas. @karpukhinDensePassageRetrieval2020 propuseram o *Dense Passage Retrieval* (DPR), demonstrando que a recuperação densa baseada em embeddings supera significativamente os métodos esparsos tradicionais como o BM25 em tarefas de pergunta-resposta em domínio aberto. O DPR utiliza dois encoders BERT independentes --- um para codificar as consultas e outro para codificar as passagens --- treinados de forma a maximizar a similaridade entre consultas e passagens relevantes no espaço vectorial.
+
+@izacardLeveragingPassageRetrieval2021 demonstraram que a combinação de recuperação densa com modelos generativos (*Fusion-in-Decoder*) produz resultados superiores, ao permitir que o modelo generativo processe simultaneamente múltiplas passagens recuperadas, extraindo e sintetizando informação relevante de forma mais eficaz do que abordagens que se limitam a uma única passagem.
+
+O armazenamento e a pesquisa eficiente de embeddings em larga escala requerem infraestruturas especializadas, designadas por bases de dados vectoriais. @panSurveyVectorDatabase2023 apresentam uma revisão dos sistemas de gestão de bases de dados vectoriais, identificando cinco desafios principais: a imprecisão inerente à similaridade semântica, a elevada dimensionalidade dos vectores, o custo computacional das comparações de similaridade, a ausência de partições naturais para indexação e a dificuldade de responder eficientemente a consultas híbridas que combinam atributos e vectores.
+
+@maComprehensiveSurveyVector2023 complementam esta análise com uma revisão das técnicas de armazenamento e recuperação em bases de dados vectoriais, incluindo métodos de compressão (quantização), estratégias de particionamento e algoritmos de busca aproximada do vizinho mais próximo (*Approximate Nearest Neighbor* --- ANN). Os autores destacam a crescente integração entre bases de dados vectoriais e LLMs como uma tendência estruturante no desenvolvimento de sistemas de IA aplicados.
+
+O sistema proposto neste trabalho utiliza a extensão pgvector do PostgreSQL como base de dados vectorial, o que permite combinar a busca semântica por similaridade vectorial com consultas relacionais tradicionais numa única plataforma. Esta escolha arquitectural possibilita a implementação de consultas híbridas que filtram os resultados semânticos com base em critérios de acesso (departamento e cargo do utilizador), através da função `match_chunks()` implementada em PL/pgSQL.
 
 ### 2.3.4. Avaliação e Desafios de Sistemas RAG
 
-<!-- Refs: barnettSevenFailurePoints2024, thakurBEIRHeterogenousBenchmark2021 -->
+A avaliação de sistemas RAG apresenta desafios específicos que vão além das métricas tradicionais de recuperação de informação. @barnettSevenFailurePoints2024 identificam sete pontos de falha comuns em sistemas RAG, organizados em duas categorias: falhas na fase de recuperação e falhas na fase de geração. Na fase de recuperação, os autores identificam problemas como a ausência de conteúdo relevante na base de conhecimento, a recuperação de *chunks* irrelevantes apesar da existência de conteúdo pertinente, e a perda de contexto durante a segmentação. Na fase de geração, os pontos de falha incluem a incapacidade do modelo de extrair a resposta correcta do contexto fornecido, a geração de respostas imprecisas ou incompletas, e a produção de respostas que contradizem o contexto recuperado.
+
+Estas observações são particularmente relevantes para o presente trabalho, uma vez que orientam as decisões de concepção do sistema. A validação de que o sistema é eficaz na recuperação e geração requer não apenas testes técnicos de precisão e revocação, mas também a avaliação da experiência do utilizador final na obtenção de respostas úteis e fiáveis.
+
+@thakurBEIRHeterogenousBenchmark2021 propõem o BEIR (*Benchmarking Information Retrieval*), um benchmark heterogéneo para a avaliação de modelos de recuperação de informação em cenários de transferência zero-shot. Os autores demonstram que, embora os métodos de recuperação densa apresentem resultados promissores em domínios específicos, a sua capacidade de generalização para domínios não vistos durante o treino permanece limitada em comparação com métodos léxicos como o BM25. Esta constatação sugere que abordagens híbridas, que combinam busca semântica e léxica, podem oferecer uma robustez superior em cenários práticos, constituindo uma direcção de desenvolvimento futuro para o sistema proposto.
 
 ## 2.4. Sistemas Multiagentes (SMA)
 
+Os Sistemas Multiagentes constituem o paradigma de engenharia de software que inspira a arquitectura do sistema proposto, no qual múltiplos componentes autónomos colaboram para realizar tarefas complexas de gestão da informação. Esta secção apresenta os conceitos fundamentais dos agentes de software, as arquitecturas multiagentes e a convergência recente entre SMA e LLMs.
+
 ### 2.4.1. Definição e Tipos de Agentes de Software
 
-<!-- Refs: wooldridgeIntroductionMultiagentSystems2012, russellArtificialIntelligenceModern2021 -->
+O conceito de agente de software constitui um dos pilares da Inteligência Artificial. @wooldridgeIntroductionMultiagentSystems2012 define um agente como um sistema computacional situado num determinado ambiente, capaz de agir de forma autónoma para atingir os seus objectivos. O autor distingue duas concepções de agente: uma concepção fraca, que se refere a sistemas com propriedades de autonomia, reactividade, pro-actividade e capacidade social; e uma concepção forte, que acrescenta atributos como crenças, desejos, intenções e capacidade de aprendizagem.
+
+@russellArtificialIntelligenceModern2021 adoptam uma perspectiva centrada no agente racional, definindo-o como uma entidade que percebe o seu ambiente através de sensores e actua sobre ele através de actuadores, de forma a maximizar uma medida de desempenho. Os autores classificam os agentes segundo a sua complexidade interna em cinco tipos: agentes reactivos simples, agentes reactivos baseados em modelo, agentes baseados em objectivos, agentes baseados em utilidade e agentes com aprendizagem. Esta taxonomia é útil para compreender o espectro de capacidades que os agentes podem exibir, desde respostas reflexas simples até comportamentos sofisticados com planeamento e adaptação.
+
+No sistema proposto neste trabalho, os agentes de IA funcionam como componentes autónomos especializados em tarefas específicas dentro do pipeline de processamento da informação: um agente é responsável pela extracção de texto, outro pela segmentação, outro pela geração de embeddings e outro pela síntese de respostas. Cada agente opera de forma autónoma mas coordenada, seguindo o modelo de agentes baseados em objectivos com capacidade reactiva.
 
 ### 2.4.2. Arquitecturas Multiagentes
 
-<!-- Refs: weissMultiagentSystems2013, dorriMultiAgentSystemsSurvey2018 -->
+Um Sistema Multiagente (SMA) é composto por múltiplos agentes que interagem entre si para atingir objectivos individuais ou colectivos. @weissMultiagentSystems2013 apresenta uma visão abrangente dos SMA, abordando aspectos como a comunicação entre agentes, os protocolos de coordenação, os mecanismos de negociação e as estratégias de cooperação e competição. O autor destaca que a principal vantagem dos SMA reside na sua capacidade de resolver problemas que excedem a competência de um único agente, através da decomposição de tarefas complexas em subtarefas especializadas.
+
+@dorriMultiAgentSystemsSurvey2018 realizam uma revisão abrangente dos SMA, identificando três arquitecturas fundamentais: arquitecturas reactivas, em que os agentes respondem directamente a estímulos do ambiente sem manter um modelo interno; arquitecturas deliberativas (ou cognitivas), em que os agentes mantêm representações internas do mundo e planeiam as suas acções; e arquitecturas híbridas, que combinam elementos reactivos e deliberativos em camadas complementares. Os autores sublinham que os SMA encontram aplicação em domínios tão diversos como a robótica, os sistemas de transporte inteligente, a gestão de redes de energia e o comércio electrónico.
+
+A arquitectura do sistema proposto neste trabalho segue um modelo de orquestração, no qual um componente central (a plataforma n8n) coordena a execução sequencial dos agentes especializados dentro do pipeline de processamento. Esta abordagem combina a flexibilidade dos SMA com a previsibilidade de um fluxo de trabalho orquestrado, permitindo que cada agente se concentre na sua tarefa específica enquanto a coordenação global é garantida pela plataforma de automação.
 
 ### 2.4.3. Agentes Autónomos Baseados em LLMs
 
-<!-- Refs: wangSurveyLargeLanguage2023, schickToolformerLanguageModels2023, kluschInformationAgentTechnology2001 -->
+O advento dos Modelos de Linguagem de Grande Escala trouxe uma transformação profunda ao campo dos Sistemas Multiagentes, permitindo a criação de agentes com capacidades linguísticas e de raciocínio sem precedentes. @wangSurveyLargeLanguage2023 apresentam uma revisão abrangente dos agentes autónomos baseados em LLMs, propondo um enquadramento unificado que identifica três componentes essenciais: o módulo de perfil (que define o papel e os objectivos do agente), o módulo de memória (que armazena experiências e contexto) e o módulo de acção (que planeia e executa tarefas). Os autores analisam as aplicações destes agentes em domínios como as ciências sociais, as ciências naturais e a engenharia.
+
+@schickToolformerLanguageModels2023 demonstraram que os LLMs podem aprender, de forma auto-supervisionada, a utilizar ferramentas externas através de APIs, decidindo quando invocar uma ferramenta, quais argumentos passar e como integrar os resultados na geração subsequente. Esta capacidade de *tool-use* é fundamental para a construção de agentes de IA que não se limitam à geração de texto, mas que podem interagir com bases de dados, APIs e outros sistemas de forma autónoma.
+
+No domínio específico da gestão da informação, @kluschInformationAgentTechnology2001 antecipou o potencial dos agentes de informação na Internet, definindo-os como sistemas que actuam em nome de utilizadores ou de outras aplicações para realizar tarefas de busca, filtragem, negociação e integração de informação proveniente de múltiplas fontes heterogéneas. As ideias seminais de Klusch materializam-se hoje em sistemas que combinam agentes baseados em LLMs com capacidades de recuperação de informação, como é o caso do sistema proposto neste trabalho.
+
+A convergência entre SMA e LLMs é particularmente relevante para o presente trabalho porque o sistema proposto implementa, na prática, um SMA onde agentes especializados --- orquestrados pela plataforma n8n --- executam tarefas de extracção, processamento e recuperação de informação, utilizando LLMs como motor de compreensão e geração de linguagem natural. Esta arquitectura permite que o sistema seja extensível a novas fontes de dados (emails, canais de mensagens) e a novas capacidades (sumarização automática, geração de wikis) através da adição de novos agentes ao pipeline.
 
 ## 2.5. Tecnologias de Desenvolvimento
 
+A implementação do sistema proposto neste trabalho requer a integração de diversas tecnologias que, em conjunto, sustentam a arquitectura de uma plataforma SaaS multi-tenant com capacidades de inteligência artificial. Esta secção apresenta os fundamentos teóricos das principais tecnologias adoptadas, justificando as escolhas realizadas à luz dos requisitos do sistema.
+
 ### 2.5.1. Arquitectura SaaS e Multi-Tenancy
 
-<!-- Refs: erlCloudComputingConcepts2013, tsaiServiceOrientedCloudComputing2010 -->
+O modelo *Software as a Service* (SaaS) constitui um dos três modelos fundamentais de entrega de serviços em *cloud computing*, juntamente com o *Infrastructure as a Service* (IaaS) e o *Platform as a Service* (PaaS). @erlCloudComputingConcepts2013 define SaaS como um modelo no qual o software é disponibilizado como um serviço acessível pela Internet, sendo o fornecedor responsável pela gestão da infraestrutura, da plataforma e da própria aplicação. Neste modelo, os utilizadores acedem ao software através de um navegador web, sem necessidade de instalação local, beneficiando de actualizações automáticas e de uma redução significativa dos custos de manutenção.
+
+Um conceito central na arquitectura SaaS é o de *multi-tenancy* (multi-inquilinato), que se refere à capacidade de uma única instância da aplicação servir múltiplos clientes (designados *tenants*) de forma simultânea, mantendo o isolamento dos dados e das configurações de cada um. @tsaiServiceOrientedCloudComputing2010 descrevem a arquitectura orientada a serviços em ambientes de *cloud computing*, destacando que o multi-tenancy permite optimizar a utilização de recursos e reduzir os custos operacionais, ao partilhar uma infraestrutura comum entre múltiplos inquilinos.
+
+O isolamento de dados num ambiente multi-tenant pode ser implementado segundo diferentes estratégias, que variam no grau de partilha: bases de dados separadas por tenant, esquemas separados dentro da mesma base de dados, ou tabelas partilhadas com discriminadores de tenant. O sistema proposto neste trabalho adopta a terceira abordagem, utilizando um campo `company_id` como discriminador em todas as tabelas da base de dados, complementado por políticas de controlo de acesso ao nível das linhas (*Row Level Security*) para garantir o isolamento entre empresas.
+
+Esta escolha arquitectural permite que múltiplas organizações angolanas utilizem a mesma instância da plataforma, cada uma com os seus documentos, utilizadores, departamentos e configurações de acesso isolados, sem necessidade de infraestruturas dedicadas. Esta abordagem é particularmente adequada ao contexto angolano, onde a partilha de recursos tecnológicos pode contribuir para a redução de custos e para a democratização do acesso a ferramentas de gestão inteligente da informação.
 
 ### 2.5.2. Frameworks Web Modernos (React, Next.js)
 
-<!-- Refs: banksLearningReactModern2020, rivaRealWorldNextjsBuild2022 -->
+O desenvolvimento de interfaces web modernas e interactivas requer a utilização de *frameworks* que facilitem a construção de componentes reutilizáveis, a gestão do estado da aplicação e a optimização do desempenho. @banksLearningReactModern2020 apresentam o React como uma biblioteca JavaScript para a construção de interfaces de utilizador baseadas em componentes. Os autores descrevem o modelo declarativo do React, no qual o programador especifica o estado desejado da interface e a biblioteca se encarrega de actualizar eficientemente o DOM (*Document Object Model*) para reflectir as alterações, através de um mecanismo de reconciliação virtual.
+
+O React introduziu conceitos que se tornaram paradigmáticos no desenvolvimento web moderno, nomeadamente a composição de componentes, o fluxo unidireccional de dados e os *hooks* para a gestão de estado e de efeitos colaterais. Estes conceitos promovem a modularidade, a reutilização de código e a manutenibilidade das aplicações [@banksLearningReactModern2020].
+
+@rivaRealWorldNextjsBuild2022 descreve o Next.js como um *framework* construído sobre o React que acrescenta funcionalidades essenciais para aplicações de produção, incluindo a renderização do lado do servidor (*Server-Side Rendering* --- SSR), a geração estática de páginas (*Static Site Generation* --- SSG), a renderização incremental estática (*Incremental Static Regeneration* --- ISR) e um sistema de rotas baseado no sistema de ficheiros. O autor destaca que o Next.js simplifica significativamente a arquitectura de aplicações web ao unificar o *frontend* e o *backend* numa única plataforma, permitindo a implementação de rotas de API (*API Routes*) directamente no mesmo projecto.
+
+O sistema proposto neste trabalho utiliza o Next.js 15 com o *App Router*, que introduz os *React Server Components* como paradigma por defeito, permitindo a renderização de componentes directamente no servidor e reduzindo a quantidade de JavaScript enviada ao cliente. As rotas de API do Next.js são utilizadas como camada de backend para a autenticação, a gestão de dados e a comunicação com os serviços externos (Supabase e n8n), evitando a necessidade de um servidor backend separado.
 
 ### 2.5.3. Bases de Dados e Armazenamento Vectorial (PostgreSQL, pgvector)
 
-<!-- Refs: obePostgreSQLRunningPractical2018, panSurveyVectorDatabase2023 -->
+A escolha da base de dados constitui uma decisão arquitectural fundamental em qualquer sistema de informação. @obePostgreSQLRunningPractical2018 apresentam o PostgreSQL como um sistema de gestão de bases de dados relacional de código aberto, reconhecido pela sua robustez, conformidade com os padrões SQL, extensibilidade e capacidade de lidar com cargas de trabalho complexas. Os autores destacam que o PostgreSQL suporta tipos de dados avançados, funções definidas pelo utilizador, índices especializados e mecanismos sofisticados de controlo de concorrência, tornando-o adequado para aplicações empresariais de grande escala.
+
+Uma das características mais relevantes do PostgreSQL para o presente trabalho é a sua extensibilidade, que permite a adição de funcionalidades especializadas sem modificar o núcleo do sistema. A extensão pgvector adiciona ao PostgreSQL a capacidade de armazenar e pesquisar vectores de alta dimensionalidade, possibilitando a realização de buscas por similaridade vectorial directamente na base de dados relacional. @panSurveyVectorDatabase2023 distinguem entre duas abordagens para o armazenamento vectorial: os sistemas nativos, construídos de raiz para a gestão de vectores (como Pinecone, Weaviate e Milvus), e os sistemas estendidos, que incorporam capacidades vectoriais em bases de dados existentes (como o pgvector no PostgreSQL).
+
+A escolha do pgvector sobre bases de dados vectoriais nativas justifica-se por várias razões no contexto deste trabalho. Em primeiro lugar, permite unificar os dados relacionais (utilizadores, documentos, permissões) e os dados vectoriais (embeddings) numa única plataforma, simplificando a arquitectura e eliminando a necessidade de sincronização entre sistemas. Em segundo lugar, possibilita a implementação de consultas híbridas que combinam filtros relacionais (departamento, cargo, permissões) com buscas por similaridade vectorial, através da função `match_chunks()` implementada em PL/pgSQL. Em terceiro lugar, o PostgreSQL é suportado nativamente pela plataforma Supabase, que fornece adicionalmente serviços de autenticação, armazenamento de ficheiros e APIs REST automáticas, reduzindo significativamente a complexidade da infraestrutura.
 
 ### 2.5.4. Automação e Orquestração de Workflows (n8n)
 
-<!-- Refs: syedRoboticProcessAutomation2020 -->
+A automação de processos constitui um factor essencial na construção de sistemas inteligentes que processam informação de forma autónoma. @syedRoboticProcessAutomation2020 realizam uma revisão abrangente da Automação Robótica de Processos (RPA), definindo-a como a utilização de software para automatizar tarefas repetitivas e baseadas em regras que anteriormente requeriam intervenção humana. Os autores identificam tendências emergentes na convergência entre RPA e inteligência artificial, apontando para a evolução da automação simples baseada em regras para a automação inteligente que incorpora capacidades de aprendizagem e de tomada de decisão.
+
+O n8n é uma plataforma de automação de workflows de código aberto que permite a criação de pipelines de processamento através de uma interface visual de *drag-and-drop*. Ao contrário de ferramentas proprietárias como o Zapier ou o Microsoft Power Automate, o n8n pode ser auto-hospedado, garantindo o controlo total sobre os dados processados --- uma consideração importante em contextos organizacionais onde a confidencialidade da informação é um requisito. A plataforma suporta a integração com centenas de serviços externos através de conectores pré-construídos e permite a criação de lógica personalizada através de nós de código JavaScript.
+
+No sistema proposto, o n8n desempenha o papel de orquestrador central do pipeline RAG, coordenando a execução dos agentes de processamento através de workflows especializados. Os workflows de ingestão processam informação proveniente de diversas fontes --- documentos, emails e canais de mensagens ---, extraindo o texto, segmentando-o em *chunks*, gerando embeddings através da API da Cohere e armazenando os resultados na base de dados. O workflow de consulta recebe perguntas do utilizador, gera o embedding da consulta, executa a função `match_chunks()` para recuperar contexto relevante e invoca o LLM para gerar a resposta. Esta arquitectura modular permite que novos fluxos de ingestão e processamento sejam adicionados sem modificar o código da aplicação principal, bastando criar ou estender workflows no n8n.
 
 ## 2.6. Controlo de Acessos Baseado em Papéis (RBAC)
 
+A segurança e o controlo de acessos constituem requisitos fundamentais em qualquer sistema de informação organizacional, especialmente quando este gere documentos sensíveis em ambiente multi-tenant. Esta secção apresenta os fundamentos do modelo RBAC e a sua aplicação no contexto de plataformas multi-tenant.
+
 ### 2.6.1. O Modelo RBAC
 
-<!-- Refs: sandhuRolebasedAccessControl1996, ferraioloProposedNISTStandard2001 -->
+O controlo de acessos baseado em papéis (*Role-Based Access Control* --- RBAC) foi formalizado por @sandhuRolebasedAccessControl1996, que propuseram uma família de modelos de referência nos quais as permissões de acesso são atribuídas a papéis organizacionais, e os utilizadores recebem acesso ao sistema através da sua associação a esses papéis. Esta abordagem contrasta com os modelos de controlo de acesso discricionário (DAC), onde as permissões são atribuídas directamente a utilizadores individuais, e com os modelos de controlo de acesso obrigatório (MAC), onde as permissões são definidas por políticas centralizadas baseadas em classificações de segurança.
+
+O modelo RBAC base define três componentes fundamentais: utilizadores, papéis e permissões. Os utilizadores são associados a papéis, e os papéis são associados a permissões, criando uma camada de indirecta que simplifica significativamente a administração do controlo de acessos. @sandhuRolebasedAccessControl1996 argumentam que esta abordagem reflecte a estrutura organizacional natural das empresas, onde os direitos de acesso dependem da função desempenhada pelo colaborador, e não da sua identidade individual.
+
+@ferraioloProposedNISTStandard2001 propuseram a normalização do modelo RBAC pelo National Institute of Standards and Technology (NIST), definindo quatro componentes hierárquicos: o RBAC base (*Core RBAC*), que estabelece os elementos fundamentais de utilizadores, papéis, permissões e sessões; o RBAC hierárquico (*Hierarchical RBAC*), que introduz relações de herança entre papéis; o RBAC com separação estática de deveres (*Static Separation of Duty*), que impede a atribuição de papéis conflituantes ao mesmo utilizador; e o RBAC com separação dinâmica de deveres (*Dynamic Separation of Duty*), que aplica restrições ao nível da sessão activa.
+
+No sistema proposto, implementa-se o modelo RBAC base complementado com uma dimensão departamental. Cada utilizador é associado a um cargo (papel) e a um departamento, e cada cargo possui um conjunto de permissões granulares (como `doc:view`, `doc:upload`, `users:manage`). Esta combinação permite um controlo de acessos que respeita simultaneamente a hierarquia funcional e a estrutura organizacional da empresa.
 
 ### 2.6.2. RBAC em Ambientes Multi-Tenant
 
-<!-- Refs: ferraioloProposedNISTStandard2001, erlCloudComputingConcepts2013 -->
+A aplicação do modelo RBAC em ambientes multi-tenant introduz uma camada adicional de complexidade, uma vez que é necessário garantir que as políticas de acesso de cada tenant são independentes e que os dados de um tenant nunca são acessíveis a utilizadores de outro tenant. @ferraioloProposedNISTStandard2001 sublinham que o RBAC deve ser suficientemente flexível para acomodar diferentes políticas de segurança em diferentes contextos organizacionais, o que é particularmente relevante quando múltiplas organizações partilham a mesma instância de uma aplicação SaaS.
+
+@erlCloudComputingConcepts2013 abordam a segurança em ambientes de *cloud computing*, destacando que o isolamento entre tenants deve ser garantido em múltiplas camadas: ao nível da rede, ao nível do armazenamento e ao nível da aplicação. No contexto de uma aplicação SaaS multi-tenant, o controlo de acessos ao nível da aplicação é frequentemente implementado através de filtros que restringem as consultas à base de dados aos registos pertencentes ao tenant do utilizador autenticado.
+
+No sistema proposto neste trabalho, o isolamento multi-tenant é implementado através de uma combinação de estratégias. Em primeiro lugar, todas as tabelas da base de dados incluem um campo `company_id` que identifica o tenant proprietário de cada registo. Em segundo lugar, as rotas de API verificam a autenticação do utilizador e filtram automaticamente os resultados pelo `company_id` correspondente. Em terceiro lugar, a função `match_chunks()`, responsável pela busca semântica, aplica filtros baseados no departamento e no cargo do utilizador, garantindo que os resultados da pesquisa respeitam as permissões de acesso definidas para cada documento. Esta abordagem implementa, na prática, uma política de controlo de acessos que combina o isolamento ao nível do tenant com o controlo granular ao nível do RBAC departamental, assegurando que cada utilizador apenas acede à informação que lhe é permitida pela sua posição na organização.
+
 
 ## 2.7. Estado da Arte
 
+A presente secção analisa o panorama actual das soluções de gestão documental inteligente, situando o sistema proposto neste trabalho face às alternativas existentes no mercado e na literatura académica. Esta análise visa identificar as lacunas que o sistema proposto procura colmatar e justificar as escolhas arquitecturais adoptadas.
+
 ### 2.7.1. Soluções Existentes de Gestão Documental Inteligente
 
-<!-- TODO: Precisa de referências adicionais — ver nota no context.md -->
-<!-- Sugestões de soluções a analisar: -->
-<!-- - Sistemas empresariais: SharePoint, Confluence, Google Workspace -->
-<!-- - Plataformas com IA: Notion AI, Glean, Guru, Docsumo -->
-<!-- - Projectos académicos/open-source semelhantes -->
+A intersecção entre inteligência artificial e gestão do conhecimento organizacional tem sido objecto de crescente atenção tanto na indústria como na investigação académica. @jarrahiArtificialIntelligenceKnowledge2023 argumentam que a IA não deve ser vista como um substituto dos processos humanos de gestão do conhecimento, mas como um parceiro que complementa as capacidades humanas. Os autores propõem um enquadramento baseado na teoria da complementaridade, segundo o qual a IA é particularmente eficaz na automatização de tarefas de codificação, classificação e recuperação de conhecimento explícito, enquanto os processos de criação e partilha de conhecimento tácito continuam a depender fundamentalmente da interacção humana.
+
+@divaioRoleDigitalInnovation2021 realizam uma revisão sistemática da literatura sobre o papel da inovação digital nos sistemas de gestão do conhecimento, identificando uma tendência clara para a integração de tecnologias emergentes (IA, *cloud computing*, *big data*) nos processos de KMS. Os autores concluem que as organizações que adoptam abordagens digitais inovadoras na gestão do conhecimento obtêm vantagens competitivas significativas, nomeadamente na capacidade de resposta, na eficiência operacional e na inovação. Contudo, sublinham que o sucesso destas iniciativas depende de factores organizacionais como a cultura, a liderança e o alinhamento estratégico.
+
+No domínio específico do processamento inteligente de documentos, @cuiDocumentAIBenchmarks2021 apresentam uma revisão abrangente do campo designado *Document AI*, que engloba o conjunto de técnicas de IA aplicadas à compreensão, classificação e extracção de informação de documentos. Os autores identificam tarefas como a análise de *layout*, o reconhecimento óptico de caracteres (OCR), a extracção de entidades, a classificação de documentos e a resposta a perguntas baseadas em documentos, descrevendo os modelos e benchmarks de referência para cada uma.
+
+No mercado actual, diversas soluções abordam parcialmente o problema da gestão inteligente da informação organizacional, podendo ser agrupadas em três categorias:
+
+**Plataformas empresariais tradicionais.** O Microsoft SharePoint e o Atlassian Confluence constituem as soluções mais amplamente adoptadas para gestão documental em contexto empresarial. Estas plataformas oferecem funcionalidades robustas de armazenamento, organização e colaboração documental, incluindo controlo de versões, fluxos de aprovação e integração com outros produtos dos respectivos ecossistemas. No entanto, as suas capacidades de recuperação de informação baseiam-se predominantemente em busca por palavras-chave, sem mecanismos nativos de compreensão semântica. A incorporação recente de funcionalidades de IA (Microsoft Copilot no SharePoint, Atlassian Intelligence no Confluence) representa uma evolução significativa, embora estas funcionalidades estejam frequentemente limitadas aos planos empresariais de custo elevado e dependam de infraestruturas proprietárias.
+
+**Plataformas com IA nativa.** Uma nova geração de ferramentas integra capacidades de IA como componente central da experiência. O Notion AI combina gestão de documentos e bases de conhecimento com funcionalidades de geração e sumarização de texto baseadas em LLMs. O Glean oferece busca empresarial unificada com compreensão semântica, indexando conteúdo de múltiplas fontes (email, documentos, mensagens). O Guru disponibiliza uma base de conhecimento com verificação automática de actualidade e sugestões contextuais. Estas soluções demonstram o potencial da IA aplicada à gestão da informação, mas apresentam limitações comuns: são predominantemente proprietárias, operam em infraestruturas centralizadas fora do controlo da organização, têm custos de subscrição elevados e oferecem capacidades limitadas de personalização das políticas de acesso.
+
+**Projectos open-source.** O Danswer (actualmente designado Onyx) constitui a referência mais próxima ao sistema proposto no espaço open-source. Trata-se de uma plataforma de perguntas e respostas empresarial que utiliza RAG para recuperar informação de múltiplas fontes (documentos, Slack, email) e gerar respostas contextualizadas. Embora partilhe princípios arquitecturais semelhantes ao sistema proposto, o Danswer não foi concebido para contextos multi-tenant com isolamento por empresa, não oferece RBAC granular por departamento, e a sua arquitectura não foi optimizada para o contexto linguístico e organizacional angolano.
 
 ### 2.7.2. Comparação com a Solução Proposta
 
-<!-- TODO: Tabela comparativa entre soluções existentes e o sistema proposto -->
+A Tabela 1 apresenta uma análise comparativa entre as soluções existentes e o sistema proposto neste trabalho, considerando as dimensões mais relevantes para o contexto organizacional angolano.
+
+| Critério | SharePoint | Confluence | Notion AI | Glean | Danswer | **Sistema Proposto** |
+|---|---|---|---|---|---|---|
+| Busca semântica (RAG) | Parcial | Não | Parcial | Sim | Sim | **Sim** |
+| Multi-tenancy | Sim | Sim | Sim | Sim | Não | **Sim** |
+| RBAC departamental | Parcial | Parcial | Não | Parcial | Básico | **Sim (granular)** |
+| Código aberto | Não | Não | Não | Não | Sim | **Sim** |
+| Auto-hospedagem | Parcial | Parcial | Não | Não | Sim | **Sim** |
+| Ingestão multi-fonte | Parcial | Parcial | Não | Sim | Sim | **Sim** |
+| Custo de entrada | Elevado | Elevado | Médio | Elevado | Baixo | **Baixo** |
+| Personalização | Limitada | Limitada | Limitada | Limitada | Elevada | **Elevada** |
+| Contexto lusófono | Não | Não | Parcial | Não | Não | **Sim** |
+
+Table: Comparação entre soluções existentes e o sistema proposto.
+
+A análise comparativa evidencia que o sistema proposto neste trabalho se diferencia das soluções existentes em cinco aspectos fundamentais. Em primeiro lugar, combina busca semântica baseada em RAG com controlo de acessos granular por departamento e cargo, uma combinação que não se encontra disponível na maioria das soluções analisadas. Em segundo lugar, é construído inteiramente sobre componentes open-source (PostgreSQL, Next.js, n8n, Supabase) que possibilitam a auto-hospedagem integral, permitindo que organizações com requisitos de soberania de dados implementem a plataforma em infraestrutura própria, sem dependência de fornecedores proprietários. Em terceiro lugar, implementa multi-tenancy nativo com isolamento por empresa, permitindo que a mesma instância da plataforma sirva múltiplas organizações. Em quarto lugar, utiliza modelos de embeddings multilíngues que suportam o português, adequando-se ao contexto linguístico angolano. Em quinto lugar, a orquestração via n8n proporciona uma flexibilidade de personalização que permite adaptar os pipelines de processamento às necessidades específicas de cada organização sem alterar o código-fonte da aplicação.
+
+Estas características posicionam o sistema proposto como uma solução particularmente adequada ao contexto das organizações angolanas, onde os custos de licenciamento de plataformas proprietárias, a limitação de largura de banda para soluções exclusivamente na nuvem, e a necessidade de processar documentação em língua portuguesa constituem barreiras significativas à adopção de soluções existentes no mercado.

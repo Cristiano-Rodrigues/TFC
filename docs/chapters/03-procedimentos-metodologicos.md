@@ -20,7 +20,7 @@ A **população teórica** é constituída pelas organizações a operar em Ango
 
 A **unidade de avaliação** consiste num ambiente simulado que representa uma organização angolana típica. Este ambiente foi implementado através da criação de um único *tenant* (inquilino) de teste na plataforma desenvolvida, reproduzindo a estrutura departamental, hierárquica e documental de uma empresa. Importa sublinhar que não foram estudadas organizações angolanas reais; toda a avaliação decorreu neste cenário controlado, concebido para isolar as variáveis técnicas em análise.
 
-A **amostra de teste**, de carácter não-probabilístico e intencional, é composta por dois elementos: (i) um conjunto de perfis de utilizadores fictícios, alocados a diferentes níveis hierárquicos e departamentos, e (ii) um *corpus* documental que reflecte a tipologia de uma organização (normas, despachos e relatórios técnicos). Esta configuração garante as condições necessárias para testar, de forma controlada, o isolamento de dados no ambiente multi-tenant e a eficácia das regras de Controlo de Acessos Baseado em Papéis (RBAC).
+A amostra de teste, de carácter não-probabilístico e intencional, é composta por: (i) 1 tenant (empresa fictícia), (ii) 3 departamentos estruturais, (iii) 4 perfis de utilizadores alocados a diferentes níveis hierárquicos e de acesso, e (iv) um corpus documental de 5 ficheiros técnicos e páginas wiki representativos da tipologia organizacional. Esta configuração garante as condições necessárias para testar, de forma controlada, o isolamento de dados no ambiente multi-tenant e a eficácia das regras de Controlo de Acessos Baseado em Papéis (RBAC).
 
 ## 3.4. Técnicas e Instrumentos de Recolha de Dados
 

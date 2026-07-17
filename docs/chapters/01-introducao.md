@@ -14,7 +14,7 @@ No contexto das organizações angolanas, a gestão da informação apresenta de
 
 O Ministério das Telecomunicações, Tecnologias de Informação e Comunicação Social (MTTI) reconhece esta lacuna, sublinhando a necessidade urgente de transição para serviços digitais mais eficientes no seu Livro Branco sobre as TIC [@mttiLivroBrancoTIC2019]. Adicionalmente, @quialaGOVERNOELETRONICOUMA2023 evidenciam que a modernização administrativa em Angola carece de sistemas integrados que superem as barreiras da burocracia documental tradicional. Apesar da evolução global, a Inteligência Artificial é ainda frequentemente percepcionada nestas organizações como uma ferramenta futurista ou inacessível, e não como uma necessidade operacional imediata para a gestão do conhecimento.
 
-Diante deste cenário, a presente investigação estrutura-se em torno da seguinte **pergunta central**: *Como desenvolver um sistema de gestão da informação organizacional, baseado em agentes de inteligência artificial, capaz de centralizar, classificar e facilitar a recuperação inteligente da informação em organizações angolanas?*
+Diante deste cenário, a presente investigação estrutura-se em torno da seguinte **pergunta central**: *Como avaliar a viabilidade técnica de um protótipo de sistema de gestão da informação organizacional, baseado em orquestração de inteligência artificial, capaz de centralizar, classificar e facilitar a recuperação de dados em ambientes empresariais angolanos?*
 
 ## 1.2. Objectivo da Pesquisa
 

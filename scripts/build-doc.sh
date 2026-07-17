@@ -6,7 +6,8 @@ CSL="docs/styles/apa.csl"
 
 FILES=$(sed 's/^/docs\//' docs/structure.txt)
 
-pandoc $FILES \
+pandoc docs/metadata.yaml $FILES \
+  --filter mermaid-filter \
   --bibliography=$BIB \
   --citeproc \
   --csl=$CSL \

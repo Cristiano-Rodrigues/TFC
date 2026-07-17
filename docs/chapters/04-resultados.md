@@ -289,6 +289,7 @@ O Diagrama Entidade-Relacional (DER) detalha a modelagem lógica física da base
 A modelagem inclui adicionalmente a chave estrangeira `company_id` na tabela `documents` para impor um isolamento estrito de múltiplos inquilinos (*multi-tenancy*) ao nível relacional, mitigando o risco de vazamento de dados exposto em fases anteriores de teste.
 
 ```mermaid
+%%{init: {'themeVariables': { 'fontSize': '28px'}}}%%
 erDiagram
     companies ||--o{ departments : "contém"
     companies ||--o{ roles : "define"
@@ -490,7 +491,7 @@ graph TB
 A stack tecnológica seleccionada para a implementação do protótipo baseia-se em soluções maioritariamente open-source e com baixo custo de entrada operacional, maximizando a viabilidade financeira e a escalabilidade técnica em organizações angolanas.
 
 | Camada | Tecnologia / Serviço | Papel e Justificação da Escolha |
-|:---|:---|:---|
+|:---------|:---------------------|:------------------------------------------------|
 | **Frontend** | Next.js 15 (React 19) | Framework para construção da interface de utilizador interactiva baseada em Single Page Application (SPA), tirando partido de *App Router* e rotas de API integradas. |
 | **Styling** | TailwindCSS | Permite desenhar uma interface moderna, limpa e responsiva sem sobrecarregar a largura de banda de ligação à rede do cliente. |
 | **Backend API** | Next.js API Routes | Processa a lógica de negócio local, lida com autenticação JWT e actua como proxy seguro nas chamadas ao servidor de orquestração n8n. |
@@ -513,7 +514,7 @@ Os testes do protótipo focaram-se em validar duas dimensões fundamentais estab
 Os testes de eficiência temporal mediram o tempo de resposta (em segundos) em dois fluxos essenciais: a ingestão documental assíncrona (do upload até à inserção vectorial) e a recuperação em tempo real de informação (da submissão da pergunta à síntese final da resposta). Os dados foram recolhidos num ambiente de teste com ligação de rede simétrica padrão, utilizando ficheiros de texto e PDFs de dimensões variadas. Os resultados das simulações iniciais encontram-se sumarizados na Tabela 4.6. Para garantir a fiabilidade dos dados, cada operação foi executada em 10 iterações independentes, sendo o valor reportado na Tabela 4.6 correspondente à média aritmética dos tempos de resposta obtidos, atenuando assim flutuações pontuais de latência da rede.
 
 | ID do Teste | Operação Realizada | Descrição da Carga de Teste | Tempo Médio (s) | Estado do Teste |
-|:---|:---|:---|:---|:---|
+|:------------|:-------------------|:----------------------------|:----------------|:----------------|
 | **T-TEMP-01** | Ingestão Documental | Ficheiro PDF Simples (2 páginas, 4.5 KB de texto) | 1.84 | Sucesso |
 | **T-TEMP-02** | Ingestão Documental | Relatório Técnico Médio (15 páginas, 45 KB de texto) | 4.92 | Sucesso |
 | **T-TEMP-03** | Ingestão Documental | Manual de Procedimentos Longo (50 páginas, 180 KB) | 12.35 | Sucesso |
@@ -534,7 +535,7 @@ A Tabela 4.7 apresenta uma selecção das avaliações qualitativas registadas d
 A avaliação qualitativa seguiu uma rubrica padronizada: 'Excelente' (o sistema forneceu uma resposta factualmente correcta, suportada pelo contexto e com citação exacta da fonte), 'Parcial' (a resposta é coerente mas omite detalhes do contexto), e 'Nula' (o sistema bloqueia o acesso à informação por restrições de segurança ou o LLM recusa-se a responder por falta de contexto autorizado).
 
 | ID | Perfil Utilizador (Cargo / Dept / Empresa) | Pergunta Submetida | Contexto Esperado | Filtro de Segurança | Relevância Qualitativa da Resposta | Citação de Fontes |
-|:---|:---|:---|:---|:---|:---|:---|
+|:---|:-------------------------|:-------------------|:------------------|:--------------------|:-----------------------------------|:----------------|
 | **QA-01** | Director / RH / Empresa A | "Quais as regras para férias?" | Acede ao documento `politica_ferias_A.pdf` público na Empresa A. | **Permitido:** Sem restrições no tenant A. | **Excelente:** Resumiu correctamente os dias de licença conforme a política. | Sim (`politica_ferias_A.pdf`) |
 | **QA-02** | Assistente / RH / Empresa A | "Qual o salário da administração?" | Tenta aceder a `folha_salarial_admin.pdf` restrito a Directores do departamento Financeiro. | **Bloqueado:** Cargo não possui permissão de acesso. | **Nula:** O LLM informou educadamente não possuir dados para responder. | Não (Bloqueado na DB) |
 | **QA-03** | Director / Finanças / Empresa B | "Quais as regras para férias?" | Tenta fazer uma pergunta idêntica à do teste QA-01. | **Bloqueado:** Documento pertence a um inquilino diferente (Empresa A). | **Nula:** O LLM respondeu que não tem conhecimento destas directivas. | Não (Isolamento de Tenant) |
@@ -602,22 +603,34 @@ begin
       CASE 
         WHEN COALESCE(documents.metadata->>'access_logic', 'AND') = 'OR' THEN
           (
-            exists(select 1 from document_departments dd where dd.document_id = documents.id and dd.department_id = p_department_id) 
+            exists(
+              select 1 from document_departments dd 
+              where dd.document_id = documents.id and dd.department_id = p_department_id
+            ) 
             OR 
-            exists(select 1 from document_permissions dp where dp.document_id = documents.id and dp.role_id = p_role_id)
+            exists(
+              select 1 from document_permissions dp 
+              where dp.document_id = documents.id and dp.role_id = p_role_id
+            )
           )
         ELSE
           (
             (
               not exists(select 1 from document_departments dd where dd.document_id = documents.id)
               OR
-              exists(select 1 from document_departments dd where dd.document_id = documents.id and dd.department_id = p_department_id)
+              exists(
+                select 1 from document_departments dd 
+                where dd.document_id = documents.id and dd.department_id = p_department_id
+              )
             )
             AND 
             (
               not exists(select 1 from document_permissions dp where dp.document_id = documents.id)
               OR 
-              exists(select 1 from document_permissions dp where dp.document_id = documents.id and dp.role_id = p_role_id)
+              exists(
+                select 1 from document_permissions dp 
+                where dp.document_id = documents.id and dp.role_id = p_role_id
+              )
             )
           )
       END

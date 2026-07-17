@@ -11,6 +11,7 @@ pandoc docs/metadata.yaml $FILES \
   --bibliography=$BIB \
   --citeproc \
   --csl=$CSL \
+  --listings \
   --pdf-engine=xelatex \
   -V mainfont="Times New Roman" \
   -V fontsize=12pt \

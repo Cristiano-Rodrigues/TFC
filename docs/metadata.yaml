@@ -10,4 +10,18 @@ header-includes:
     \usepackage{caption}
     \captionsetup[table]{labelformat=empty}
     \captionsetup[figure]{labelformat=empty}
+    \usepackage{pdflscape}
+    \newcommand{\blandscape}{\begin{landscape}}
+    \newcommand{\elandscape}{\end{landscape}}
+    \usepackage{listings}
+    \usepackage{xcolor}
+    \definecolor{codebg}{rgb}{0.95,0.95,0.95}
+    \lstset{
+      basicstyle=\ttfamily\footnotesize,
+      breaklines=true,
+      backgroundcolor=\color{codebg},
+      frame=single,
+      rulecolor=\color{codebg},
+      showstringspaces=false
+    }
 ---

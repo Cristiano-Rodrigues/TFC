@@ -8,7 +8,7 @@
 >
 > **Tipo:** Trabalho Final de Curso (TFC) — componente teórica + componente prática (protótipo funcional)
 >
-> **Data de última actualização deste ficheiro:** 2026-07-14
+> **Data de última actualização deste ficheiro:** 2026-07-17
 
 ---
 
@@ -25,7 +25,7 @@ O projecto demonstra como organizações angolanas podem centralizar, classifica
 
 ## 2. Problema de Investigação
 
-**Pergunta central:** Como desenvolver um sistema de gestão da informação organizacional, baseado em agentes de inteligência artificial, capaz de centralizar, classificar e facilitar a recuperação inteligente da informação em organizações angolanas?
+**Pergunta central:** Como avaliar a viabilidade técnica de um protótipo de sistema de gestão da informação organizacional, baseado em orquestração de inteligência artificial, capaz de centralizar, classificar e facilitar a recuperação de dados em ambientes empresariais angolanos?
 
 ### Contexto do Problema
 - Nas organizações angolanas, a informação encontra-se dispersa em silos (documentos, emails, plataformas isoladas).
@@ -34,14 +34,14 @@ O projecto demonstra como organizações angolanas podem centralizar, classifica
 - A IA ainda é vista como ferramenta de futuro, não como necessidade operacional imediata.
 
 ### Objectivos
-**Geral:** Desenvolver um sistema baseado em agentes de IA para apoiar a centralização, classificação e recuperação inteligente da informação.
+**Geral:** Desenvolver um protótipo funcional de um sistema baseado em agentes de Inteligência Artificial para apoiar a centralização, a classificação e a recuperação inteligente da informação em contexto organizacional.
 
 **Específicos:**
-1. Identificar os principais desafios na gestão da informação no contexto angolano.
-2. Analisar soluções existentes de gestão da informação e sistemas inteligentes.
-3. Modelar a arquitectura de um sistema baseado em agentes de IA.
-4. Implementar um protótipo funcional do sistema.
-5. Avaliar o desempenho quanto à eficiência na recuperação da informação.
+1. Identificar e caracterizar os principais desafios na gestão da informação no contexto empresarial angolano.
+2. Analisar as soluções tecnológicas existentes para a gestão documental e a recuperação de conhecimento.
+3. Modelar a arquitectura técnica de um sistema baseado em agentes de Inteligência Artificial.
+4. Implementar um protótipo funcional do sistema proposto, assegurando requisitos de segurança, suporte multi-tenant e RBAC.
+5. Avaliar o desempenho do sistema construído, aferindo a relevância qualitativa das respostas geradas e a eficiência temporal na recuperação de informação.
 
 ---
 
@@ -354,19 +354,9 @@ O projecto inclui um pipeline robusto para compilar a monografia final directame
 
 ---
 
-## 9. Referências Bibliográficas Existentes
+## 9. Gestão Bibliográfica
 
-### No documento teórico:
-1. Choo, C. W. (2003). *The Knowing Organization*. Oxford University Press.
-2. Russell, S., & Norvig, P. (2021). *Artificial Intelligence: A Modern Approach*. Pearson.
-3. Lopes, R. (2020). *Estratégias de Transformação Digital em Países da SADC: O Caso de Angola*. Revista Angolana de Computação.
-
-### No ficheiro BibTeX (`references.bib`):
-1. Haverbeke, M. (2024). *Eloquent Javascript*. 4th Edition.
-
-### TFCs de Referência (na pasta `references/`):
-- `TFC_ANTONIOJANUARIO.pdf`
-- `TFC_CAROLINA MENDES- versão final.pdf`
+As referências bibliográficas da investigação encontram-se integralmente centralizadas e geridas através do ficheiro BibTeX (`docs/references.bib`). As citações ao longo da monografia são processadas automaticamente pelo Pandoc com o auxílio do `citeproc` e formatadas de acordo com as normas CSL configuradas no projecto.
 
 ---
 

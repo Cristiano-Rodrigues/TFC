@@ -43,44 +43,24 @@ O projecto demonstra como organizações angolanas podem centralizar, classifica
 4. Implementar um protótipo funcional do sistema.
 5. Avaliar o desempenho quanto à eficiência na recuperação da informação.
 
-### Hipóteses
-- **H1:** A implementação de um sistema baseado em agentes de IA melhora a eficiência na recuperação da informação organizacional.
-- **H2:** A centralização inteligente da informação reduz o tempo médio de busca por documentos e conteúdos relevantes.
-
-### Variáveis
-- **Independente:** Implementação do sistema baseado em agentes de IA.
-- **Dependentes:** Tempo médio de recuperação, precisão dos resultados, grau de satisfação dos utilizadores.
-
 ---
 
 ## 3. Estado Actual da Monografia Teórica
 
-O documento teórico (`docs/dot docx/Trabalho oficial.docx`) contém actualmente um pré-projecto/proposta com as seguintes secções redigidas:
+A monografia encontra-se **integralmente redigida** em ficheiros Markdown na pasta `docs/chapters/`, substituindo o rascunho inicial em formato `.docx`. Todos os 5 capítulos exigidos pelo modelo do ISAF foram concluídos, revistos e integrados no pipeline de compilação automática para PDF.
 
-### Secções Existentes
-1. **Problema** — Título, formulação do problema, objectivos, justificação, limitações.
-2. **Marco de Referência** — Fundamentos teóricos (breve), antecedentes, hipóteses, variáveis.
-3. **Metodologia** — Tipo de pesquisa, procedimentos, técnicas de recolha, população/amostra, guia de campo.
-4. **Aspectos Administrativos** — Recursos, orçamento, cronograma.
-5. **Bibliografia Preliminar** — 3 referências (Choo, 2003; Russell & Norvig, 2021; Lopes, 2020).
-
-### Feedback do Tutor (Alterações Necessárias)
-1. **Referências bibliográficas** — Necessidade de adicionar referências para validar afirmações feitas ao longo do texto. Muitas afirmações estão sem suporte bibliográfico.
-2. **Formatação** — Substituir listas com bullet points por texto corrido em certas secções do trabalho (especialmente na fundamentação teórica e metodologia).
-
-### Lacunas Identificadas
-- A fundamentação teórica está muito superficial (apenas bullet points sem desenvolvimento).
-- Falta uma revisão de literatura aprofundada.
-- As referências bibliográficas são insuficientes (apenas 3).
-- Não há secção de "Estado da Arte" detalhada.
-- Falta a secção de "Resultados" (descrição do protótipo, testes, avaliação).
-- O capítulo de "Considerações Finais" ainda não existe.
+### Capítulos Concluídos
+1. `01-introducao.md` — Problema, objectivos, justificativa e limitações.
+2. `02-fundamentacao-teorica.md` — Revisão de literatura, RAG, agentes de IA, e controlo de acessos multi-tenant.
+3. `03-procedimentos-metodologicos.md` — Desenho da pesquisa, instrumentos de recolha e protocolo de avaliação.
+4. `04-resultados.md` — Apresentação do protótipo, diagramas UML e Entidade-Relacional, e testes de desempenho/segurança.
+5. `05-consideracoes-finais.md` — Conclusões, resposta à problemática e sugestões para trabalhos futuros.
 
 ---
 
-## 4. Estrutura Esperada da Monografia (Modelo IGF)
+## 4. Estrutura Consolidada da Monografia (Modelo IGF)
 
-Com base no modelo de referência (`Modelo_TFC_IGF.pdf`), a estrutura esperada é:
+Com base no modelo de referência (`Modelo_TFC_IGF.pdf`), a estrutura final desenvolvida é:
 
 ```
 ÍNDICE GERAL
@@ -364,12 +344,13 @@ TFC/
 
 ## 8. Pipeline de Compilação da Monografia
 
-O projecto inclui um pipeline para compilar a monografia a partir de ficheiros Markdown:
+O projecto inclui um pipeline robusto para compilar a monografia final directamente do código-fonte Markdown para PDF:
 
-- **Ferramenta:** Pandoc (instalado no sistema)
+- **Ferramenta:** Pandoc com motor `xelatex`.
+- **Filtros e Pacotes:** Utiliza o `mermaid-filter` para renderizar automaticamente diagramas UML/ER, e o pacote LaTeX `listings` para quebras de página fluídas em blocos de código longo.
 - **Script:** `scripts/build-doc.sh`
-- **Processo:** Lê `docs/structure.txt` → concatena capítulos Markdown → aplica bibliografia (`references.bib`) → aplica estilo APA (`styles/apa.csl`) → gera PDF em `dist/output.pdf`
-- **Estado actual:** Apenas com um capítulo de teste (`01-test.md`)
+- **Processo:** Lê `docs/structure.txt` → concatena os 5 capítulos → aplica a bibliografia (`docs/references.bib`) → formata no estilo APA (`docs/styles/apa.csl`) → aplica metadados e configuração de página (`docs/metadata.yaml`) → gera o documento formatado em `dist/output.pdf`.
+- **Estado actual:** Totalmente operacional. O PDF compila com sucesso, cumprindo os rigorosos requisitos visuais e tipográficos académicos.
 
 ---
 
@@ -421,20 +402,9 @@ O projecto inclui um pipeline para compilar a monografia a partir de ficheiros M
 
 ## 12. Próximos Passos
 
-### Componente Prática
-- Melhorar robustez do pipeline RAG (retry, error handling, status tracking)
-- Suporte a múltiplos formatos (PDF com OCR, imagens)
-- Detecção de duplicados (checksum SHA256)
-- Extracção e geração de metadados com LLM
-- Implementação de busca híbrida (semântica + keyword)
-- Testes de desempenho formais
-- Configuração de RLS (Row Level Security) para produção
+O desenvolvimento do protótipo e a redação da monografia encontram-se **concluídos**. O sistema foi totalmente implementado, testado e documentado com rigor académico. O código-fonte está versionado e o protótipo encontra-se funcional e acessível num ambiente de produção (Vercel).
 
-### Componente Teórica
-- Expandir fundamentação teórica com subcapítulos desenvolvidos
-- Substituir bullet points por texto corrido
-- Adicionar referências bibliográficas ao longo de todo o texto
-- Redigir capítulo de Resultados (descrição detalhada do protótipo)
-- Criar diagramas UML (Casos de Uso, Classes, ER, Contexto)
-- Redigir capítulo de Considerações Finais
-- Completar bibliografia
+### Passos Finais
+- Leitura final de revisão para detetar pequenos erros tipográficos no PDF final (`dist/output.pdf`).
+- Impressão e submissão formal do Trabalho Final de Curso (TFC) ao ISAF.
+- Preparação da apresentação de Defesa da Tese (criação de diapositivos resumindo o problema de pesquisa, a arquitectura metodológica/técnica construída e as conclusões).

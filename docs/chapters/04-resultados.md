@@ -59,7 +59,7 @@ A modelagem gráfica do sistema foi elaborada recorrendo à linguagem UML (*Unif
 
 O Diagrama de Contexto define a fronteira entre a aplicação desenvolvida e as entidades ou sistemas externos com os quais interage directamente para assegurar as funcionalidades requeridas.
 
-```mermaid {caption="Figura 4.1: Diagrama de Contexto do Sistema. Fonte: Elaboração própria."}
+```mermaid
 graph TD
     User([Utilizador Comum]) <--> |Interface Web Next.js| App[Backend]
     Admin([Administrador da Empresa]) <--> |Interface de Gestão Next.js| App
@@ -72,11 +72,13 @@ graph TD
     end
 ```
 
+**Figura 4.1:** Diagrama de Contexto do Sistema. Fonte: Elaboração própria.
+
 #### 4.1.3.2. Diagrama de Casos de Uso
 
 O Diagrama de Casos de Uso detalha as interacções dos actores principais (Utilizador e Administrador) com o sistema, mapeando o escopo funcional do protótipo desenvolvido.
 
-```mermaid {caption="Figura 4.2: Diagrama de Casos de Uso do Sistema. Fonte: Elaboração própria."}
+```mermaid
 flowchart LR
     Utilizador((Utilizador))
     Admin((Administrador da Empresa))
@@ -101,6 +103,8 @@ flowchart LR
     Admin --> UC6
     Admin --> UC7
 ```
+
+**Figura 4.2:** Diagrama de Casos de Uso do Sistema. Fonte: Elaboração própria.
 
 #### 4.1.3.3. Especificação dos Casos de Uso
 
@@ -190,7 +194,7 @@ Table: Tabela 4.4: Especificação do Caso de Uso - Upload de Conteúdo e Acesso
 
 O Diagrama de Classes apresenta a estrutura lógica do sistema ao nível do domínio dos dados, modelando as entidades principais, os seus atributos e os relacionamentos de associação e multiplicidade que sustentam o funcionamento da plataforma.
 
-```mermaid {caption="Figura 4.3: Diagrama de Classes do Domínio do Sistema. Fonte: Elaboração própria."}
+```mermaid
 classDiagram
     class Company {
         +UUID id
@@ -276,13 +280,15 @@ classDiagram
     Document "*" -- "*" Role : restrito_por_DocumentPermission
 ```
 
+**Figura 4.3:** Diagrama de Classes do Domínio do Sistema. Fonte: Elaboração própria.
+
 #### 4.1.3.5. Diagrama Entidade-Relacional
 
 O Diagrama Entidade-Relacional (DER) detalha a modelagem lógica física da base de dados PostgreSQL alojada no Supabase. O modelo implementa a **Opção A (Abstração Unificada)** para as fontes de conhecimento, na qual as páginas Wiki, uploads de PDF ou integrações de terceiros são todos armazenados de forma unificada na tabela `documents` e diferenciados pelo atributo `source_type`. Esta abordagem garante que toda e qualquer fonte de dados possa ser fatiada em `chunks` e submetida a pesquisas vectoriais utilizando a mesma infraestrutura, respeitando as regras relacionais de segurança.
 
 A modelagem inclui adicionalmente a chave estrangeira `company_id` na tabela `documents` para impor um isolamento estrito de múltiplos inquilinos (*multi-tenancy*) ao nível relacional, mitigando o risco de vazamento de dados exposto em fases anteriores de teste.
 
-```mermaid {caption="Figura 4.4: Diagrama Entidade-Relacional (DER) da Base de Dados. Fonte: Elaboração própria."}
+```mermaid
 erDiagram
     companies ||--o{ departments : "contém"
     companies ||--o{ roles : "define"
@@ -386,6 +392,8 @@ erDiagram
     }
 ```
 
+**Figura 4.4:** Diagrama Entidade-Relacional (DER) da Base de Dados. Fonte: Elaboração própria.
+
 ### 4.1.4. Qualidade do Software
 
 Para assegurar que o protótipo cumpre os padrões mínimos de qualidade aceitáveis para uso em organizações angolanas, foram definidos critérios baseados nas características da norma ISO/IEC 25010:
@@ -427,7 +435,7 @@ O protótipo divide-se em oito módulos funcionais interligados:
 
 A arquitetura do sistema segue um modelo de camadas descentralizado, separando a interface do utilizador, a lógica da aplicação, a base de dados relacional e vectorial, e a orquestração assíncrona dos pipelines de Inteligência Artificial.
 
-```mermaid {caption="Figura 4.5: Arquitectura Física e Lógica do Sistema. Fonte: Elaboração própria."}
+```mermaid
 graph TB
     subgraph Client ["Camada de Apresentação (Cliente)"]
         Browser[Navegador Web] <--> |SPA / HTTPS| ReactUI[Interface React / Next.js 15]

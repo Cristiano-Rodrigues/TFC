@@ -439,7 +439,7 @@ A arquitetura do sistema segue um modelo de camadas descentralizado, separando a
 ```mermaid
 graph TB
     subgraph Client ["Camada de Apresentação (Cliente)"]
-        Browser[Navegador Web] <--> |SPA / HTTPS| ReactUI[Interface React / Next.js 15]
+        Browser[Navegador Web] <--> |App Router / HTTPS| ReactUI[Interface React / Next.js 15]
     end
 
     subgraph API_Backend ["Camada de Lógica (Next.js Server API)"]
@@ -492,7 +492,7 @@ A stack tecnológica seleccionada para a implementação do protótipo baseia-se
 
 | Camada | Tecnologia / Serviço | Papel e Justificação da Escolha |
 |:---------|:---------------------|:------------------------------------------------|
-| **Frontend** | Next.js 15 (React 19) | Framework para construção da interface de utilizador interactiva baseada em Single Page Application (SPA), tirando partido de *App Router* e rotas de API integradas. |
+| **Frontend** | Next.js 15 (React 19) | Framework para construção da interface de utilizador interactiva e navegação nativa, tirando partido do *App Router* (arquitetura multi-rota) e rotas de API integradas. |
 | **Styling** | TailwindCSS | Permite desenhar uma interface moderna, limpa e responsiva sem sobrecarregar a largura de banda de ligação à rede do cliente. |
 | **Backend API** | Next.js API Routes | Processa a lógica de negócio local, lida com autenticação JWT e actua como proxy seguro nas chamadas ao servidor de orquestração n8n. |
 | **Base de Dados** | Supabase (PostgreSQL) | Fornece uma base de dados relacional robusta com suporte nativo a políticas de segurança RLS (*Row Level Security*) por inquilino. |
@@ -547,13 +547,55 @@ A análise qualitativa das simulações confirma a robustez das políticas de se
 
 #### 4.1.5.6. Protótipo das Telas
 
-As interfaces desenvolvidas em Next.js priorizaram a simplicidade de utilização, a fluidez das transições e o fornecimento de feedback claro acerca do processamento assíncrono efetuado no n8n.
+As interfaces desenvolvidas em Next.js priorizaram a simplicidade de utilização, a fluidez das transições e o fornecimento de feedback claro acerca do processamento assíncrono efetuado na infraestrutura. A apresentação gráfica das principais telas da aplicação demonstra a concretização prática dos requisitos do protótipo:
 
-*   **Ecrã de Login e Registo Multi-tenant:** Apresenta um formulário unificado que permite a um novo cliente registar uma organização autónoma na base de dados e criar a conta do primeiro utilizador administrador.
-*   **Painel Administrativo (RBAC e Departamentos):** Fornece interfaces para que o administrador crie e edite cargos, assinale caixas de selecção para associar permissões de sistema e crie os departamentos necessários à segmentação organizacional.
-*   **Módulo de Documentos e Upload:** Disponibiliza uma zona de arrastamento de ficheiros (*drag-and-drop*) e uma tabela de metadados onde se pode acompanhar o estado de conversão dos ficheiros em tempo real.
-*   **Módulo de Wiki:** Editor de texto simples incorporado na plataforma, onde o utilizador cria conteúdo directamente no sistema sem precisar de fazer upload de um ficheiro externo.
-*   **Interface de Chat IA (Pesquisa Inteligente):** Consiste num ecrã limpo com histórico de conversa, onde as respostas geradas mostram botões contendo as fontes bibliográficas identificadas. Ao clicar numa fonte, um painel lateral exibe o trecho do documento que fundamentou a afirmação da IA.
+##### a) Ecrã de Autenticação e Registo Multi-tenant
+
+Apresenta um formulário unificado e responsivo com divisão visual (imagem concetual e marca à esquerda, e formulário de acesso/registo de alta fidelidade à direita). Permite a uma nova organização registar o seu perfil autónomo na base de dados PostgreSQL e criar a conta do utilizador administrador inicial de forma simples.
+
+![Ecrã de Login e Registo Multi-tenant.](docs/images/login.png){width=88%}
+
+**Figura 4.5:** Ecrã de Autenticação e Registo Multi-tenant. Fonte: Elaboração própria.
+
+##### b) Painel Administrativo (RBAC e Departamentos)
+
+Fornece interfaces centralizadas para gestão de acesso relacional. Através deste painel, o administrador pode criar e editar cargos organizacionais, assinalar permissões granulares de sistema (`doc:upload`, `roles:manage`, `users:manage`, etc.) e gerir os departamentos necessários à segmentação e isolamento dos dados da empresa.
+
+![Painel Administrativo e Gestão de Permissões.](docs/images/administracao.png){width=88%}
+
+**Figura 4.6:** Interface do Painel Administrativo (RBAC e Departamentos). Fonte: Elaboração própria.
+
+##### c) Módulo de Gestão Documental e Upload
+
+O módulo de documentos subdivide-se no ecossistema de carregamento e na tabela de gestão de metadados:
+
+*   **Zona de Upload Assíncrono:** Disponibiliza uma interface moderna de arrastamento (*drag-and-drop*) de ficheiros (PDF, TXT, DOCX), permitindo associar o departamento de destino e a visibilidade antes do envio para a pipeline do n8n.
+
+![Interface de Upload de Arquivos.](docs/images/upload-arquivos.png){width=88%}
+
+**Figura 4.7:** Módulo de Carregamento de Documentos (*Drag-and-Drop*). Fonte: Elaboração própria.
+
+*   **Tabela de Base Documental:** Exibe o repositório centralizado de ficheiros da organização, listando metadados como tamanho, departamento associado, data de criação e o estado de conversão e vetorização em tempo real (`pending`, `processed`, `error`).
+
+![Tabela de Base Documental.](docs/images/base-documental.png){width=88%}
+
+**Figura 4.8:** Tabela da Base Documental Organizacional. Fonte: Elaboração própria.
+
+##### d) Módulo de Wiki Corporativa
+
+Consiste num editor de texto incorporado diretamente na plataforma. Permite aos colaboradores elaborar e publicar políticas internas, manuais de procedimentos e notas operacionais de forma ágil, convertendo instantaneamente o conteúdo criado em blocos textuais (*chunks*) vetorizados sem a necessidade de upload de documentos externos.
+
+![Interface da Wiki Corporativa.](docs/images/wiki.png){width=88%}
+
+**Figura 4.9:** Módulo de Wiki e Edição de Conteúdo Interno. Fonte: Elaboração própria.
+
+##### e) Interface de Chat IA (Pesquisa Inteligente)
+
+Representa a interface principal de interação do utilizador com o agente de inteligência artificial. Possui um layout moderno, histórico lateral de conversas persistentes, suporte a múltiplas sessões e caixas de diálogo estilizados. Cada resposta gerada apresenta botões interativos com as fontes bibliográficas consultadas; ao clicar em qualquer citação, um painel lateral de inspeção exibe o trecho exato do documento vetorizado utilizado pelo modelo para fundamentar a sua resposta.
+
+![Interface do Chat de IA (Pesquisa Inteligente).](docs/images/chat-ia.png){width=88%}
+
+**Figura 4.10:** Interface de Pesquisa Inteligente e Inspeção de Fontes Bibliográficas. Fonte: Elaboração própria.
 
 #### 4.1.5.7. Codificação
 

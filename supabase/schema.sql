@@ -58,6 +58,7 @@ CREATE TABLE IF NOT EXISTS public.users (
 
 CREATE TABLE IF NOT EXISTS public.documents (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    company_id UUID REFERENCES public.companies(id) ON DELETE CASCADE,
     filename TEXT NOT NULL,
     storage_path TEXT,
     file_size BIGINT,
@@ -107,13 +108,13 @@ CREATE TABLE IF NOT EXISTS public.ai_chat_messages (
 );
 
 -- 3. Create Search Function (match_chunks)
-DROP FUNCTION IF EXISTS public.match_chunks(vector, double precision, integer);
-DROP FUNCTION IF EXISTS public.match_chunks(vector, double precision, integer, uuid, uuid, uuid);
+DROP FUNCTION IF EXISTS public.match_chunks(vector, double precision, integer, uuid, uuid, uuid, uuid);
 
 CREATE OR REPLACE FUNCTION public.match_chunks(
   p_embedding vector, 
   p_threshold double precision, 
   p_count integer, 
+  p_company_id uuid DEFAULT NULL::uuid,
   p_user_id uuid DEFAULT NULL::uuid, 
   p_department_id uuid DEFAULT NULL::uuid, 
   p_role_id uuid DEFAULT NULL::uuid
@@ -130,11 +131,23 @@ begin
   from chunks
   left join documents on documents.id = chunks.document_id
   where 1 - (chunks.embedding <=> p_embedding) > p_threshold
+  -- Imposição rigorosa de isolamento por Empresa (Tenant) através do dono do documento ou das suas permissões
   and (
-    -- Admin bypass
-    exists(select 1 from roles where id = p_role_id and name = 'admin')
+    exists(select 1 from users u where u.id = documents.uploaded_by and u.company_id = p_company_id)
     OR
-    -- Global fallback
+    exists(select 1 from document_departments dd join departments d on d.id = dd.department_id where dd.document_id = documents.id and d.company_id = p_company_id)
+    OR
+    exists(select 1 from document_permissions dp join roles r on r.id = dp.role_id where dp.document_id = documents.id and r.company_id = p_company_id)
+  )
+  and (
+    -- Bypass total para utilizadores com permissão explícita de visão global
+    exists(
+      select 1 from role_permissions rp
+      join permissions p on p.id = rp.permission_id
+      where rp.role_id = p_role_id and p.code = 'doc:view_all'
+    )
+    OR
+    -- Fallback global: documentos públicos da própria empresa
     (
       not exists(select 1 from document_departments dd where dd.document_id = documents.id) 
       AND 

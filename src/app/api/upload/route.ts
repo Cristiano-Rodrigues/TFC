@@ -17,6 +17,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Sessão inválida' }, { status: 401 });
     }
 
+    const { data: user } = await supabaseAdmin
+      .from('users')
+      .select('company_id')
+      .eq('id', payload.sub)
+      .single();
+
     const formData = await req.formData();
     const file = formData.get('file') as File;
     const department_ids_str = formData.get('department_ids') as string | null;
@@ -71,6 +77,7 @@ export async function POST(req: NextRequest) {
         file_size: file.size,
         mime_type: file.type,
         uploaded_by: payload.sub,
+        company_id: user?.company_id,
         n8n_status: 'pending',
         metadata: { access_logic }
       })

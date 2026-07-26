@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
     const { data: user } = await supabaseAdmin
       .from('users')
-      .select('id, department_id, role_id')
+      .select('id, department_id, role_id, company_id')
       .eq('id', payload.sub)
       .single();
 
@@ -39,7 +39,8 @@ export async function POST(req: NextRequest) {
         query: message,
         user_id: user?.id,
         department_id: user?.department_id,
-        role_id: user?.role_id
+        role_id: user?.role_id,
+        company_id: user?.company_id
       }),
     });
 
@@ -56,9 +57,17 @@ export async function POST(req: NextRequest) {
       throw new Error(`O n8n devolveu uma resposta não-JSON ou vazia: ${textResponse.slice(0, 100)}...`);
     }
 
+    const rawAnswer = data.answer || "Resposta não fornecida pelo modelo.";
+    const allSources = data.sources || [];
+    const relevantSources = allSources.filter((source: any) => {
+      if (!source.title) return false;
+      const titleWithoutExt = source.title.replace(/\.[^/.]+$/, "");
+      return rawAnswer.includes(source.title) || rawAnswer.includes(titleWithoutExt);
+    });
+
     return NextResponse.json({
-      answer: data.answer || "Resposta não fornecida pelo modelo.",
-      sources: data.sources || [],
+      answer: rawAnswer,
+      sources: relevantSources,
     });
   } catch (error: any) {
     console.error("Erro RAG Chat:", error);

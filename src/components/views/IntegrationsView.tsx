@@ -143,20 +143,20 @@ export const IntegrationsView: React.FC = () => {
           <div
             id={`integration-card-${item.id}`}
             key={item.id}
-            className={`bg-white border rounded-lg p-5 shadow-3xs flex flex-col justify-between transition-all relative group ${
-              item.status === 'Conectado' ? 'border-slate-200 hover:border-slate-350' : 'border-slate-150 opacity-90'
+            className={`bg-white border rounded-xl p-5 shadow-2xs flex flex-col justify-between transition-all relative group ${
+              item.status === 'Conectado' ? 'border-slate-200 hover:border-slate-300' : 'border-slate-200 opacity-90'
             }`}
           >
             <div>
               {/* Header inside Card */}
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
-                  <div className={`p-2.5 rounded-lg border ${item.status === 'Conectado' ? 'bg-slate-50 border-slate-200 text-slate-800' : 'bg-slate-50 border-slate-100 text-slate-300'}`}>
+                  <div className={`p-2.5 rounded-lg border ${item.status === 'Conectado' ? 'bg-[#f3f3f5] border-slate-200 text-slate-800' : 'bg-slate-50 border-slate-200 text-slate-400'}`}>
                     <item.logo className="h-5 w-5" />
                   </div>
                   <div>
                     <h3 className="text-sm font-bold text-slate-900">{item.name}</h3>
-                    <span className="text-[10px] text-slate-400 font-medium">{item.type}</span>
+                    <span className="text-[10px] text-slate-500 font-medium">{item.type}</span>
                   </div>
                 </div>
                 
@@ -176,25 +176,25 @@ export const IntegrationsView: React.FC = () => {
 
               {/* Body inside Card */}
               <div className="mt-5 space-y-2.5">
-                <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-50">
+                <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-100">
                   <span className="text-slate-500 font-medium">Estado da Sincronia:</span>
                   {item.status === 'Conectado' ? (
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 uppercase bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 uppercase bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                       Ligado
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase bg-slate-50 px-2 py-0.5 rounded border border-slate-100">
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 uppercase bg-[#f3f3f5] px-2 py-0.5 rounded border border-slate-200">
                       Inativo
                     </span>
                   )}
                 </div>
 
-                <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-50">
+                <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-100">
                   <span className="text-slate-500 font-medium">Última indexação:</span>
                   <span className="font-semibold text-slate-700">{item.lastSync}</span>
                 </div>
 
-                <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-50">
+                <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-100">
                   <span className="text-slate-500 font-medium">Conteúdos indexados:</span>
                   <span className="font-bold text-slate-900">{item.importedItemsCount} itens catalogados</span>
                 </div>
@@ -205,7 +205,7 @@ export const IntegrationsView: React.FC = () => {
                     <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">Pastas Ativas:</span>
                     <div className="flex flex-wrap gap-1">
                       {item.scopes.map((scope, i) => (
-                        <span key={i} className="inline-block text-[9px] font-semibold bg-blue-50 text-blue-700 border border-blue-100 px-1.5 py-0.5 rounded">
+                        <span key={i} className="inline-block text-[9px] font-semibold bg-blue-50 text-blue-700 border border-blue-200 px-1.5 py-0.5 rounded-md">
                           {scope}
                         </span>
                       ))}
@@ -222,7 +222,7 @@ export const IntegrationsView: React.FC = () => {
                   id={`btn-sync-${item.id}`}
                   onClick={() => handleSyncNow(item.id)}
                   disabled={item.isLoadingSync}
-                  className="w-full bg-[#1e293b] hover:bg-slate-800 disabled:bg-slate-100 disabled:text-slate-400 text-white text-xs font-bold uppercase py-2 rounded shadow-3xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  className="w-full bg-[#030213] hover:bg-[#030213]/90 disabled:bg-slate-200 disabled:text-slate-400 text-white text-xs font-semibold uppercase py-2 rounded-md shadow-2xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                 >
                   {item.isLoadingSync ? (
                     <>
@@ -239,7 +239,7 @@ export const IntegrationsView: React.FC = () => {
               ) : (
                 <button
                   onClick={() => handleToggleState(item.id)}
-                  className="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold uppercase py-2 rounded shadow-3xs transition-colors cursor-pointer"
+                  className="w-full bg-[#f3f3f5] hover:bg-slate-200 text-slate-700 text-xs font-semibold uppercase py-2 rounded-md shadow-2xs transition-colors cursor-pointer border border-slate-200"
                 >
                   Configurar Acesso
                 </button>
@@ -248,7 +248,7 @@ export const IntegrationsView: React.FC = () => {
             
             {/* Padlock icon when inactive */}
             {item.status !== 'Conectado' && (
-              <div className="absolute inset-0 bg-slate-50/10 backdrop-blur-3xs rounded-lg pointer-events-none transition-all group-hover:bg-slate-50/0" />
+              <div className="absolute inset-0 bg-slate-50/10 backdrop-blur-3xs rounded-xl pointer-events-none transition-all group-hover:bg-slate-50/0" />
             )}
           </div>
         ))}

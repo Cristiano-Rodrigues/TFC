@@ -253,13 +253,13 @@ export const DocumentsView: React.FC = () => {
         <div className="xl:col-span-2 space-y-4">
           
           {/* Advanced Filter Panel */}
-          <div className="bg-white p-4 border border-slate-200 rounded-lg grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
+          <div className="bg-white p-4 border border-slate-200 rounded-xl grid grid-cols-1 sm:grid-cols-4 gap-3 items-end shadow-2xs">
             <div className="sm:col-span-1 space-y-1">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Filtro por Tipo</label>
+              <label className="text-xs font-semibold text-slate-700 block">Filtro por Tipo</label>
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded focus:outline-none bg-slate-50"
+                className="w-full h-9 px-3 text-xs border border-slate-200 rounded-md focus:outline-none bg-[#f3f3f5] text-slate-900"
               >
                 <option value="Todos">Todos (PDF, DOC, TXT...)</option>
                 <option value="PDF">PDF</option>
@@ -270,11 +270,11 @@ export const DocumentsView: React.FC = () => {
             </div>
 
             <div className="sm:col-span-1 space-y-1">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Departamento</label>
+              <label className="text-xs font-semibold text-slate-700 block">Departamento</label>
               <select
                 value={deptFilter}
                 onChange={(e) => setDeptFilter(e.target.value)}
-                className="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded focus:outline-none bg-slate-50"
+                className="w-full h-9 px-3 text-xs border border-slate-200 rounded-md focus:outline-none bg-[#f3f3f5] text-slate-900"
               >
                 <option value="Todos">Todas as Áreas</option>
                 <option value="Geral">Geral / Global</option>
@@ -285,11 +285,11 @@ export const DocumentsView: React.FC = () => {
             </div>
 
             <div className="sm:col-span-1 space-y-1">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block font-medium">Origem do Arquivo</label>
+              <label className="text-xs font-semibold text-slate-700 block">Origem do Arquivo</label>
               <select
                 value={sourceFilter}
                 onChange={(e) => setSourceFilter(e.target.value)}
-                className="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded focus:outline-none bg-slate-50"
+                className="w-full h-9 px-3 text-xs border border-slate-200 rounded-md focus:outline-none bg-[#f3f3f5] text-slate-900"
               >
                 <option value="Todos">Todas as Origens</option>
                 <option value="Local Upload">Upload Local</option>
@@ -300,21 +300,21 @@ export const DocumentsView: React.FC = () => {
             </div>
 
             <div className="sm:col-span-1 relative">
-              <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-400" />
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Filtrar nesta lista..."
-                className="w-full text-xs pl-8 pr-3 py-1.5 border border-slate-300 rounded focus:outline-none bg-slate-50/50"
+                className="w-full h-9 pl-9 pr-3 text-xs border border-slate-200 rounded-md focus:outline-none bg-[#f3f3f5] text-slate-900 placeholder:text-slate-400"
               />
             </div>
           </div>
 
           {/* Table Element */}
-          <div className="bg-white border border-slate-200 rounded-lg overflow-x-auto shadow-3xs">
-            <table className="w-full border-collapse text-left text-xs text-slate-600">
-              <thead className="bg-[#f8fafc] text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-200">
+          <div className="bg-white border border-slate-200 rounded-xl overflow-x-auto shadow-2xs">
+            <table className="w-full border-collapse text-left text-xs text-slate-700">
+              <thead className="bg-slate-50/80 text-[11px] font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-200">
                 <tr>
                   <th scope="col" className="px-4 py-3">Nome do Ficheiro</th>
                   <th scope="col" className="px-4 py-3">Área / Origem</th>

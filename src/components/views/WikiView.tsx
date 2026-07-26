@@ -137,7 +137,7 @@ export const WikiView: React.FC = () => {
           <button
             id="btn-trigger-wiki-gen"
             onClick={() => setShowGenModal(true)}
-            className="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-md shadow-2xs cursor-pointer transition-colors"
+            className="inline-flex items-center gap-1.5 bg-[#030213] hover:bg-[#030213]/90 text-white text-xs font-semibold px-4 py-2 rounded-md shadow-2xs cursor-pointer transition-colors"
           >
             <Sparkles className="h-3.5 w-3.5" />
             Compilar Novo Artigo (IA)
@@ -239,7 +239,7 @@ export const WikiView: React.FC = () => {
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
           <div className="xl:col-span-3 space-y-5">
             {/* Search and category filters */}
-            <div className="flex flex-col md:flex-row md:items-center gap-3 bg-white p-4 rounded-lg border border-slate-200">
+            <div className="flex flex-col md:flex-row md:items-center gap-3 bg-white p-4 rounded-xl border border-slate-200">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
                 <input
@@ -247,7 +247,7 @@ export const WikiView: React.FC = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Pesquisar manuais, regulamentos técnicos e rascunhos de Wiki..."
-                  className="w-full text-xs pl-9 pr-4 py-2 border border-slate-300 rounded focus:outline-none focus:border-slate-450 text-slate-700 bg-slate-50/55"
+                  className="w-full text-xs pl-9 pr-4 py-2 border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 text-slate-900 bg-[#f3f3f5]"
                 />
               </div>
               <div className="flex flex-wrap gap-1.5">
@@ -255,9 +255,9 @@ export const WikiView: React.FC = () => {
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
-                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all border cursor-pointer ${
+                    className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all border cursor-pointer ${
                       selectedCategory === cat
-                        ? 'bg-blue-50 border-blue-200 text-blue-700 shadow-2xs font-semibold'
+                        ? 'bg-[#030213] border-[#030213] text-white shadow-2xs'
                         : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                     }`}
                   >
@@ -274,7 +274,7 @@ export const WikiView: React.FC = () => {
                   <div
                     key={art.id}
                     onClick={() => incrementPopularity(art)}
-                    className="bg-white border border-slate-200 hover:border-blue-300 rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all cursor-pointer flex flex-col justify-between group"
+                    className="bg-white border border-slate-200 hover:border-slate-300 rounded-xl p-5 shadow-2xs transition-all cursor-pointer flex flex-col justify-between group"
                   >
                     <div>
                       <div className="flex items-center gap-2 mb-2.5">
@@ -298,7 +298,7 @@ export const WikiView: React.FC = () => {
                     
                     <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
                       <span className="text-[10px] text-slate-400">Atribuído em: {art.updatedAt}</span>
-                      <span className="text-xs text-blue-600 font-semibold group-hover:translate-x-1 transition-transform inline-flex items-center gap-0.5">
+                      <span className="text-xs text-slate-900 font-bold group-hover:translate-x-1 transition-transform inline-flex items-center gap-0.5">
                         Ler Artigo &rarr;
                       </span>
                     </div>
@@ -368,15 +368,15 @@ export const WikiView: React.FC = () => {
       {/* COMPILATION MODAL POPUP */}
       {showGenModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 transition-all">
-          <div id="wiki-creation-modal" className="bg-white rounded-lg border border-slate-200 w-full max-w-md shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="p-5 border-b border-slate-100 bg-white flex items-center justify-between">
+          <div id="wiki-creation-modal" className="bg-white rounded-xl border border-slate-200 w-full max-w-md shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="px-5 py-4 bg-[#030213] flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Sparkles className="h-4.5 w-4.5 text-blue-600" />
-                <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800">Compilação Inteligente</h3>
+                <Sparkles className="h-4.5 w-4.5 text-white" />
+                <h3 className="text-sm font-bold uppercase tracking-wider text-white">Compilação Inteligente</h3>
               </div>
               <button
                 onClick={() => setShowGenModal(false)}
-                className="text-slate-400 hover:text-slate-600 cursor-pointer"
+                className="text-slate-400 hover:text-white cursor-pointer"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -390,7 +390,7 @@ export const WikiView: React.FC = () => {
               )}
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Assunto / Perguntas de Interesse</label>
+                <label className="text-xs font-semibold text-slate-700 block">Assunto / Perguntas de Interesse</label>
                 <input
                   id="modal-gen-topic"
                   type="text"
@@ -398,18 +398,18 @@ export const WikiView: React.FC = () => {
                   value={genTopic}
                   onChange={(e) => setGenTopic(e.target.value)}
                   placeholder="Ex: 'Procedimentos de Auditoria de Software'"
-                  className="w-full text-xs px-3 py-2 border border-slate-300 rounded focus:outline-none focus:border-slate-500 text-slate-800"
+                  className="w-full text-xs px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 text-slate-900 bg-[#f3f3f5]"
                   disabled={isGenerating}
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Departamento Organizacional</label>
+                <label className="text-xs font-semibold text-slate-700 block">Departamento Organizacional</label>
                 <select
                   id="modal-gen-dept"
                   value={genDept}
                   onChange={(e) => setGenDept(e.target.value)}
-                  className="w-full text-xs px-3 py-2 border border-slate-300 rounded focus:outline-none focus:border-slate-500 text-slate-800 bg-white"
+                  className="w-full text-xs px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 text-slate-900 bg-[#f3f3f5]"
                   disabled={isGenerating}
                 >
                   {categories.filter(c => c !== 'Todas').map(c => (
@@ -426,7 +426,7 @@ export const WikiView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowGenModal(false)}
-                  className="px-3.5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded border border-slate-200 transition-colors cursor-pointer"
+                  className="px-3.5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 rounded-md border border-slate-200 transition-colors cursor-pointer"
                   disabled={isGenerating}
                 >
                   Cancelar
@@ -435,7 +435,7 @@ export const WikiView: React.FC = () => {
                   id="btn-confirm-wiki-gen"
                   type="submit"
                   disabled={isGenerating || !genTopic.trim()}
-                  className="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 rounded shadow-3xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                  className="px-4 py-2 text-xs font-semibold text-white bg-[#030213] hover:bg-[#030213]/90 disabled:bg-slate-200 disabled:text-slate-400 rounded-md shadow-2xs flex items-center gap-1.5 transition-colors cursor-pointer"
                 >
                   {isGenerating ? (
                     <>

@@ -257,34 +257,34 @@ export const AdminView: React.FC = () => {
             <button
               id="btn-add-user"
               onClick={() => setShowAddModal(true)}
-              className="inline-flex items-center gap-1.5 bg-[#1e293b] hover:bg-slate-800 text-white text-xs font-semibold px-4 py-2 rounded-md shadow-2xs cursor-pointer transition-all mt-3 md:mt-0"
+              className="inline-flex items-center gap-1.5 bg-[#030213] hover:bg-[#030213]/90 text-white text-xs font-semibold px-4 py-2 rounded-md shadow-2xs cursor-pointer transition-all mt-3 md:mt-0"
             >
               <UserPlus className="h-4 w-4" />
               Adicionar Utilizador
             </button>
           </div>
 
-          <div className="bg-white p-4 border border-slate-200 rounded-lg grid grid-cols-1 sm:grid-cols-3 gap-3 items-end shadow-3xs mb-4">
+          <div className="bg-white p-4 border border-slate-200 rounded-xl grid grid-cols-1 sm:grid-cols-3 gap-3 items-end shadow-2xs mb-4">
             <div className="space-y-1">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Pesquisar Utilizador</label>
+              <label className="text-xs font-semibold text-slate-700 block">Pesquisar Utilizador</label>
               <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-400" />
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
                 <input
                   type="text"
                   value={searchEmail}
                   onChange={(e) => setSearchEmail(e.target.value)}
                   placeholder="Buscar por nome ou email..."
-                  className="w-full text-xs pl-8 pr-3 py-1.5 border border-slate-300 rounded focus:outline-none bg-slate-50/50"
+                  className="w-full h-9 text-xs pl-9 pr-3 border border-slate-200 rounded-md focus:outline-none bg-[#f3f3f5] text-slate-900 placeholder:text-slate-400"
                 />
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Filtrar Cargo (Role)</label>
+              <label className="text-xs font-semibold text-slate-700 block">Filtrar Cargo (Role)</label>
               <select
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
-                className="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded focus:outline-none bg-slate-50"
+                className="w-full h-9 text-xs px-3 border border-slate-200 rounded-md focus:outline-none bg-[#f3f3f5] text-slate-900"
               >
                 <option value="Todas">Todas as Roles</option>
                 {availableRoles.map(r => (
@@ -294,11 +294,11 @@ export const AdminView: React.FC = () => {
             </div>
 
             <div className="space-y-1">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Filtrar Departamento</label>
+              <label className="text-xs font-semibold text-slate-700 block">Filtrar Departamento</label>
               <select
                 value={deptFilter}
                 onChange={(e) => setDeptFilter(e.target.value)}
-                className="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded focus:outline-none bg-slate-50"
+                className="w-full h-9 text-xs px-3 border border-slate-200 rounded-md focus:outline-none bg-[#f3f3f5] text-slate-900"
               >
                 <option value="Todas">Todos os Departamentos</option>
                 {availableDepts.map(d => (
@@ -308,9 +308,9 @@ export const AdminView: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-lg overflow-x-auto shadow-3xs">
-            <table className="w-full border-collapse text-left text-xs text-slate-600">
-              <thead className="bg-[#f8fafc] text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-200">
+          <div className="bg-white border border-slate-200 rounded-xl overflow-x-auto shadow-2xs">
+            <table className="w-full border-collapse text-left text-xs text-slate-700">
+              <thead className="bg-slate-50/80 text-[11px] font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-200">
                 <tr>
                   <th scope="col" className="px-5 py-3">Identificação do Membro</th>
                   <th scope="col" className="px-5 py-3">Departamento Organizacional</th>

@@ -217,20 +217,20 @@ export const UploadView: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white p-5 border border-slate-200 rounded-lg space-y-4">
+          <div className="bg-white p-5 border border-slate-200 rounded-xl space-y-4 shadow-2xs">
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4 border-b border-slate-100">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4 border-b border-slate-200">
               <div className="space-y-1.5 md:col-span-2">
-                <span className="text-xs font-bold text-[#1e293b] uppercase tracking-wider block">1. Departamentos Destino</span>
-                <div className="flex flex-wrap gap-2 p-3 border border-slate-200 rounded bg-slate-50">
+                <span className="text-xs font-semibold text-slate-800 uppercase tracking-wider block">1. Departamentos Destino</span>
+                <div className="flex flex-wrap gap-2 p-3 border border-slate-200 rounded-md bg-[#f3f3f5]">
                   {departments.length === 0 && <span className="text-[10px] text-slate-400 p-1">A carregar...</span>}
                   {departments.map(d => (
-                    <label key={d.id} className="flex items-center gap-1.5 cursor-pointer bg-white px-2.5 py-1.5 border border-slate-200 rounded shadow-3xs hover:border-blue-400 transition-colors">
+                    <label key={d.id} className="flex items-center gap-1.5 cursor-pointer bg-white px-2.5 py-1.5 border border-slate-200 rounded-md shadow-2xs hover:border-slate-300 transition-colors">
                       <input 
                         type="checkbox" 
                         checked={selectedDepts.includes(d.id)} 
                         onChange={() => toggleDept(d.id)}
-                        className="rounded text-blue-600 focus:ring-0"
+                        className="rounded text-slate-900 focus:ring-0"
                       />
                       <span className="text-[10px] font-bold text-slate-700">{d.name}</span>
                     </label>
@@ -239,11 +239,11 @@ export const UploadView: React.FC = () => {
               </div>
               
               <div className="space-y-1.5">
-                <span className="text-xs font-bold text-[#1e293b] uppercase tracking-wider block">2. Lógica de Acesso Restrito</span>
+                <span className="text-xs font-semibold text-slate-800 uppercase tracking-wider block">2. Lógica de Acesso Restrito</span>
                 <select
                   value={accessLogic}
                   onChange={(e) => setAccessLogic(e.target.value as 'AND' | 'OR')}
-                  className="w-full text-xs px-3 py-2 border border-slate-300 rounded focus:outline-none bg-white text-slate-800 font-medium"
+                  className="w-full text-xs px-3 py-2 border border-slate-200 rounded-md focus:outline-none bg-[#f3f3f5] text-slate-900 font-medium"
                 >
                   <option value="AND">Exigir Cargo E Departamento (AND)</option>
                   <option value="OR">Exigir Cargo OU Departamento (OR)</option>
@@ -251,18 +251,18 @@ export const UploadView: React.FC = () => {
               </div>
 
               <div className="md:col-span-2 space-y-1.5">
-                <span className="text-xs font-bold text-[#1e293b] uppercase tracking-wider block flex justify-between">
-                  3. Restringir a Cargos (Opcional)
+                <span className="text-xs font-semibold text-slate-800 uppercase tracking-wider flex justify-between">
+                  <span>3. Restringir a Cargos (Opcional)</span>
                   <span className="text-slate-400 font-normal">Se não selecionar nenhum, qualquer membro do departamento tem acesso.</span>
                 </span>
-                <div className="flex flex-wrap gap-2 p-3 border border-slate-200 rounded bg-slate-50">
+                <div className="flex flex-wrap gap-2 p-3 border border-slate-200 rounded-md bg-[#f3f3f5]">
                   {roles.map(r => (
-                    <label key={r.id} className="flex items-center gap-1.5 cursor-pointer bg-white px-2.5 py-1.5 border border-slate-200 rounded shadow-3xs hover:border-blue-400 transition-colors">
+                    <label key={r.id} className="flex items-center gap-1.5 cursor-pointer bg-white px-2.5 py-1.5 border border-slate-200 rounded-md shadow-2xs hover:border-slate-300 transition-colors">
                       <input 
                         type="checkbox" 
                         checked={selectedRoles.includes(r.id)} 
                         onChange={() => toggleRole(r.id)}
-                        className="rounded text-blue-600 focus:ring-0"
+                        className="rounded text-slate-900 focus:ring-0"
                       />
                       <span className="text-[10px] font-bold text-slate-700">{r.name}</span>
                     </label>
@@ -278,9 +278,9 @@ export const UploadView: React.FC = () => {
               onDragOver={handleDrag}
               onDragLeave={handleDrag}
               onDrop={handleDrop}
-              className={`border-2 border-dashed rounded-lg p-12 text-center transition-all ${dragActive
-                ? 'border-blue-500 bg-blue-50/20'
-                : 'border-slate-300 hover:border-slate-400 bg-slate-50/25'
+              className={`border-2 border-dashed rounded-xl p-12 text-center transition-all ${dragActive
+                ? 'border-slate-900 bg-slate-100/50'
+                : 'border-slate-200 hover:border-slate-300 bg-slate-50/50'
                 }`}
             >
               <input
@@ -292,14 +292,14 @@ export const UploadView: React.FC = () => {
                 accept=".pdf,.docx,.txt,.csv,.xlsx,.pptx"
               />
               <UploadCloud className="h-10 w-10 text-slate-400 mx-auto stroke-[1.5]" />
-              <p className="mt-4 text-xs font-bold text-slate-800 uppercase tracking-wider">Arraste os arquivos para aqui</p>
+              <p className="mt-4 text-xs font-bold text-slate-900 uppercase tracking-wider">Arraste os arquivos para aqui</p>
               <p className="text-[10px] text-slate-400 mt-1 max-w-[280px] mx-auto leading-normal">
                 Suporta: PDF, DOCX, TXT, CSV, XLSX, PPTX até 15MB para particionamento.
               </p>
               <button
                 type="button"
                 onClick={() => document.getElementById('file-input-manual')?.click()}
-                className="mt-4 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold px-4 py-2 rounded shadow-3xs cursor-pointer transition-all"
+                className="mt-4 bg-[#030213] hover:bg-[#030213]/90 text-white text-xs font-semibold px-4 py-2 rounded-md shadow-2xs cursor-pointer transition-all"
               >
                 Procurar Ficheiros
               </button>

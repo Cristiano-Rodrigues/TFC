@@ -123,23 +123,23 @@ export const RolesPanel: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-            <ShieldCheck className="h-5 w-5 text-indigo-500" />
+            <ShieldCheck className="h-5 w-5 text-slate-700" />
             Cargos e Permissões (Roles)
           </h2>
           <p className="text-xs text-slate-500 mt-1">Gira os níveis de acesso associando permissões a cargos.</p>
         </div>
         <button
           onClick={openNewModal}
-          className="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-md shadow-2xs transition-all"
+          className="inline-flex items-center gap-1.5 bg-[#030213] hover:bg-[#030213]/90 text-white text-xs font-semibold px-4 py-2 rounded-md shadow-2xs transition-all cursor-pointer"
         >
           <Plus className="h-4 w-4" />
           Novo Cargo (Role)
         </button>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-lg overflow-x-auto shadow-3xs">
-        <table className="w-full border-collapse text-left text-xs text-slate-600">
-          <thead className="bg-[#f8fafc] text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-200">
+      <div className="bg-white border border-slate-200 rounded-xl overflow-x-auto shadow-2xs">
+        <table className="w-full border-collapse text-left text-xs text-slate-700">
+          <thead className="bg-slate-50/80 text-[11px] font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-200">
             <tr>
               <th className="px-5 py-3">Cargo</th>
               <th className="px-5 py-3">Permissões Associadas</th>
@@ -149,7 +149,7 @@ export const RolesPanel: React.FC = () => {
           <tbody className="divide-y divide-slate-100 font-medium">
             {loading ? (
               <tr>
-                <td colSpan={3} className="px-5 py-8 text-center text-slate-450">A carregar...</td>
+                <td colSpan={3} className="px-5 py-8 text-center text-slate-400">A carregar...</td>
               </tr>
             ) : roles.length > 0 ? (
               roles.map((r) => (
@@ -161,7 +161,7 @@ export const RolesPanel: React.FC = () => {
                   <td className="px-5 py-3.5">
                     <div className="flex flex-wrap gap-1">
                       {r.role_permissions.map((rp, i) => rp.permissions && (
-                        <span key={i} className="inline-block px-2 py-0.5 bg-slate-100 text-slate-600 text-[9px] font-bold uppercase rounded border border-slate-200">
+                        <span key={i} className="inline-block px-2 py-0.5 bg-[#f3f3f5] text-slate-700 text-[9px] font-bold uppercase rounded-md border border-slate-200">
                           {rp.permissions.code}
                         </span>
                       ))}
@@ -169,10 +169,10 @@ export const RolesPanel: React.FC = () => {
                     </div>
                   </td>
                   <td className="px-5 py-3.5 text-right space-x-2">
-                    <button onClick={() => openEditModal(r)} className="text-slate-400 hover:text-indigo-600 p-1">
+                    <button onClick={() => openEditModal(r)} className="text-slate-400 hover:text-[#030213] p-1 cursor-pointer">
                       <Edit2 className="h-4 w-4" />
                     </button>
-                    <button onClick={() => handleDelete(r.id)} className="text-slate-400 hover:text-red-600 p-1">
+                    <button onClick={() => handleDelete(r.id)} className="text-slate-400 hover:text-red-600 p-1 cursor-pointer">
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </td>
@@ -180,7 +180,7 @@ export const RolesPanel: React.FC = () => {
               ))
             ) : (
               <tr>
-                <td colSpan={3} className="px-5 py-8 text-center text-slate-450">Nenhum cargo encontrado.</td>
+                <td colSpan={3} className="px-5 py-8 text-center text-slate-400">Nenhum cargo encontrado.</td>
               </tr>
             )}
           </tbody>
@@ -188,36 +188,36 @@ export const RolesPanel: React.FC = () => {
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg border border-slate-200 w-full max-w-lg shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="px-5 py-4 bg-slate-900 text-white flex items-center justify-between shrink-0">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl border border-slate-200 w-full max-w-lg shadow-xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-150">
+            <div className="px-5 py-4 bg-[#030213] text-white flex items-center justify-between shrink-0">
               <h3 className="text-sm font-bold uppercase tracking-wider">{isEditing ? 'Editar Cargo' : 'Novo Cargo'}</h3>
-              <button onClick={handleCloseModal} className="text-slate-400 hover:text-white"><X className="h-4 w-4" /></button>
+              <button onClick={handleCloseModal} className="text-slate-400 hover:text-white cursor-pointer"><X className="h-4 w-4" /></button>
             </div>
             
             <form onSubmit={handleSubmit} className="flex flex-col overflow-hidden">
               <div className="p-5 space-y-4 overflow-y-auto">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5 col-span-2 sm:col-span-1">
-                    <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Nome *</label>
-                    <input required value={name} onChange={e => setName(e.target.value)} className="w-full text-xs px-3 py-2 border rounded focus:border-indigo-500 outline-none" />
+                    <label className="text-xs font-semibold text-slate-700 block">Nome *</label>
+                    <input required value={name} onChange={e => setName(e.target.value)} className="w-full text-xs px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 bg-[#f3f3f5] text-slate-900" />
                   </div>
                   <div className="space-y-1.5 col-span-2 sm:col-span-1">
-                    <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Descrição</label>
-                    <input value={description} onChange={e => setDescription(e.target.value)} className="w-full text-xs px-3 py-2 border rounded focus:border-indigo-500 outline-none" />
+                    <label className="text-xs font-semibold text-slate-700 block">Descrição</label>
+                    <input value={description} onChange={e => setDescription(e.target.value)} className="w-full text-xs px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 bg-[#f3f3f5] text-slate-900" />
                   </div>
                 </div>
                 
                 <div className="pt-2">
-                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-2 block">Permissões de Sistema</label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 border border-slate-200 p-3 rounded bg-slate-50">
+                  <label className="text-xs font-semibold text-slate-700 mb-2 block">Permissões de Sistema</label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 border border-slate-200 p-3 rounded-md bg-[#f3f3f5]">
                     {allPermissions.map(p => (
                       <label key={p.id} className="flex items-center gap-2 cursor-pointer p-1.5 hover:bg-white rounded border border-transparent hover:border-slate-200 transition-colors">
                         <input 
                           type="checkbox" 
                           checked={selectedPerms.includes(p.id)} 
                           onChange={() => togglePermission(p.id)}
-                          className="rounded text-indigo-600 focus:ring-0" 
+                          className="rounded text-slate-900 focus:ring-0" 
                         />
                         <span className="text-[10px] font-bold text-slate-700 uppercase">{p.code}</span>
                       </label>
@@ -227,8 +227,8 @@ export const RolesPanel: React.FC = () => {
               </div>
 
               <div className="p-4 border-t border-slate-100 flex justify-end gap-2 bg-slate-50 shrink-0">
-                <button type="button" onClick={handleCloseModal} className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-white border border-slate-200 rounded">Cancelar</button>
-                <button type="submit" disabled={submitting} className="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded shadow-3xs">{isEditing ? 'Guardar' : 'Criar Cargo'}</button>
+                <button type="button" onClick={handleCloseModal} className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-white border border-slate-200 rounded-md cursor-pointer transition-colors">Cancelar</button>
+                <button type="submit" disabled={submitting} className="px-4 py-2 text-xs font-semibold text-white bg-[#030213] hover:bg-[#030213]/90 rounded-md shadow-2xs cursor-pointer transition-colors">{isEditing ? 'Guardar' : 'Criar Cargo'}</button>
               </div>
             </form>
           </div>

@@ -591,7 +591,7 @@ Consiste num editor de texto incorporado diretamente na plataforma. Permite aos 
 
 ##### e) Interface de Chat IA (Pesquisa Inteligente)
 
-Representa a interface principal de interação do utilizador com o agente de inteligência artificial. Possui um layout moderno, histórico lateral de conversas persistentes, suporte a múltiplas sessões e caixas de diálogo estilizados. Cada resposta gerada apresenta botões interativos com as fontes bibliográficas consultadas; ao clicar em qualquer citação, um painel lateral de inspeção exibe o trecho exato do documento vetorizado utilizado pelo modelo para fundamentar a sua resposta.
+Representa a interface principal de interação do utilizador com o agente de inteligência artificial. Possui um layout moderno, histórico lateral de conversas persistentes, suporte a múltiplas sessões e caixas de diálogo estilizados. Cada resposta gerada apresenta botões interativos com as fontes bibliográficas consultadas; ao clicar em qualquer citação, um painel lateral de inspeção exibe o trecho exato do documento vetorizado utilizado pelo modelo para fundamentar a sua resposta. É aplicado um filtro inteligente na API (*backend*) que assegura a apresentação exclusiva das fontes efetivamente referenciadas pelo modelo de IA na resposta, eliminando assim o ruído visual de documentos contextuais que não foram julgados relevantes para a síntese final.
 
 ![Interface do Chat de IA (Pesquisa Inteligente).](docs/images/chat-ia.png){width=88%}
 
@@ -606,7 +606,7 @@ CREATE OR REPLACE FUNCTION public.match_chunks(
   p_embedding vector, 
   p_threshold double precision, 
   p_count integer, 
-  p_company_id uuid,
+  p_company_id uuid DEFAULT NULL::uuid,
   p_user_id uuid DEFAULT NULL::uuid, 
   p_department_id uuid DEFAULT NULL::uuid, 
   p_role_id uuid DEFAULT NULL::uuid
@@ -688,37 +688,50 @@ No backend Next.js, as permissões são validadas de forma síncrona antes do re
 
 ```typescript
 // Excerto simplificado de src/app/api/chat/route.ts
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const session = await getSession(req);
-    if (!session || !session.user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-    }
+    const cookieStore = await cookies();
+    const token = cookieStore.get('auth_token')?.value;
 
+    if (!token) return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
+    
+    const payload = verifyToken(token);
     const { query } = await req.json();
     
     // Obtenção dos dados do utilizador a partir da base de dados do Supabase
-    const { data: userProfile } = await supabase
+    const { data: user } = await supabaseAdmin
       .from('users')
       .select('company_id, department_id, role_id')
-      .eq('id', session.user.id)
+      .eq('id', payload.sub)
       .single();
 
     // Encaminhamento do pedido ao pipeline n8n com o respectivo contexto RAG seguro
-    const response = await fetch(process.env.N8N_QUERY_WEBHOOK_URL!, {
+    const response = await fetch(process.env.N8N_WEBHOOK_URL + '/query', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         query,
-        user_id: session.user.id,
-        company_id: userProfile.company_id,
-        department_id: userProfile.department_id,
-        role_id: userProfile.role_id
+        user_id: payload.sub,
+        company_id: user?.company_id,
+        department_id: user?.department_id,
+        role_id: user?.role_id
       })
     });
 
     const result = await response.json();
-    return NextResponse.json(result);
+    
+    // Filtro inteligente de fontes: apenas mostra ao utilizador
+    // os documentos que a IA efetivamente referenciou na resposta.
+    const relevantSources = (result.sources || []).filter((source: any) => {
+      if (!source.title) return false;
+      const titleWithoutExt = source.title.replace(/\.[^/.]+$/, "");
+      return result.answer.includes(source.title) || result.answer.includes(titleWithoutExt);
+    });
+
+    return NextResponse.json({
+      answer: result.answer,
+      sources: relevantSources
+    });
   } catch (error) {
     return NextResponse.json({ error: "Erro interno no servidor" }, { status: 500 });
   }

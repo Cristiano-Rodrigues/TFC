@@ -22,7 +22,7 @@ A especificação dos requisitos seguiu a norma ISO/IEC 25010 para a qualidade d
 
 #### 4.1.2.1. Requisitos Funcionais
 
-Os Requisitos Funcionais (RF) definem os serviços que o sistema deve fornecer aos utilizadores. A Tabela 4.1 descreve os requisitos funcionais prioritários identificados para o protótipo.
+Os Requisitos Funcionais (RF) definem os serviços que o sistema deve fornecer aos utilizadores. O Quadro 4.1 descreve os requisitos funcionais prioritários identificados para o protótipo.
 
 | Identificador | Requisito Funcional | Descrição |
 |:---|:---|:---|
@@ -35,11 +35,11 @@ Os Requisitos Funcionais (RF) definem os serviços que o sistema deve fornecer a
 | **RF-07** | Atribuição de Fontes | A interface de chat da IA deve listar de forma clara os documentos de origem utilizados pelo LLM para sintetizar a resposta, permitindo a validação da informação. |
 | **RF-08** | Gestão de Utilizadores | O administrador deve poder gerir os utilizadores da empresa, associando-os a um departamento e a um cargo específico. |
 
-Table: Tabela 4.1: Requisitos Funcionais do Sistema. Fonte: Elaboração própria.
+Table: Quadro 4.1: Requisitos Funcionais do Sistema. Fonte: Elaboração própria.
 
 #### 4.1.2.2. Requisitos Não Funcionais
 
-Os Requisitos Não Funcionais (RNF) especificam critérios que qualificam o funcionamento do sistema. A Tabela 4.2 apresenta os requisitos não funcionais.
+Os Requisitos Não Funcionais (RNF) especificam critérios que qualificam o funcionamento do sistema. O Quadro 4.2 apresenta os requisitos não funcionais.
 
 | Identificador | Categoria | Descrição |
 |:---|:---|:---|
@@ -49,7 +49,7 @@ Os Requisitos Não Funcionais (RNF) especificam critérios que qualificam o func
 | **RNF-04** | Usabilidade (Interface) | A interface deve apresentar-se responsiva, fluida e incluir transições e animações visuais curtas para guiar a navegação do utilizador (*Framer Motion*). |
 | **RNF-05** | Disponibilidade e Extensibilidade | A lógica de ingestão documental e recuperação RAG deve correr numa infraestrutura modular externa (n8n), facilitando a adição de novos conectores sem necessidade de recompilar o frontend Next.js. |
 
-Table: Tabela 4.2: Requisitos Não Funcionais do Sistema. Fonte: Elaboração própria.
+Table: Quadro 4.2: Requisitos Não Funcionais do Sistema. Fonte: Elaboração própria.
 
 ### 4.1.3. Modelagem do Sistema
 
@@ -72,7 +72,9 @@ graph TD
     end
 ```
 
-**Figura 4.1:** Diagrama de Contexto do Sistema. Fonte: Elaboração própria.
+\begin{center}
+\captionof{figure}{Diagrama de Contexto do Sistema. Fonte: Elaboração própria.}
+\end{center}
 
 #### 4.1.3.2. Diagrama de Casos de Uso
 
@@ -104,11 +106,13 @@ flowchart LR
     Admin --> UC7
 ```
 
-**Figura 4.2:** Diagrama de Casos de Uso do Sistema. Fonte: Elaboração própria.
+\begin{center}
+\captionof{figure}{Diagrama de Casos de Uso do Sistema. Fonte: Elaboração própria.}
+\end{center}
 
 #### 4.1.3.3. Especificação dos Casos de Uso
 
-A especificação detalhada dos casos de uso principais do sistema fornece uma descrição passo-a-passo das acções executadas pelos actores e as correspondentes reacções do sistema. A Tabela 4.3 especifica o caso de uso principal de Pesquisa Inteligente.
+A especificação detalhada dos casos de uso principais do sistema fornece uma descrição passo-a-passo das acções executadas pelos actores e as correspondentes reacções do sistema. O Quadro 4.3 especifica o caso de uso principal de Pesquisa Inteligente.
 
 +--------------------------+----------------------------------------------------------------------------------+
 | Campo                    | Descrição                                                                        |
@@ -148,9 +152,9 @@ A especificação detalhada dos casos de uso principais do sistema fornece uma d
 |                          | às fontes é mostrada ao utilizador.                                              |
 +--------------------------+----------------------------------------------------------------------------------+
 
-Table: Tabela 4.3: Especificação do Caso de Uso - Consultar Base de Conhecimento (Chat). Fonte: Elaboração própria.
+Table: Quadro 4.3: Especificação do Caso de Uso - Consultar Base de Conhecimento (Chat). Fonte: Elaboração própria.
 
-A Tabela 4.4 descreve a especificação do caso de uso de Upload de Conteúdo e Configuração de Acesso.
+O Quadro 4.4 descreve a especificação do caso de uso de Upload de Conteúdo e Configuração de Acesso.
 
 +--------------------------+----------------------------------------------------------------------------------+
 | Campo                    | Descrição                                                                        |
@@ -188,7 +192,7 @@ A Tabela 4.4 descreve a especificação do caso de uso de Upload de Conteúdo e 
 |                          | pesquisas semânticas pelas pessoas autorizadas.                                  |
 +--------------------------+----------------------------------------------------------------------------------+
 
-Table: Tabela 4.4: Especificação do Caso de Uso - Upload de Conteúdo e Acessos. Fonte: Elaboração própria.
+Table: Quadro 4.4: Especificação do Caso de Uso - Upload de Conteúdo e Acessos. Fonte: Elaboração própria.
 
 #### 4.1.3.4. Diagrama de Classes
 
@@ -280,7 +284,9 @@ classDiagram
     Document "*" -- "*" Role : restrito_por_DocumentPermission
 ```
 
-**Figura 4.3:** Diagrama de Classes do Domínio do Sistema. Fonte: Elaboração própria.
+\begin{center}
+\captionof{figure}{Diagrama de Classes do Domínio do Sistema. Fonte: Elaboração própria.}
+\end{center}
 
 #### 4.1.3.5. Diagrama Entidade-Relacional
 
@@ -393,7 +399,9 @@ erDiagram
     }
 ```
 
-**Figura 4.4:** Diagrama Entidade-Relacional (DER) da Base de Dados. Fonte: Elaboração própria.
+\begin{center}
+\captionof{figure}{Diagrama Entidade-Relacional (DER) da Base de Dados. Fonte: Elaboração própria.}
+\end{center}
 
 ### 4.1.4. Qualidade do Software
 
@@ -503,7 +511,7 @@ A stack tecnológica seleccionada para a implementação do protótipo baseia-se
 | **Otimização de Busca (Re-Ranking)** | Cohere Rerank API (modelo `rerank-multilingual-v3.0`) | Avalia e reordena os fragmentos devolvidos pelo PostgreSQL pela sua relevância semântica real face à pergunta do utilizador, antes do envio ao LLM, materializando o paradigma de RAG Avançado. |
 | **Síntese LLM** | Cohere Chat (`command-r-plus`) | Modelo de linguagem optimizado para tarefas RAG com forte capacidade de raciocínio, formatação estruturada e citação transparente de fontes do contexto. |
 
-Table: Tabela 4.5: Stack Tecnológica do Sistema. Fonte: Elaboração própria.
+Table: Quadro 4.5: Stack Tecnológica do Sistema. Fonte: Elaboração própria.
 
 #### 4.1.5.5. Testes Realizados
 
@@ -511,18 +519,24 @@ Os testes do protótipo focaram-se em validar duas dimensões fundamentais estab
 
 ##### A. Testes de Eficiência Temporal
 
-Os testes de eficiência temporal mediram o tempo de resposta (em segundos) em dois fluxos essenciais: a ingestão documental assíncrona (do upload até à inserção vectorial) e a recuperação em tempo real de informação (da submissão da pergunta à síntese final da resposta). Os dados foram recolhidos num ambiente de teste com ligação de rede simétrica padrão, utilizando ficheiros de texto e PDFs de dimensões variadas. Os resultados das simulações iniciais encontram-se sumarizados na Tabela 4.6. Para garantir a fiabilidade dos dados, cada operação foi executada em 10 iterações independentes, sendo o valor reportado na Tabela 4.6 correspondente à média aritmética dos tempos de resposta obtidos, atenuando assim flutuações pontuais de latência da rede.
+Os testes de eficiência temporal mediram o tempo de resposta (em segundos) em dois fluxos essenciais: a ingestão documental assíncrona (do upload até à inserção vectorial) e a recuperação em tempo real de informação (da submissão da pergunta à síntese final da resposta). Os dados foram recolhidos num ambiente de teste com ligação de rede simétrica padrão, utilizando ficheiros de texto e PDFs de dimensões variadas. Os resultados das simulações iniciais encontram-se sumarizados na Tabela 4.1. Para garantir a fiabilidade dos dados, cada operação foi executada em 10 iterações independentes, sendo o valor reportado na Tabela 4.1 correspondente à média aritmética dos tempos de resposta obtidos, atenuando assim flutuações pontuais de latência da rede.
 
-| ID do Teste | Operação Realizada | Descrição da Carga de Teste | Tempo Médio (s) | Estado do Teste |
-|:------------|:-------------------|:----------------------------|:----------------|:----------------|
-| **T-TEMP-01** | Ingestão Documental | Ficheiro PDF Simples (2 páginas, 4.5 KB de texto) | 1.84 | Sucesso |
-| **T-TEMP-02** | Ingestão Documental | Relatório Técnico Médio (15 páginas, 45 KB de texto) | 4.92 | Sucesso |
-| **T-TEMP-03** | Ingestão Documental | Manual de Procedimentos Longo (50 páginas, 180 KB) | 12.35 | Sucesso |
-| **T-TEMP-04** | Ingestão Documental | Página Wiki (Texto editado directamente, ~2000 caracteres) | 0.95 | Sucesso |
-| **T-TEMP-05** | Pesquisa Semântica | Consulta de 1 linha ("Qual é o prazo de entrega do relatório?") | 1.88 | Sucesso |
-| **T-TEMP-06** | Pesquisa Semântica | Consulta de 2 linhas ("Como solicitar reembolso de despesas?") | 2.15 | Sucesso |
-
-Table: Tabela 4.6: Resultados dos Testes de Eficiência Temporal. Fonte: Elaboração própria.
+\begin{tabela}[htbp]
+\centering
+\begin{tabular}{p{2cm} p{3.5cm} p{5.5cm} c c}
+\hline
+\textbf{ID do Teste} & \textbf{Operação Realizada} & \textbf{Descrição da Carga de Teste} & \textbf{Tempo Médio (s)} & \textbf{Estado do Teste} \\
+\hline
+\textbf{T-TEMP-01} & Ingestão Documental & Ficheiro PDF Simples (2 páginas, 4.5 KB de texto) & 1.84 & Sucesso \\
+\textbf{T-TEMP-02} & Ingestão Documental & Relatório Técnico Médio (15 páginas, 45 KB de texto) & 4.92 & Sucesso \\
+\textbf{T-TEMP-03} & Ingestão Documental & Manual de Procedimentos Longo (50 páginas, 180 KB) & 12.35 & Sucesso \\
+\textbf{T-TEMP-04} & Ingestão Documental & Página Wiki (Texto editado directamente, $\sim$2000 caracteres) & 0.95 & Sucesso \\
+\textbf{T-TEMP-05} & Pesquisa Semântica & Consulta de 1 linha ("Qual é o prazo de entrega do relatório?") & 1.88 & Sucesso \\
+\textbf{T-TEMP-06} & Pesquisa Semântica & Consulta de 2 linhas ("Como solicitar reembolso de despesas?") & 2.15 & Sucesso \\
+\hline
+\end{tabular}
+\caption{Tabela 4.1: Resultados dos Testes de Eficiência Temporal. Fonte: Elaboração própria.}
+\end{tabela}
 
 Os resultados demonstram que, mesmo com a latência de rede associada à invocação assíncrona de webhooks no n8n e à geração remota de embeddings pela API da Cohere, o tempo médio para obter uma resposta inteligente manteve-se confortavelmente abaixo do limiar não-funcional de 5 segundos definido no requisito **RNF-02**.
 
@@ -530,7 +544,7 @@ Os resultados demonstram que, mesmo com a latência de rede associada à invoca�
 
 Para atestar a eficácia do isolamento multi-tenant e das restrições de visibilidade por departamento e cargo, foi executado um conjunto de simulações com perfis de utilizadores fictícios pertencentes a organizações distintas. O critério de sucesso consistia em verificar se a resposta gerada pelo LLM era qualitativamente correcta, se citava a fonte devida e se respeitava o perímetro de segurança.
 
-A Tabela 4.7 apresenta uma selecção das avaliações qualitativas registadas durante as sessões de teste.
+O Quadro 4.6 apresenta uma selecção das avaliações qualitativas registadas durante as sessões de teste.
 
 A avaliação qualitativa seguiu uma rubrica padronizada: 'Excelente' (o sistema forneceu uma resposta factualmente correcta, suportada pelo contexto e com citação exacta da fonte), 'Parcial' (a resposta é coerente mas omite detalhes do contexto), e 'Nula' (o sistema bloqueia o acesso à informação por restrições de segurança ou o LLM recusa-se a responder por falta de contexto autorizado).
 
@@ -541,7 +555,7 @@ A avaliação qualitativa seguiu uma rubrica padronizada: 'Excelente' (o sistema
 | **QA-03** | Director / Finanças / Empresa B | "Quais as regras para férias?" | Tenta fazer uma pergunta idêntica à do teste QA-01. | **Bloqueado:** Documento pertence a um inquilino diferente (Empresa A). | **Nula:** O LLM respondeu que não tem conhecimento destas directivas. | Não (Isolamento de Tenant) |
 | **QA-04** | Operador / Produção / Empresa B | "Como iniciar a máquina X?" | Acede à página Wiki `Procedimento_Maquina_X` do departamento de Produção. | **Permitido:** Pertence ao departamento do utilizador. | **Excelente:** Passos descritos de forma coerente e estruturada. | Sim (`Procedimento_Maquina_X`) |
 
-Table: Tabela 4.7: Matriz de Testes de Relevância Qualitativa e Segurança. Fonte: Elaboração própria.
+Table: Quadro 4.6: Matriz de Testes de Relevância Qualitativa e Segurança. Fonte: Elaboração própria.
 
 A análise qualitativa das simulações confirma a robustez das políticas de segurança: a base de dados PostgreSQL actua como um guarda-barreiras eficiente, impedindo o envio de dados não-autorizados para o LLM, mitigando significativamente a possibilidade de fuga de informação inter-tenant (dentro do perímetro dos testes realizados) e minimizando alucinações ao limitar o contexto apenas a dados fidedignos e autorizados.
 
@@ -553,17 +567,13 @@ As interfaces desenvolvidas em Next.js priorizaram a simplicidade de utilizaçã
 
 Apresenta um formulário unificado e responsivo com divisão visual (imagem concetual e marca à esquerda, e formulário de acesso/registo de alta fidelidade à direita). Permite a uma nova organização registar o seu perfil autónomo na base de dados PostgreSQL e criar a conta do utilizador administrador inicial de forma simples.
 
-![Ecrã de Login e Registo Multi-tenant.](docs/images/login.png){width=88%}
-
-**Figura 4.5:** Ecrã de Autenticação e Registo Multi-tenant. Fonte: Elaboração própria.
+![Ecrã de Autenticação e Registo Multi-tenant. Fonte: Elaboração própria.](docs/images/login.png){width=88%}
 
 ##### b) Painel Administrativo (RBAC e Departamentos)
 
 Fornece interfaces centralizadas para gestão de acesso relacional. Através deste painel, o administrador pode criar e editar cargos organizacionais, assinalar permissões granulares de sistema (`doc:upload`, `roles:manage`, `users:manage`, etc.) e gerir os departamentos necessários à segmentação e isolamento dos dados da empresa.
 
-![Painel Administrativo e Gestão de Permissões.](docs/images/administracao.png){width=88%}
-
-**Figura 4.6:** Interface do Painel Administrativo (RBAC e Departamentos). Fonte: Elaboração própria.
+![Interface do Painel Administrativo (RBAC e Departamentos). Fonte: Elaboração própria.](docs/images/administracao.png){width=88%}
 
 ##### c) Módulo de Gestão Documental e Upload
 
@@ -571,31 +581,23 @@ O módulo de documentos subdivide-se no ecossistema de carregamento e na tabela 
 
 *   **Zona de Upload Assíncrono:** Disponibiliza uma interface moderna de arrastamento (*drag-and-drop*) de ficheiros (PDF, TXT, DOCX), permitindo associar o departamento de destino e a visibilidade antes do envio para a pipeline do n8n.
 
-![Interface de Upload de Arquivos.](docs/images/upload-arquivos.png){width=88%}
-
-**Figura 4.7:** Módulo de Carregamento de Documentos (*Drag-and-Drop*). Fonte: Elaboração própria.
+![Módulo de Carregamento de Documentos (*Drag-and-Drop*). Fonte: Elaboração própria.](docs/images/upload-arquivos.png){width=88%}
 
 *   **Tabela de Base Documental:** Exibe o repositório centralizado de ficheiros da organização, listando metadados como tamanho, departamento associado, data de criação e o estado de conversão e vetorização em tempo real (`pending`, `processed`, `error`).
 
-![Tabela de Base Documental.](docs/images/base-documental.png){width=88%}
-
-**Figura 4.8:** Tabela da Base Documental Organizacional. Fonte: Elaboração própria.
+![Tabela da Base Documental Organizacional. Fonte: Elaboração própria.](docs/images/base-documental.png){width=88%}
 
 ##### d) Módulo de Wiki Corporativa
 
 Consiste num editor de texto incorporado diretamente na plataforma. Permite aos colaboradores elaborar e publicar políticas internas, manuais de procedimentos e notas operacionais de forma ágil, convertendo instantaneamente o conteúdo criado em blocos textuais (*chunks*) vetorizados sem a necessidade de upload de documentos externos.
 
-![Interface da Wiki Corporativa.](docs/images/wiki.png){width=88%}
-
-**Figura 4.9:** Módulo de Wiki e Edição de Conteúdo Interno. Fonte: Elaboração própria.
+![Módulo de Wiki e Edição de Conteúdo Interno. Fonte: Elaboração própria.](docs/images/wiki.png){width=88%}
 
 ##### e) Interface de Chat IA (Pesquisa Inteligente)
 
 Representa a interface principal de interação do utilizador com o agente de inteligência artificial. Possui um layout moderno, histórico lateral de conversas persistentes, suporte a múltiplas sessões e caixas de diálogo estilizados. Cada resposta gerada apresenta botões interativos com as fontes bibliográficas consultadas; ao clicar em qualquer citação, um painel lateral de inspeção exibe o trecho exato do documento vetorizado utilizado pelo modelo para fundamentar a sua resposta. É aplicado um filtro inteligente na API (*backend*) que assegura a apresentação exclusiva das fontes efetivamente referenciadas pelo modelo de IA na resposta, eliminando assim o ruído visual de documentos contextuais que não foram julgados relevantes para a síntese final.
 
-![Interface do Chat de IA (Pesquisa Inteligente).](docs/images/chat-ia.png){width=88%}
-
-**Figura 4.10:** Interface de Pesquisa Inteligente e Inspeção de Fontes Bibliográficas. Fonte: Elaboração própria.
+![Interface de Pesquisa Inteligente e Inspeção de Fontes Bibliográficas. Fonte: Elaboração própria.](docs/images/chat-ia.png){width=88%}
 
 #### 4.1.5.7. Codificação
 

@@ -247,7 +247,7 @@ No mercado actual, diversas soluções abordam parcialmente o problema da gestã
 
 ### 2.7.2. Comparação com a Solução Proposta
 
-A Tabela 1 apresenta uma análise comparativa entre as soluções existentes e o sistema proposto neste trabalho, considerando as dimensões mais relevantes para o contexto organizacional angolano.
+Apresenta-se uma análise comparativa entre as soluções existentes e o sistema proposto neste trabalho, considerando as dimensões mais relevantes para o contexto organizacional angolano. O Quadro 2.1 sintetiza estas diferenças fundamentais.
 
 | Critério | SharePoint | Confluence | Notion AI | Glean | Danswer | **Sistema Proposto** |
 |---|---|---|---|---|---|---|
@@ -262,9 +262,9 @@ A Tabela 1 apresenta uma análise comparativa entre as soluções existentes e o
 | Optimização nativa de Embeddings para PT | Não | Não | Parcial | Não | Não | **Sim** |
 | Orquestração Visual de Pipelines (Low-Code) | Não | Não | Não | Não | Não | **Sim** |
 
-Table: Tabela 2.1: Comparação entre soluções existentes e o sistema proposto. Fonte: Elaboração própria.
+Table: Quadro 2.1: Comparação entre soluções existentes e o sistema proposto. Fonte: Elaboração própria.
 
-Não obstante as vantagens evidenciadas na tabela, importa reconhecer as limitações inerentes ao sistema proposto na sua fase actual de desenvolvimento:
+Não obstante as vantagens evidenciadas no quadro, importa reconhecer as limitações inerentes ao sistema proposto na sua fase actual de desenvolvimento:
 
 - **Escalabilidade não comprovada:** o protótipo foi avaliado num cenário de *tenant* único com um *corpus* documental de dimensão reduzida; o comportamento em ambientes com múltiplos tenants simultâneos e grandes volumes de documentos carece de validação;
 - **Ausência de validação com utilizadores reais:** toda a avaliação decorreu com perfis fictícios num ambiente simulado, não tendo sido realizado qualquer estudo de usabilidade ou de satisfação com utilizadores de organizações angolanas;

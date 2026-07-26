@@ -91,7 +91,7 @@
   <macro name="title">
     <choose>
       <if type="book thesis report motion_picture webpage" match="any">
-        <text variable="title" font-weight="bold"/>
+        <text variable="title" font-style="italic"/>
       </if>
       <else>
         <text variable="title"/>
@@ -101,7 +101,7 @@
   <macro name="title-short">
     <choose>
       <if type="book thesis report motion_picture webpage" match="any">
-        <text variable="title" form="short" font-weight="bold"/>
+        <text variable="title" form="short" font-style="italic"/>
       </if>
       <else>
         <text variable="title" form="short"/>
@@ -112,7 +112,7 @@
   <macro name="container">
     <choose>
       <if type="book thesis report motion_picture webpage" match="none">
-        <text variable="container-title" font-weight="bold"/>
+        <text variable="container-title" font-style="italic"/>
       </if>
       <else>
         <text variable="container-title"/>
@@ -290,10 +290,26 @@
         <text variable="publisher" suffix=", "/>
         <text variable="publisher-place" suffix=", "/>
         <text macro="issued"/>
+        <choose>
+          <if variable="number-of-pages">
+            <text variable="number-of-pages" prefix=", " suffix=" p."/>
+          </if>
+          <else-if variable="page">
+            <text variable="page" prefix=", p. "/>
+          </else-if>
+        </choose>
       </if>
       <!--Se for outro tipo de monografia, apresenta cidade, editora, ano-->
       <else-if type="book motion_picture report" match="any">
         <text macro="imprenta"/>
+        <choose>
+          <if variable="number-of-pages">
+            <text variable="number-of-pages" prefix=", " suffix=" p."/>
+          </if>
+          <else-if variable="page">
+            <text variable="page" prefix=", p. "/>
+          </else-if>
+        </choose>
       </else-if>
       <!--Se for capítulo, apresenta imprenta, volume, e paginação (se for o caso) -->
       <else-if type="broadcast entry entry-dictionary entry-encyclopedia chapter paper-conference speech" match="any">
@@ -439,7 +455,7 @@
     </layout>
   </citation>
   <!-- :: B I B L I O G R A P H Y   S T Y L E :: -->
-  <bibliography hanging-indent="false" entry-spacing="0" et-al-min="4" et-al-use-first="3" name-delimiter="; " delimiter-precedes-last="never" and="text">
+  <bibliography hanging-indent="false" entry-spacing="0" et-al-min="4" et-al-use-first="1" name-delimiter="; " delimiter-precedes-last="never" and="text">
     <sort>
       <!--Classificado por autor e título-->
       <key macro="producers"/>

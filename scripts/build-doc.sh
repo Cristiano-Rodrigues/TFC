@@ -2,7 +2,7 @@
 
 OUTPUT="dist/output.pdf"
 BIB="docs/references.bib"
-CSL="docs/styles/apa.csl"
+CSL="docs/styles/abnt.csl"
 
 FILES=$(sed 's/^/docs\//' docs/structure.txt)
 
@@ -11,6 +11,7 @@ pandoc docs/metadata.yaml $FILES \
   --bibliography=$BIB \
   --citeproc \
   --csl=$CSL \
+  --lua-filter=scripts/filter-bib.lua \
   --listings \
   --pdf-engine=xelatex \
   -V mainfont="Times New Roman" \

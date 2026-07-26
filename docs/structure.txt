@@ -1,3 +1,4 @@
+chapters/00-pre-textuais.md
 chapters/01-introducao.md
 chapters/02-fundamentacao-teorica.md
 chapters/03-procedimentos-metodologicos.md

@@ -9,7 +9,12 @@ header-includes:
     \makeatother
     \usepackage{caption}
     \captionsetup[table]{labelformat=empty}
-    \captionsetup[figure]{labelformat=empty}
+    \usepackage{newfloat}
+    \DeclareFloatingEnvironment[fileext=lotab,listname={Índice de Tabelas},name=Tabela]{tabela}
+    \captionsetup[tabela]{labelformat=empty}
+    \usepackage{chngcntr}
+    \counterwithin{figure}{section}
+    \renewcommand{\figurename}{Figura}
     \usepackage{pdflscape}
     \newcommand{\blandscape}{\begin{landscape}}
     \newcommand{\elandscape}{\end{landscape}}

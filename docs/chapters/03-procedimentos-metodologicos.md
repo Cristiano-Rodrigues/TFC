@@ -1,4 +1,5 @@
 \clearpage
+\setcounter{section}{3}
 
 # 3. Procedimentos Metodológicos
 

@@ -1,4 +1,6 @@
 \clearpage
+\setcounter{section}{4}
+\setcounter{figure}{0}
 
 # 4. Resultados da Pesquisa
 
@@ -59,17 +61,39 @@ A modelagem gráfica do sistema foi elaborada recorrendo à linguagem UML (*Unif
 
 O Diagrama de Contexto define a fronteira entre a aplicação desenvolvida e as entidades ou sistemas externos com os quais interage directamente para assegurar as funcionalidades requeridas.
 
-```mermaid
-graph TD
-    User([Utilizador Comum]) <--> |Interface Web Next.js| App[Backend]
-    Admin([Administrador da Empresa]) <--> |Interface de Gestão Next.js| App
-    
-    subgraph "Infraestrutura Externa"
-        App <--> |Chamadas REST API| Supabase[(Base de Dados Supabase / PostgreSQL)]
-        App --> |Pedidos de Execução RAG HTTP| n8n[Servidor de Orquestração n8n]
-        n8n <--> |Leitura/Gravação de Chunks| Supabase
-        n8n <--> |Embeddings, Re-Ranking e Chat| Cohere[API IA - Cohere]
-    end
+```plantuml
+@startuml
+skinparam rectangle {
+    BackgroundColor white
+    BorderColor black
+}
+skinparam usecase {
+    BackgroundColor white
+    BorderColor black
+}
+
+rectangle "Utilizador Comum" as user
+rectangle "Administrador da Empresa" as admin
+usecase "Sistema RAG\nMulti-Tenant" as system
+rectangle "Supabase / PostgreSQL" as supabase
+rectangle "Servidor n8n" as n8n
+rectangle "API Cohere" as cohere
+
+user --> system : "Perguntas / Documentos"
+system --> user : "Respostas / Fontes"
+
+admin --> system : "Credenciais / Permissões"
+system --> admin : "Estado / Confirmações"
+
+system --> supabase : "Gravação de Dados"
+supabase --> system : "Dados Relacionais"
+
+system --> n8n : "Pedidos de Processamento"
+n8n --> system : "Resultados do RAG"
+
+n8n --> cohere : "Textos para Processamento"
+cohere --> n8n : "Vectores / Respostas"
+@enduml
 ```
 
 \begin{center}
@@ -80,30 +104,34 @@ graph TD
 
 O Diagrama de Casos de Uso detalha as interacções dos actores principais (Utilizador e Administrador) com o sistema, mapeando o escopo funcional do protótipo desenvolvido.
 
-```mermaid
-flowchart LR
-    Utilizador((Utilizador))
-    Admin((Administrador da Empresa))
-    
-    subgraph Sistema ["Sistema RAG Multi-Tenant"]
-        UC1[Efectuar Login e Registo]
-        UC2[Fazer Upload de Documento / Criar Wiki]
-        UC3[Consultar Base de Conhecimento Chat]
-        UC4[Configurar Acessos do Documento RBAC/Dept]
-        UC5[Visualizar Fontes Citadas]
-        UC6[Gerir Departamentos e Cargos]
-        UC7[Gerir Utilizadores da Empresa]
-    end
+```plantuml
+@startuml
+left to right direction
+skinparam packageStyle rectangle
 
-    Utilizador --> UC1
-    Utilizador --> UC2
-    Utilizador --> UC3
-    Utilizador --> UC4
-    Utilizador --> UC5
+actor "Utilizador" as Utilizador
+actor "Administrador da Empresa" as Admin
 
-    Admin --> Utilizador
-    Admin --> UC6
-    Admin --> UC7
+rectangle "Sistema RAG Multi-Tenant" {
+    usecase "Efectuar Login e Registo" as UC1
+    usecase "Fazer Upload de Documento / Criar Wiki" as UC2
+    usecase "Consultar Base de Conhecimento Chat" as UC3
+    usecase "Configurar Acessos do Documento RBAC/Dept" as UC4
+    usecase "Visualizar Fontes Citadas" as UC5
+    usecase "Gerir Departamentos e Cargos" as UC6
+    usecase "Gerir Utilizadores da Empresa" as UC7
+}
+
+Utilizador --> UC1
+Utilizador --> UC2
+Utilizador --> UC3
+Utilizador --> UC4
+Utilizador --> UC5
+
+Admin -|> Utilizador
+Admin --> UC6
+Admin --> UC7
+@enduml
 ```
 
 \begin{center}
@@ -198,90 +226,91 @@ Table: Quadro 4.4: Especificação do Caso de Uso - Upload de Conteúdo e Acesso
 
 O Diagrama de Classes apresenta a estrutura lógica do sistema ao nível do domínio dos dados, modelando as entidades principais, os seus atributos e os relacionamentos de associação e multiplicidade que sustentam o funcionamento da plataforma.
 
-```mermaid
-classDiagram
-    class Company {
-        +UUID id
-        +String name
-        +String contactEmail
-        +Date createdAt
-    }
-    class Department {
-        +UUID id
-        +UUID companyId
-        +String name
-        +String description
-    }
-    class Role {
-        +UUID id
-        +UUID companyId
-        +String name
-        +String description
-    }
-    class Permission {
-        +UUID id
-        +String code
-        +String description
-    }
-    class User {
-        +UUID id
-        +UUID companyId
-        +String fullName
-        +String email
-        +String passwordHash
-        +UUID roleId
-        +UUID departmentId
-        +Boolean active
-        +login()
-        +hasPermission(code)
-    }
-    class Document {
-        +UUID id
-        +UUID companyId
-        +String filename
-        +String storagePath
-        +Long fileSize
-        +String mimeType
-        +String n8nStatus
-        +String sourceType
-        +JSONB metadata
-        +UUID uploadedBy
-        +setPermissions(roles, depts)
-    }
-    class Chunk {
-        +UUID id
-        +UUID documentId
-        +String content
-        +Vector embedding
-    }
-    class AIChatSession {
-        +UUID id
-        +UUID userId
-        +String title
-        +Date createdAt
-    }
-    class AIChatMessage {
-        +UUID id
-        +UUID sessionId
-        +String role
-        +String content
-        +JSONB sources
-        +Boolean isError
-    }
+```plantuml
+@startuml
+class Company {
+    +id: UUID
+    +name: String
+    +contactEmail: String
+    +createdAt: Date
+}
+class Department {
+    +id: UUID
+    +companyId: UUID
+    +name: String
+    +description: String
+}
+class Role {
+    +id: UUID
+    +companyId: UUID
+    +name: String
+    +description: String
+}
+class Permission {
+    +id: UUID
+    +code: String
+    +description: String
+}
+class User {
+    +id: UUID
+    +companyId: UUID
+    +fullName: String
+    +email: String
+    +passwordHash: String
+    +roleId: UUID
+    +departmentId: UUID
+    +active: Boolean
+    +login()
+    +hasPermission(code: String)
+}
+class Document {
+    +id: UUID
+    +companyId: UUID
+    +filename: String
+    +storagePath: String
+    +fileSize: Long
+    +mimeType: String
+    +n8nStatus: String
+    +sourceType: String
+    +metadata: JSONB
+    +uploadedBy: UUID
+    +setPermissions(roles, depts)
+}
+class Chunk {
+    +id: UUID
+    +documentId: UUID
+    +content: String
+    +embedding: Vector
+}
+class AIChatSession {
+    +id: UUID
+    +userId: UUID
+    +title: String
+    +createdAt: Date
+}
+class AIChatMessage {
+    +id: UUID
+    +sessionId: UUID
+    +role: String
+    +content: String
+    +sources: JSONB
+    +isError: Boolean
+}
 
-    Company "1" -- "*" Department : contém
-    Company "1" -- "*" Role : define
-    Company "1" -- "*" User : regista
-    Company "1" -- "*" Document : possui
-    Department "0..1" -- "*" User : aloca
-    Role "1" -- "*" User : atribui
-    Role "*" -- "*" Permission : associada_via_RolePermission
-    User "1" -- "*" Document : carrega
-    User "1" -- "*" AIChatSession : inicia
-    AIChatSession "1" -- "*" AIChatMessage : contém
-    Document "1" -- "*" Chunk : fragmentado_em
-    Document "*" -- "*" Department : restrito_por_DocumentDepartment
-    Document "*" -- "*" Role : restrito_por_DocumentPermission
+Company "1" *-- "*" Department : contém >
+Company "1" *-- "*" Role : define >
+Company "1" *-- "*" User : regista >
+Company "1" *-- "*" Document : possui >
+Department "0..1" o-- "*" User : aloca >
+Role "1" o-- "*" User : atribui >
+Role "*" o-- "*" Permission : associada via RolePermission >
+User "1" -- "*" Document : carrega >
+User "1" *-- "*" AIChatSession : inicia >
+AIChatSession "1" *-- "*" AIChatMessage : contém >
+Document "1" *-- "*" Chunk : fragmentado em >
+Document "*" o-- "*" Department : restrito por DocumentDepartment >
+Document "*" o-- "*" Role : restrito por DocumentPermission >
+@enduml
 ```
 
 \begin{center}
@@ -294,109 +323,125 @@ O Diagrama Entidade-Relacional (DER) detalha a modelagem lógica física da base
 
 A modelagem inclui adicionalmente a chave estrangeira `company_id` na tabela `documents` para impor um isolamento estrito de múltiplos inquilinos (*multi-tenancy*) ao nível relacional, mitigando o risco de vazamento de dados exposto em fases anteriores de teste.
 
-```mermaid
-%%{init: {'themeVariables': { 'fontSize': '28px'}}}%%
-erDiagram
-    companies ||--o{ departments : "contém"
-    companies ||--o{ roles : "define"
-    companies ||--o{ users : "regista"
-    companies ||--o{ documents : "possui (Tenant Isolation)"
-    
-    departments ||--o{ users : "aloca (0..1)"
-    roles ||--o{ users : "atribui"
-    
-    roles ||--o{ role_permissions : "contém"
-    permissions ||--o{ role_permissions : "está_em"
-    
-    users ||--o{ documents : "carrega (0..1)"
-    users ||--o{ ai_chat_sessions : "inicia"
-    
-    documents ||--o{ document_departments : "restringe_a"
-    departments ||--o{ document_departments : "aplica_em"
-    
-    documents ||--o{ document_permissions : "restringe_a"
-    roles ||--o{ document_permissions : "aplica_em"
-    
-    documents ||--o{ chunks : "fragmentado_em"
-    ai_chat_sessions ||--o{ ai_chat_messages : "contém"
+```plantuml
+@startuml
+!define Table(name,desc) entity name as "desc" << (T,#FFAAAA) >>
+!define primary_key(x) <b>x</b>
+!define foreign_key(x) <i>x</i>
 
-    companies {
-        uuid id PK
-        text name
-        text contact_email
-        timestamp created_at
-    }
-    departments {
-        uuid id PK
-        uuid company_id FK
-        text name
-        text description
-    }
-    roles {
-        uuid id PK
-        uuid company_id FK
-        text name
-        text description
-    }
-    permissions {
-        uuid id PK
-        text code UK
-        text description
-    }
-    role_permissions {
-        uuid role_id PK, FK
-        uuid permission_id PK, FK
-    }
-    users {
-        uuid id PK
-        uuid company_id FK
-        text full_name
-        text email UK
-        text password_hash
-        uuid role_id FK
-        uuid department_id FK
-        boolean active
-    }
-    documents {
-        uuid id PK
-        uuid company_id FK
-        text filename
-        text storage_path
-        bigint file_size
-        text mime_type
-        text n8n_status
-        text source_type
-        jsonb metadata
-        uuid uploaded_by FK
-    }
-    document_departments {
-        uuid document_id PK, FK
-        uuid department_id PK, FK
-    }
-    document_permissions {
-        uuid document_id PK, FK
-        uuid role_id PK, FK
-    }
-    chunks {
-        uuid id PK
-        uuid document_id FK
-        text content
-        vector embedding
-    }
-    ai_chat_sessions {
-        uuid id PK
-        uuid user_id FK
-        text title
-        timestamp created_at
-    }
-    ai_chat_messages {
-        uuid id PK
-        uuid session_id FK
-        text role
-        text content
-        jsonb sources
-        boolean is_error
-    }
+hide methods
+hide stereotypes
+
+entity "companies" {
+    primary_key(id) : uuid
+    --
+    name : text
+    contact_email : text
+    created_at : timestamp
+}
+entity "departments" {
+    primary_key(id) : uuid
+    --
+    foreign_key(company_id) : uuid
+    name : text
+    description : text
+}
+entity "roles" {
+    primary_key(id) : uuid
+    --
+    foreign_key(company_id) : uuid
+    name : text
+    description : text
+}
+entity "permissions" {
+    primary_key(id) : uuid
+    --
+    code : text
+    description : text
+}
+entity "role_permissions" {
+    primary_key(foreign_key(role_id)) : uuid
+    primary_key(foreign_key(permission_id)) : uuid
+}
+entity "users" {
+    primary_key(id) : uuid
+    --
+    foreign_key(company_id) : uuid
+    foreign_key(role_id) : uuid
+    foreign_key(department_id) : uuid
+    full_name : text
+    email : text
+    password_hash : text
+    active : boolean
+}
+entity "documents" {
+    primary_key(id) : uuid
+    --
+    foreign_key(company_id) : uuid
+    foreign_key(uploaded_by) : uuid
+    filename : text
+    storage_path : text
+    file_size : bigint
+    mime_type : text
+    n8n_status : text
+    source_type : text
+    metadata : jsonb
+}
+entity "document_departments" {
+    primary_key(foreign_key(document_id)) : uuid
+    primary_key(foreign_key(department_id)) : uuid
+}
+entity "document_permissions" {
+    primary_key(foreign_key(document_id)) : uuid
+    primary_key(foreign_key(role_id)) : uuid
+}
+entity "chunks" {
+    primary_key(id) : uuid
+    --
+    foreign_key(document_id) : uuid
+    content : text
+    embedding : vector
+}
+entity "ai_chat_sessions" {
+    primary_key(id) : uuid
+    --
+    foreign_key(user_id) : uuid
+    title : text
+    created_at : timestamp
+}
+entity "ai_chat_messages" {
+    primary_key(id) : uuid
+    --
+    foreign_key(session_id) : uuid
+    role : text
+    content : text
+    sources : jsonb
+    is_error : boolean
+}
+
+companies ||--o{ departments : "contém"
+companies ||--o{ roles : "define"
+companies ||--o{ users : "regista"
+companies ||--o{ documents : "possui (Tenant Isolation)"
+
+departments |o--o{ users : "aloca (0..1)"
+roles ||--o{ users : "atribui"
+
+roles ||--o{ role_permissions : "contém"
+permissions ||--o{ role_permissions : "está em"
+
+users |o--o{ documents : "carrega (0..1)"
+users ||--o{ ai_chat_sessions : "inicia"
+
+documents ||--o{ document_departments : "restringe a"
+departments ||--o{ document_departments : "aplica em"
+
+documents ||--o{ document_permissions : "restringe a"
+roles ||--o{ document_permissions : "aplica em"
+
+documents ||--o{ chunks : "fragmentado em"
+ai_chat_sessions ||--o{ ai_chat_messages : "contém"
+@enduml
 ```
 
 \begin{center}
@@ -444,54 +489,39 @@ O protótipo divide-se em oito módulos funcionais interligados:
 
 A arquitetura do sistema segue um modelo de camadas descentralizado, separando a interface do utilizador, a lógica da aplicação, a base de dados relacional e vectorial, e a orquestração assíncrona dos pipelines de Inteligência Artificial.
 
-```mermaid
-graph TB
-    subgraph Client ["Camada de Apresentação (Cliente)"]
-        Browser[Navegador Web] <--> |App Router / HTTPS| ReactUI[Interface React / Next.js 15]
-    end
+```plantuml
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
-    subgraph API_Backend ["Camada de Lógica (Next.js Server API)"]
-        NextServer[Servidor Next.js Node.js]
-        NextServer --> |JWT Auth| AuthRoute["/api/auth/*"]
-        NextServer --> |Document CRUD| DocRoute["/api/documents/*"]
-        NextServer --> |Chat IA Controller| ChatRoute["/api/chat/*"]
-        NextServer --> |Upload Proxy| UploadRoute["/api/upload/*"]
-    end
+Person(browser, "Navegador Web", "Acedido pelo Utilizador")
 
-    subgraph Orchestrator ["Camada de Orquestração RAG (n8n)"]
-        n8nApp[n8n Workflow Engine]
-        n8nApp --> |/upload webhook| IngestFlow[Pipeline de Ingestão]
-        n8nApp --> |/query webhook| QueryFlow[Pipeline de Pesquisa]
-    end
+System_Boundary(c1, "Sistema RAG Multi-Tenant") {
+    Container(reactUI, "Interface React / Next.js 15", "Next.js App Router", "Fornece interface de utilizador via HTTPS")
+    Container(nextServer, "Servidor Next.js Node.js", "Next.js API", "Gere autenticação JWT, CRUD e proxy")
+    Container(n8nApp, "n8n Workflow Engine", "Plataforma Visual", "Orquestra pipelines RAG assíncronos")
+    ContainerDb(database, "PostgreSQL DB", "Supabase", "Base de dados relacional e RLS")
+    ContainerDb(vectorDb, "PostgreSQL pgvector", "Extensão", "Armazena vectores embeddings")
+    ContainerDb(storage, "Supabase Storage", "Bucket", "Armazena documentos")
+}
 
-    subgraph Data ["Camada de Dados e Armazenamento (Supabase)"]
-        Database[(PostgreSQL DB)]
-        Storage[(Supabase Storage)]
-        VectorDb[(PostgreSQL pgvector)]
-    end
+System_Ext(embedAPI, "Cohere Embeddings API", "Serviço IA")
+System_Ext(rerankAPI, "Cohere Rerank API", "Serviço IA")
+System_Ext(chatAPI, "Cohere Chat LLM API", "Serviço IA")
 
-    subgraph AI_Services ["Camada de Inteligência Artificial"]
-        EmbedAPI[Cohere Embeddings API]
-        RerankAPI[Cohere Rerank API]
-        ChatAPI[Cohere Chat LLM API]
-    end
+Rel(browser, reactUI, "Interage", "HTTPS")
+Rel(reactUI, nextServer, "Chamadas API", "HTTPS/JSON")
 
-    Browser <--> NextServer
-    UploadRoute --> |Assíncrono / JSON| n8nApp
-    ChatRoute <--> |Síncrono / JSON| n8nApp
-    
-    NextServer <--> |Conexão Relacional| Database
-    n8nApp <--> |SQL Queries / RPC| Database
-    n8nApp <--> |SQL Insert Chunks| VectorDb
-    n8nApp --> |Armazena ficheiros| Storage
-    
-    IngestFlow --> |Extrair texto & Chunking| IngestFlow
-    IngestFlow <--> |Gera embeddings| EmbedAPI
-    QueryFlow --> |"Router Agent: Decisão de Rota"| QueryFlow
-    QueryFlow <--> |Gera embedding pergunta| EmbedAPI
-    QueryFlow <--> |Executa match_chunks| VectorDb
-    QueryFlow <--> |Re-ranking semântico| RerankAPI
-    QueryFlow <--> |Envia Contexto + Pergunta| ChatAPI
+Rel(nextServer, n8nApp, "Invoca webhooks (Upload/Chat)", "HTTPS/JSON")
+Rel(nextServer, database, "Lê/Escreve dados", "PostgreSQL TCP")
+
+Rel(n8nApp, database, "Consultas e RPC", "PostgreSQL TCP")
+Rel(n8nApp, vectorDb, "Insere Chunks", "PostgreSQL TCP")
+Rel(n8nApp, storage, "Lê ficheiros", "REST API")
+
+Rel(n8nApp, embedAPI, "Gera embeddings", "REST API")
+Rel(n8nApp, rerankAPI, "Re-ranking semântico", "REST API")
+Rel(n8nApp, chatAPI, "Gera respostas RAG", "REST API")
+@enduml
 ```
 
 \begin{center}

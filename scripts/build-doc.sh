@@ -1,4 +1,5 @@
 #!/bin/bash
+export PATH="$HOME/.local/bin:$PATH"
 
 OUTPUT="dist/output.pdf"
 BIB="docs/references.bib"
@@ -7,7 +8,7 @@ CSL="docs/styles/abnt.csl"
 FILES=$(sed 's/^/docs\//' docs/structure.txt)
 
 pandoc docs/metadata.yaml $FILES \
-  --filter mermaid-filter \
+  --filter pandoc-plantuml \
   --bibliography=$BIB \
   --citeproc \
   --csl=$CSL \

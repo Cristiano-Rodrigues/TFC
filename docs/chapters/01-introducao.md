@@ -1,4 +1,5 @@
 \clearpage
+\setcounter{section}{1}
 \rhead{\fontsize{10pt}{12pt}\selectfont Sistema de Gestão da Informação Organizacional Baseado em Agentes de IA}
 \fancypagestyle{plain}{%
   \fancyhf{}%

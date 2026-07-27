@@ -1,4 +1,5 @@
 \clearpage
+\setcounter{section}{2}
 
 # 2. Fundamentação Teórica
 

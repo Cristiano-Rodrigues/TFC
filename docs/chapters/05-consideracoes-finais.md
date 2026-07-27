@@ -1,4 +1,5 @@
 \clearpage
+\setcounter{section}{5}
 
 # 5. Considerações Finais
 

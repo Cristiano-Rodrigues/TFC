@@ -18,3 +18,4 @@ dist/
 # Temp files
 
 mermaid-filter.err
+plantuml-images/

@@ -494,6 +494,10 @@ graph TB
     QueryFlow <--> |Envia Contexto + Pergunta| ChatAPI
 ```
 
+\begin{center}
+\captionof{figure}{Arquitectura Física e Lógica do Sistema. Fonte: Elaboração própria.}
+\end{center}
+
 #### 4.1.5.4. Ferramentas e Tecnologias Utilizadas
 
 A stack tecnológica seleccionada para a implementação do protótipo baseia-se em soluções maioritariamente open-source e com baixo custo de entrada operacional, maximizando a viabilidade financeira e a escalabilidade técnica em organizações angolanas.

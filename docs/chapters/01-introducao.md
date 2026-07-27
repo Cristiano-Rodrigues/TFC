@@ -1,4 +1,11 @@
 \clearpage
+\rhead{\fontsize{10pt}{12pt}\selectfont Sistema de Gestão da Informação Organizacional Baseado em Agentes de IA}
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \rhead{\fontsize{10pt}{12pt}\selectfont Sistema de Gestão da Informação Organizacional Baseado em Agentes de IA}%
+  \cfoot{\thepage}%
+  \renewcommand{\headrulewidth}{0pt}%
+}
 
 # 1. Introdução
 

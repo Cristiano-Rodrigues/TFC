@@ -34,7 +34,7 @@ O conhecimento tácito é pessoal, difícil de formalizar e está enraizado nas 
 
 @davenportWorkingKnowledgeHow2010 complementam esta perspectiva ao defenderem que a gestão do conhecimento não pode ser reduzida a um problema tecnológico. Embora as tecnologias de informação desempenhem um papel facilitador, o sucesso da gestão do conhecimento depende igualmente de factores culturais, organizacionais e humanos. Estes autores sublinham a importância de criar ambientes que promovam a partilha voluntária de conhecimento e de reconhecer que o conhecimento mais valioso reside frequentemente nas pessoas e nas suas interacções, e não apenas nos repositórios documentais.
 
-Esta perspectiva é fundamental para o presente trabalho, cuja arquitectura procura precisamente facilitar a transição entre conhecimento tácito disperso e conhecimento explícito acessível, utilizando agentes de inteligência artificial para automatizar processos de extracção, organização e recuperação de informação organizacional a partir de múltiplas fontes, incluindo documentos, emails e canais de mensagens.
+Esta perspectiva é fundamental para o presente trabalho, cuja arquitectura procura precisamente facilitar a transição entre conhecimento tácito disperso e conhecimento explícito acessível, utilizando agentes de inteligência artificial para automatizar processos de extracção, organização e recuperação de informação organizacional a partir de fontes documentais diversas, sendo extensível a novas origens de dados como emails e canais de mensagens.
 
 ### 2.1.4. Desafios da Gestão da Informação no Contexto Angolano
 
@@ -46,7 +46,7 @@ O Livro Branco das Tecnologias de Informação e Comunicação, publicado pelo M
 
 @bealGestaoEstrategicaInformacao2004 argumenta que a gestão estratégica da informação requer uma abordagem sistémica que considere não apenas os aspectos tecnológicos, mas também os processos organizacionais, a cultura informacional e as competências dos utilizadores. Esta perspectiva é particularmente relevante para o contexto angolano, onde a introdução de novas tecnologias deve ser acompanhada por estratégias de capacitação e de gestão da mudança.
 
-Face a estes desafios, torna-se evidente a necessidade de soluções que não apenas armazenem documentos, mas que sejam capazes de extrair, classificar e disponibilizar informação de forma inteligente a partir de diversas fontes organizacionais --- documentos, emails e canais de mensagens ---, colmatando as lacunas existentes nos processos de gestão da informação das organizações angolanas.
+Face a estes desafios, torna-se evidente a necessidade de soluções que não apenas armazenem documentos, mas que sejam capazes de extrair, classificar e disponibilizar informação de forma inteligente a partir de fontes documentais organizacionais, colmatando as lacunas existentes nos processos de gestão da informação das organizações angolanas.
 
 ## 2.2. Inteligência Artificial
 
@@ -58,7 +58,7 @@ A Inteligência Artificial pode ser definida como o campo da ciência da computa
 
 @chowdharyIntroducingArtificialIntelligence2020 apresenta uma perspectiva complementar, distinguindo entre IA fraca (*narrow AI*), que se refere a sistemas especializados numa tarefa específica, e IA forte (*general AI*), que representaria uma inteligência comparável à humana em todas as dimensões cognitivas. Os sistemas actuais de IA, incluindo os Modelos de Linguagem de Grande Escala, enquadram-se na categoria de IA fraca, embora apresentem capacidades notáveis em domínios específicos como a compreensão e geração de linguagem natural.
 
-Do ponto de vista prático, este trabalho aplica a IA como ferramenta de automação inteligente para o processamento de informação organizacional e a sua recuperação eficiente. Concretamente, o protótipo desenvolvido utiliza técnicas de IA para extrair texto de documentos, emails e canais de mensagens, segmentá-lo em unidades semânticas, gerar representações vectoriais e produzir respostas contextualizadas a consultas dos utilizadores, constituindo uma aplicação prática de IA fraca no domínio da gestão da informação organizacional.
+Do ponto de vista prático, este trabalho aplica a IA como ferramenta de automação inteligente para o processamento de informação organizacional e a sua recuperação eficiente. Concretamente, o protótipo desenvolvido utiliza técnicas de IA para extrair texto de documentos e páginas Wiki, segmentá-lo em unidades semânticas, gerar representações vectoriais e produzir respostas contextualizadas a consultas dos utilizadores, constituindo uma aplicação prática de IA fraca no domínio da gestão da informação organizacional.
 
 ### 2.2.2. Processamento de Linguagem Natural (NLP)
 
@@ -100,7 +100,7 @@ O conceito de Retrieval-Augmented Generation foi introduzido por @lewisRetrieval
 
 @asaiReliableAdaptableAttributable2024 defendem que os modelos de linguagem aumentados por recuperação devem substituir os modelos puramente paramétricos como a próxima geração de sistemas de IA linguística, uma vez que oferecem três vantagens fundamentais: fiabilidade (respostas ancoradas em fontes verificáveis), adaptabilidade (capacidade de incorporar novos dados sem re-treino) e atribuibilidade (possibilidade de rastrear as fontes utilizadas na geração). Os autores propõem um roteiro para o desenvolvimento de sistemas RAG de propósito geral, destacando a necessidade de melhorar a interacção entre os componentes de recuperação e de geração.
 
-A implementação concreta deste trabalho adopta uma arquitectura RAG que segue o paradigma avançado: os documentos, emails e mensagens organizacionais são processados, segmentados em *chunks*, convertidos em embeddings vectoriais e armazenados numa base de dados vectorial. Quando o utilizador submete uma consulta, esta é igualmente convertida em embedding, e os *chunks* semanticamente mais relevantes são recuperados e fornecidos ao LLM como contexto para a geração da resposta.
+A implementação concreta deste trabalho adopta uma arquitectura RAG que segue o paradigma avançado: os documentos e páginas Wiki organizacionais são processados, segmentados em *chunks*, convertidos em embeddings vectoriais e armazenados numa base de dados vectorial. Quando o utilizador submete uma consulta, esta é igualmente convertida em embedding, e os *chunks* semanticamente mais relevantes são recuperados e fornecidos ao LLM como contexto para a geração da resposta.
 
 ### 2.3.2. Processo de Chunking e Indexação
 
@@ -160,7 +160,7 @@ O advento dos Modelos de Linguagem de Grande Escala trouxe uma transformação p
 
 No domínio específico da gestão da informação, @kluschInformationAgentTechnology2001 antecipou o potencial dos agentes de informação na Internet, definindo-os como sistemas que actuam em nome de utilizadores ou de outras aplicações para realizar tarefas de busca, filtragem, negociação e integração de informação proveniente de múltiplas fontes heterogéneas. As ideias seminais de Klusch materializam-se hoje em sistemas que combinam agentes baseados em LLMs com capacidades de recuperação de informação, como é o caso do sistema proposto neste trabalho.
 
-A convergência entre SMA e LLMs é particularmente relevante para o presente trabalho porque a plataforma desenvolvida implementa, na prática, um SMA onde agentes especializados --- orquestrados pelo n8n --- executam tarefas de extracção, processamento e recuperação de informação, utilizando LLMs como motor de compreensão e geração de linguagem natural. Esta arquitectura permite que o sistema seja extensível a novas fontes de dados (emails, canais de mensagens) e a novas capacidades (sumarização automática, geração de wikis) através da adição de novos agentes ao pipeline.
+A convergência entre SMA e LLMs é particularmente relevante para o presente trabalho porque a plataforma desenvolvida implementa, na prática, um SMA onde agentes especializados --- orquestrados pelo n8n --- executam tarefas de extracção, processamento e recuperação de informação, utilizando LLMs como motor de compreensão e geração de linguagem natural. Esta arquitectura modular permite que o sistema seja extensível a novas fontes de dados (emails, canais de mensagens) e a novas capacidades (sumarização automática) através da adição de novos agentes ao pipeline.
 
 ## 2.5. Tecnologias de Desenvolvimento
 
@@ -200,7 +200,7 @@ A automação de processos constitui um factor essencial na construção de sist
 
 O n8n é uma plataforma de automação de workflows de código aberto que permite a criação de pipelines de processamento através de uma interface visual de *drag-and-drop*. Ao contrário de ferramentas proprietárias como o Zapier ou o Microsoft Power Automate, o n8n pode ser auto-hospedado, garantindo o controlo total sobre os dados processados --- uma consideração importante em contextos organizacionais onde a confidencialidade da informação é um requisito. A plataforma suporta a integração com centenas de serviços externos através de conectores pré-construídos e permite a criação de lógica personalizada através de nós de código JavaScript.
 
-No sistema proposto, o n8n desempenha o papel de orquestrador central do pipeline RAG, coordenando a execução dos agentes de processamento através de workflows especializados. Os workflows de ingestão processam informação proveniente de diversas fontes --- documentos, emails e canais de mensagens ---, extraindo o texto, segmentando-o em *chunks*, gerando embeddings através da API da Cohere e armazenando os resultados na base de dados. O workflow de consulta recebe perguntas do utilizador, gera o embedding da consulta, executa a função `match_chunks()` para recuperar contexto relevante e invoca o LLM para gerar a resposta. Esta arquitectura modular permite que novos fluxos de ingestão e processamento sejam adicionados sem modificar o código da aplicação principal, bastando criar ou estender workflows no n8n.
+No sistema proposto, o n8n desempenha o papel de orquestrador central do pipeline RAG, coordenando a execução dos agentes de processamento através de workflows especializados. Os workflows de ingestão processam documentos e páginas Wiki, extraindo o texto, segmentando-o em *chunks*, gerando embeddings através da API da Cohere e armazenando os resultados na base de dados. O workflow de consulta recebe perguntas do utilizador, gera o embedding da consulta, executa a função `match_chunks()` para recuperar contexto relevante e invoca o LLM para gerar a resposta. Esta arquitectura modular permite que novos fluxos de ingestão --- incluindo conectores para email e canais de mensagens --- sejam adicionados sem modificar o código da aplicação principal, bastando criar ou estender workflows no n8n.
 
 ## 2.6. Controlo de Acessos Baseado em Papéis (RBAC)
 
@@ -247,7 +247,7 @@ No mercado actual, diversas soluções abordam parcialmente o problema da gestã
 
 ### 2.7.2. Comparação com a Solução Proposta
 
-Apresenta-se uma análise comparativa entre as soluções existentes e o sistema proposto neste trabalho, considerando as dimensões mais relevantes para o contexto organizacional angolano. O Quadro 2.1 sintetiza estas diferenças fundamentais.
+Apresenta-se uma análise comparativa entre as soluções existentes e o sistema proposto neste trabalho. Os critérios de comparação foram seleccionados com base nas dimensões técnicas mais relevantes para o contexto organizacional angolano, nomeadamente o custo de entrada, o suporte linguístico, a granularidade do controlo de acessos e a capacidade de auto-hospedagem. O Quadro 2.1 sintetiza estas diferenças fundamentais.
 
 | Critério | SharePoint | Confluence | Notion AI | Glean | Danswer | **Sistema Proposto** |
 |---|---|---|---|---|---|---|
@@ -260,7 +260,7 @@ Apresenta-se uma análise comparativa entre as soluções existentes e o sistema
 | Custo de entrada | Elevado | Elevado | Médio | Elevado | Baixo | **Baixo** |
 | Personalização | Limitada | Limitada | Limitada | Limitada | Elevada | **Elevada** |
 | Optimização nativa de Embeddings para PT | Não | Não | Parcial | Não | Não | **Sim** |
-| Orquestração Visual de Pipelines (Low-Code) | Não | Não | Não | Não | Não | **Sim** |
+| Personalização de Pipelines sem Código | Não | Não | Não | Não | Não | **Sim** |
 
 Table: Quadro 2.1: Comparação entre soluções existentes e o sistema proposto. Fonte: Elaboração própria.
 
@@ -271,6 +271,6 @@ Não obstante as vantagens evidenciadas no quadro, importa reconhecer as limita�
 - **Maturidade de protótipo:** o sistema encontra-se em fase de prova de conceito, carecendo de funcionalidades de produção como tratamento robusto de erros, monitorização, *logging* avançado e recuperação de falhas;
 - **Dependência de serviços externos:** a geração de embeddings (Cohere, modelo *embed-multilingual-v3.0*) e a síntese de respostas (LLM via API) dependem de serviços de IA proprietários, o que introduz custos operacionais recorrentes e uma dependência de conectividade e de fornecedores terceiros.
 
-A análise comparativa evidencia que o sistema proposto neste trabalho se diferencia das soluções existentes em aspectos fundamentais. O principal factor distintivo da solução proposta reside na orquestração de fluxos totalmente externa e visual (low-code) através do n8n, permitindo total flexibilidade na ingestão e processamento de dados sem necessidade de alterar o código-fonte da aplicação. Adicionalmente, a plataforma é construída maioritariamente sobre componentes open-source (PostgreSQL, Next.js, n8n, Supabase), complementada por serviços de IA externos (Cohere para embeddings e geração via LLM), possibilitando a auto-hospedagem da infraestrutura nuclear e permitindo que organizações com requisitos de soberania de dados controlem o armazenamento e o processamento local, embora a camada de IA mantenha uma dependência de APIs proprietárias. O sistema oferece também multi-tenancy nativo com isolamento por empresa, permitindo que a mesma instância da plataforma sirva múltiplas organizações. Do ponto de vista linguístico, a utilização de modelos de embeddings multilíngues que suportam o português adequa a solução ao contexto angolano.
+A análise comparativa evidencia que o sistema proposto neste trabalho se diferencia das soluções existentes em aspectos fundamentais. O principal factor distintivo da solução proposta reside na personalização de pipelines sem código através do n8n, permitindo total flexibilidade na ingestão e processamento de dados sem necessidade de alterar o código-fonte da aplicação. Adicionalmente, a plataforma é construída maioritariamente sobre componentes open-source (PostgreSQL, Next.js, n8n, Supabase), complementada por serviços de IA externos (Cohere para embeddings e geração via LLM), possibilitando a auto-hospedagem da infraestrutura nuclear e permitindo que organizações com requisitos de soberania de dados controlem o armazenamento e o processamento local, embora a camada de IA mantenha uma dependência de APIs proprietárias. O sistema oferece também multi-tenancy nativo com isolamento por empresa, permitindo que a mesma instância da plataforma sirva múltiplas organizações. Do ponto de vista linguístico, a utilização de modelos de embeddings multilíngues que suportam o português adequa a solução ao contexto angolano.
 
 Estas características posicionam o sistema proposto como uma solução que optimiza determinadas dimensões — nomeadamente a busca semântica com controlo de acesso granular, a auto-hospedagem e a adequação ao contexto lusófono —, reconhecendo limitações noutras, em particular na maturidade do protótipo e na validação em ambiente organizacional real. No contexto angolano, onde os custos de licenciamento de plataformas proprietárias, a limitação de largura de banda para soluções exclusivamente na nuvem e a necessidade de processar documentação em língua portuguesa constituem barreiras significativas, a arquitectura proposta oferece um ponto de partida promissor que futuros trabalhos poderão consolidar e validar em cenários de produção.

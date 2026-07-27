@@ -12,12 +12,12 @@ pandoc docs/metadata.yaml $FILES \
   --citeproc \
   --csl=$CSL \
   --lua-filter=scripts/filter-bib.lua \
-  --listings \
+  --syntax-highlighting=idiomatic \
   --pdf-engine=xelatex \
   -V mainfont="Times New Roman" \
   -V fontsize=12pt \
   -V linestretch=1.5 \
-  -V geometry:"top=2.5cm, bottom=2.5cm, right=2.5cm, left=3.5cm" \
+  -V geometry:top=2.5cm,bottom=2.5cm,right=2.5cm,left=3.5cm,headsep=1.5cm,headheight=15pt \
   -o $OUTPUT
 
 echo "Document successfully generated in $OUTPUT"

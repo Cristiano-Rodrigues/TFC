@@ -86,7 +86,8 @@ function Div(el)
     table.insert(result, subtitle_latex)
 
     -- Internet bibliography Div
-    local internet_div = pandoc.Div(internet_entries, el.attr)
+    local internet_attr = pandoc.Attr("refs-internet", el.classes, el.attributes)
+    local internet_div = pandoc.Div(internet_entries, internet_attr)
     table.insert(result, internet_div)
 
     return result

@@ -319,7 +319,7 @@ Document "*" o-- "*" Role : restrito por DocumentPermission >
 
 #### 4.1.3.5. Diagrama Entidade-Relacional
 
-O Diagrama Entidade-Relacional (DER) detalha a modelagem lógica física da base de dados PostgreSQL alojada no Supabase. O modelo implementa a **Opção A (Abstração Unificada)** para as fontes de conhecimento, na qual as páginas Wiki, uploads de PDF ou integrações de terceiros são todos armazenados de forma unificada na tabela `documents` e diferenciados pelo atributo `source_type`. Esta abordagem garante que toda e qualquer fonte de dados possa ser fatiada em `chunks` e submetida a pesquisas vectoriais utilizando a mesma infraestrutura, respeitando as regras relacionais de segurança.
+O Diagrama Entidade-Relacional (DER) detalha a modelagem lógica e física da base de dados PostgreSQL alojada no Supabase. O modelo implementa uma **Abstração Unificada** para as fontes de conhecimento, na qual as páginas Wiki, uploads de PDF ou integrações de terceiros são todos armazenados de forma unificada na tabela `documents` e diferenciados pelo atributo `source_type`. Esta abordagem garante que toda e qualquer fonte de dados possa ser fatiada em `chunks` e submetida a pesquisas vectoriais utilizando a mesma infraestrutura, respeitando as regras relacionais de segurança.
 
 A modelagem inclui adicionalmente a chave estrangeira `company_id` na tabela `documents` para impor um isolamento estrito de múltiplos inquilinos (*multi-tenancy*) ao nível relacional, mitigando o risco de vazamento de dados exposto em fases anteriores de teste.
 

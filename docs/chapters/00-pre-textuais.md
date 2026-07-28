@@ -44,7 +44,7 @@
 \begin{flushright}
 \begin{minipage}{8cm}
 \small
-Trabalho de Conclusão de Curso apresentado ao Instituto Superior de Administração e Finanças como parte dos requisitos para obtenção do grau académico de Licenciado em Informática de Gestão Financeira.\\[0.5cm]
+Trabalho Final de Curso apresentado ao Instituto Superior de Administração e Finanças como parte dos requisitos para obtenção do grau académico de Licenciado em Informática de Gestão Financeira.\\[0.5cm]
 \textbf{Orientador:} Msc. Lírio Ramalheira
 \end{minipage}
 \end{flushright}

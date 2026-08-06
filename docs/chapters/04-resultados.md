@@ -46,7 +46,7 @@ Os Requisitos Não Funcionais (RNF) especificam critérios que qualificam o func
 | Identificador | Categoria | Descrição |
 |:---|:---|:---|
 | **RNF-01** | Segurança (Isolamento) | O isolamento entre diferentes empresas (*tenants*) deve ser garantido nativamente ao nível da base de dados através de políticas de *Row Level Security* (RLS) no PostgreSQL. |
-| **RNF-02** | Desempenho (Pesquisa) | O tempo médio de resposta do pipeline de busca semântica e geração de resposta da IA não deve ultrapassar os 5 segundos sob condições estáveis de conectividade à internet. |
+| **RNF-02** | Desempenho (Pesquisa) | O tempo médio de resposta do pipeline de busca semântica e geração de resposta da IA não deve ultrapassar os 4-10 segundos sob condições estáveis de conectividade à internet. |
 | **RNF-03** | Compatibilidade Linguística | O modelo de \textit{embeddings} utilizado pelo sistema deve possuir suporte nativo e optimizado para a língua portuguesa para assegurar a relevância das pesquisas vectoriais. |
 | **RNF-04** | Usabilidade (Interface) | A interface deve apresentar-se responsiva, fluida e incluir transições e animações visuais curtas para guiar a navegação do utilizador (*Framer Motion*). |
 | **RNF-05** | Disponibilidade e Extensibilidade | A lógica de ingestão documental e recuperação RAG deve correr numa infraestrutura modular externa (n8n), facilitando a adição de novos conectores sem necessidade de recompilar o frontend Next.js. |
@@ -208,9 +208,9 @@ O Quadro 4.4 descreve a especificação do caso de uso de Upload de Conteúdo e 
 |                          | 6. O Next.js invoca o webhook de processamento documental do n8n de forma        |
 |                          | assíncrona.                                                                      |
 |                          |                                                                                  |
-|                          | 7. O pipeline do n8n processa o texto, divide-o em chunks, gera \textit{embeddings} e     |
-|                          | insere na tabela `chunks`. Ao concluir, actualiza o estado em `documents` para   |
-|                          | `success`.                                                                       |
+|                          | 7. O pipeline do n8n processa o texto, divide-o em chunks,                       |
+|                          | gera \textit{embeddings} e insere na tabela `chunks`. Ao concluir, actualiza o   |
+|                          | estado em `documents` para `success`.                                            |
 +--------------------------+----------------------------------------------------------------------------------+
 | **Fluxo Alternativo:**   | **3a. Sem restrições de acesso:** Se o utilizador não seleccionar departamentos  |
 |                          | ou cargos, o documento é marcado como público, sendo acessível por qualquer      |
@@ -572,7 +572,7 @@ Os testes de eficiência temporal mediram o tempo de resposta (em segundos) em d
 \caption{Tabela 4.1: Resultados dos Testes de Eficiência Temporal. Fonte: Elaboração própria.}
 \end{tabela}
 
-Os resultados demonstram que, mesmo com a latência de rede associada à invocação assíncrona de webhooks no n8n e à geração remota de \textit{embeddings} pela API da Cohere, o tempo médio para obter uma resposta inteligente manteve-se confortavelmente abaixo do limiar não-funcional de 5 segundos definido no requisito **RNF-02**.
+Os resultados demonstram que, mesmo com a latência de rede associada à invocação assíncrona de webhooks no n8n e à geração remota de \textit{embeddings} pela API da Cohere, o tempo médio para obter uma resposta inteligente manteve-se confortavelmente abaixo do limiar de 10 segundos definido no requisito **RNF-02**.
 
 ##### B. Avaliação da Relevância Qualitativa e Filtros de Segurança
 

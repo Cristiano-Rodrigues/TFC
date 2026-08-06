@@ -19,7 +19,14 @@ Relativamente aos objectivos específicos definidos no início deste trabalho, f
 
 Em suma, embora a Inteligência Artificial seja ainda percepcionada localmente como um recurso distante ou de alto custo, este projecto demonstrou que a convergência de ferramentas open-source de baixo código e bases de dados híbridas permite conceber e operacionalizar sistemas avançados de inteligência documental com investimentos contidos, proporcionando uma via viável para a modernização e aceleração da maturidade digital em Angola.
 
-## 5.2. Sugestões e Recomendações
+## 5.2. Limitações
+
+Importa reconhecer as seguintes limitações inerentes ao sistema proposto na sua fase actual de desenvolvimento:
+
+- **Maturidade de protótipo:** o sistema encontra-se em fase de prova de conceito, carecendo de funcionalidades de produção como tratamento robusto de erros, monitorização, *logging* avançado e recuperação de falhas.
+- **Dependência de serviços externos:** a geração de \textit{embeddings} (Cohere, modelo *embed-multilingual-v3.0*) e a síntese de respostas (LLM via API) dependem de serviços de IA proprietários, o que introduz custos operacionais recorrentes e uma dependência de conectividade e de fornecedores terceiros.
+
+## 5.3. Sugestões e Recomendações
 
 Com base nas limitações identificadas durante o desenvolvimento do protótipo e nas particularidades do ecossistema tecnológico angolano, sugerem-se as seguintes linhas de investigação e melhorias futuras:
 

@@ -783,9 +783,3 @@ A arquitetura de segurança do protótipo baseia-se numa abordagem de defesa em 
 3.  **Políticas RLS na Base de Dados:** Configuração de regras Row Level Security no PostgreSQL para garantir que operações simples de leitura e escrita (SELECT, UPDATE, DELETE) em tabelas administrativas (ex: listar utilizadores ou listar departamentos) estão logicamente bloqueadas apenas a registos que possuam o mesmo `company_id` do utilizador autenticado.
 4.  **Lógica Híbrida RBAC + ABAC:** Conforme descrito na secção 2.6.2, o modelo de autorização implementado combina o controlo baseado no papel do utilizador com atributos organizacionais contextuais (tenant e departamento). Na prática, esta lógica é executada diretamente na base de dados PostgreSQL pela função `match_chunks()`, que filtra os fragmentos de texto antes de qualquer envio ao modelo LLM externo, assegurando que o modelo nunca recebe contexto não-autorizado para o perfil do utilizador solicitante.
 
-#### 4.1.5.9. Disponibilidade do Código-Fonte e Protótipo
-
-Atendendo à natureza aplicada desta investigação e aos princípios de transparência e reprodutibilidade em engenharia de software, o código-fonte integral deste projecto encontra-se versionado e disponível publicamente.
-
-*   **Repositório de Código (GitHub):** O código-fonte da aplicação web, do esquema de base de dados e da configuração da infraestrutura pode ser consultado em: https://github.com/Cristiano-Rodrigues/TFC
-*   **Ambiente de Produção (Live Demo):** O protótipo funcional, demonstrando as capacidades da plataforma orquestrada com o n8n e a API da Cohere, encontra-se alojado e acessível para testes em: https://tfc-lemon.vercel.app

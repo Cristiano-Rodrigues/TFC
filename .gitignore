@@ -19,3 +19,4 @@ dist/
 
 mermaid-filter.err
 plantuml-images/
+.temp/

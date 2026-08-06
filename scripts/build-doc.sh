@@ -7,7 +7,7 @@ CSL="docs/styles/abnt.csl"
 
 FILES=$(sed 's/^/docs\//' docs/structure.txt)
 
-pandoc docs/metadata.yaml $FILES \
+pandoc $FILES \
   --filter pandoc-plantuml \
   --bibliography=$BIB \
   --citeproc \

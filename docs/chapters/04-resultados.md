@@ -635,13 +635,19 @@ As interfaces desenvolvidas em Next.js priorizaram a simplicidade de utilizaçã
 
 Apresenta um formulário unificado e responsivo com divisão visual (imagem concetual e marca à esquerda, e formulário de acesso/registo de alta fidelidade à direita). Permite a uma nova organização registar o seu perfil autónomo na base de dados PostgreSQL e criar a conta do utilizador administrador inicial de forma simples.
 
-![Ecrã de Autenticação e Registo Multi-tenant. Fonte: Elaboração própria.](docs/images/login.png){width=88%}
+\begin{figure}[htbp]
+  \makebox[\textwidth][c]{\includegraphics[width=1.2\textwidth]{docs/images/login.png}}
+  \caption{Ecrã de Autenticação e Registo Multi-tenant. Fonte: Elaboração própria.}
+\end{figure}
 
 ##### b) Painel Administrativo (RBAC e Departamentos)
 
 Fornece interfaces centralizadas para gestão de acesso relacional. Através deste painel, o administrador pode criar e editar cargos organizacionais, assinalar permissões granulares de sistema (`doc:upload`, `roles:manage`, `users:manage`, etc.) e gerir os departamentos necessários à segmentação e isolamento dos dados da empresa.
 
-![Interface do Painel Administrativo (RBAC e Departamentos). Fonte: Elaboração própria.](docs/images/administracao.png){width=88%}
+\begin{figure}[htbp]
+  \makebox[\textwidth][c]{\includegraphics[width=1.2\textwidth]{docs/images/administracao.png}}
+  \caption{Interface do Painel Administrativo (RBAC e Departamentos). Fonte: Elaboração própria.}
+\end{figure}
 
 ##### c) Módulo de Gestão Documental e Upload
 
@@ -649,23 +655,35 @@ O módulo de documentos subdivide-se no ecossistema de carregamento e na tabela 
 
 *   **Zona de Upload Assíncrono:** Disponibiliza uma interface moderna de arrastamento (*drag-and-drop*) de ficheiros (PDF, TXT, DOCX), permitindo associar o departamento de destino e a visibilidade antes do envio para a pipeline do n8n.
 
-![Módulo de Carregamento de Documentos (*Drag-and-Drop*). Fonte: Elaboração própria.](docs/images/upload-arquivos.png){width=88%}
+\begin{figure}[htbp]
+  \makebox[\textwidth][c]{\includegraphics[width=1.2\textwidth]{docs/images/upload-arquivos.png}}
+  \caption{Módulo de Carregamento de Documentos (\textit{Drag-and-Drop}). Fonte: Elaboração própria.}
+\end{figure}
 
 *   **Tabela de Base Documental:** Exibe o repositório centralizado de ficheiros da organização, listando metadados como tamanho, departamento associado, data de criação e o estado de conversão e vetorização em tempo real (`pending`, `processed`, `error`).
 
-![Tabela da Base Documental Organizacional. Fonte: Elaboração própria.](docs/images/base-documental.png){width=88%}
+\begin{figure}[htbp]
+  \makebox[\textwidth][c]{\includegraphics[width=1.2\textwidth]{docs/images/base-documental.png}}
+  \caption{Tabela da Base Documental Organizacional. Fonte: Elaboração própria.}
+\end{figure}
 
 ##### d) Módulo de Wiki Corporativa
 
 Consiste num editor de texto incorporado diretamente na plataforma. Permite aos colaboradores elaborar e publicar políticas internas, manuais de procedimentos e notas operacionais de forma ágil, convertendo instantaneamente o conteúdo criado em blocos textuais (*chunks*) vetorizados sem a necessidade de upload de documentos externos.
 
-![Módulo de Wiki e Edição de Conteúdo Interno. Fonte: Elaboração própria.](docs/images/wiki.png){width=88%}
+\begin{figure}[htbp]
+  \makebox[\textwidth][c]{\includegraphics[width=1.2\textwidth]{docs/images/wiki.png}}
+  \caption{Módulo de Wiki e Edição de Conteúdo Interno. Fonte: Elaboração própria.}
+\end{figure}
 
 ##### e) Interface de Chat IA (Pesquisa Inteligente)
 
 Representa a interface principal de interação do utilizador com o agente de inteligência artificial. Possui um layout moderno, histórico lateral de conversas persistentes, suporte a múltiplas sessões e caixas de diálogo estilizados. Cada resposta gerada apresenta botões interativos com as fontes bibliográficas consultadas; ao clicar em qualquer citação, um painel lateral de inspeção exibe o trecho exato do documento vetorizado utilizado pelo modelo para fundamentar a sua resposta. É aplicado um filtro inteligente na API (*backend*) que assegura a apresentação exclusiva das fontes efetivamente referenciadas pelo modelo de IA na resposta, eliminando assim o ruído visual de documentos contextuais que não foram julgados relevantes para a síntese final.
 
-![Interface de Pesquisa Inteligente e Inspeção de Fontes Bibliográficas. Fonte: Elaboração própria.](docs/images/chat-ia.png){width=88%}
+\begin{figure}[htbp]
+  \makebox[\textwidth][c]{\includegraphics[width=1.2\textwidth]{docs/images/chat-ia.png}}
+  \caption{Interface de Pesquisa Inteligente e Inspeção de Fontes Bibliográficas. Fonte: Elaboração própria.}
+\end{figure}
 
 #### 4.1.5.7. Codificação
 

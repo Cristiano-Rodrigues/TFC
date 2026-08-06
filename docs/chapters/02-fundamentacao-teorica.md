@@ -223,7 +223,7 @@ A aplicação do modelo RBAC em ambientes multi-tenant introduz uma camada adici
 
 @erlCloudComputingConcepts2013 aborda a segurança em ambientes de *cloud computing*, destacando que o isolamento entre tenants deve ser garantido em múltiplas camadas: ao nível da rede, ao nível do armazenamento e ao nível da aplicação. No contexto de uma aplicação SaaS multi-tenant, o controlo de acessos ao nível da aplicação é frequentemente implementado através de filtros que restringem as consultas à base de dados aos registos pertencentes ao tenant do utilizador autenticado.
 
-Concretamente, o isolamento multi-tenant é implementado neste trabalho através de uma combinação de estratégias. A nível da persistência, todas as tabelas que armazenam dados pertencentes a um tenant incluem um campo `company_id` que identifica o tenant proprietário de cada registo. A nível da lógica aplicacional, as rotas de API verificam a autenticação do utilizador e filtram automaticamente os resultados pelo `company_id` correspondente. Finalmente, a nível da recuperação semântica, a função `match_chunks()` aplica filtros baseados no departamento e no cargo do utilizador, garantindo que os resultados da pesquisa respeitam as permissões de acesso definidas para cada documento. Esta abordagem implementa, na prática, uma política de controlo de acessos que combina o isolamento ao nível do tenant com o controlo granular ao nível do RBAC departamental, assegurando que cada utilizador apenas acede à informação que lhe é permitida pela sua posição na organização. Importa notar que, ao incorporar atributos organizacionais como o *tenant* (`company_id`) e o departamento como critérios de decisão de acesso — para além do papel (cargo) —, o modelo implementado aproxima-se, na prática, de uma abordagem híbrida RBAC+ABAC (*Attribute-Based Access Control*), embora a lógica de atribuição de permissões continue a ser centrada nos papéis.
+Concretamente, o isolamento multi-tenant é implementado neste trabalho através de uma combinação de estratégias. A nível da persistência, todas as tabelas que armazenam dados pertencentes a um tenant incluem um campo `company_id` que identifica o tenant proprietário de cada registo. A nível da lógica aplicacional, as rotas de API verificam a autenticação do utilizador e filtram automaticamente os resultados pelo `company_id` correspondente. Finalmente, a nível da recuperação semântica, a função `match_chunks()` aplica filtros baseados no departamento e no cargo do utilizador, garantindo que os resultados da pesquisa respeitam as permissões de acesso definidas para cada documento. Esta abordagem implementa, na prática, uma política de controlo de acessos que combina o isolamento ao nível do tenant com o controlo refinado ao nível do RBAC departamental, assegurando que cada utilizador apenas acede à informação que lhe é permitida pela sua posição na organização. Importa notar que, ao incorporar atributos organizacionais como o *tenant* (`company_id`) e o departamento como critérios de decisão de acesso — para além do papel (cargo) —, o modelo implementado aproxima-se, na prática, de uma abordagem híbrida RBAC+ABAC (*Attribute-Based Access Control*), embora a lógica de atribuição de permissões continue a ser centrada nos papéis.
 
 
 ## 2.7. Estado da Arte
@@ -244,27 +244,43 @@ No mercado actual, diversas soluções abordam parcialmente o problema da gestã
 
 **Plataformas com IA nativa.** Uma nova geração de ferramentas integra capacidades de IA como componente central da experiência. O Notion AI combina gestão de documentos e bases de conhecimento com funcionalidades de geração e sumarização de texto baseadas em LLMs. O Glean oferece busca empresarial unificada com compreensão semântica, indexando conteúdo de múltiplas fontes (email, documentos, mensagens). O Guru disponibiliza uma base de conhecimento com verificação automática de actualidade e sugestões contextuais. Estas soluções demonstram o potencial da IA aplicada à gestão da informação, mas apresentam limitações comuns: são predominantemente proprietárias, operam em infraestruturas centralizadas fora do controlo da organização, têm custos de subscrição elevados e oferecem capacidades limitadas de personalização das políticas de acesso.
 
-**Projectos open-source.** O Danswer (actualmente designado Onyx) constitui a referência mais próxima ao sistema proposto no espaço open-source. Trata-se de uma plataforma de perguntas e respostas empresarial que utiliza RAG para recuperar informação de múltiplas fontes (documentos, Slack, email) e gerar respostas contextualizadas. Embora partilhe princípios arquitecturais semelhantes ao sistema proposto, o Danswer não foi concebido para contextos multi-tenant com isolamento por empresa, não oferece RBAC granular por departamento, e a sua arquitectura não foi optimizada para o contexto linguístico e organizacional angolano.
+**Projectos open-source.** O Danswer (actualmente designado Onyx) constitui a referência mais próxima ao sistema proposto no espaço open-source. Trata-se de uma plataforma de perguntas e respostas empresarial que utiliza RAG para recuperar informação de múltiplas fontes (documentos, Slack, email) e gerar respostas contextualizadas. Embora partilhe princípios arquitecturais semelhantes ao sistema proposto, o Danswer não foi concebido para contextos multi-tenant com isolamento por empresa, não oferece RBAC refinado por departamento, e a sua arquitectura não foi optimizada para o contexto linguístico e organizacional angolano.
 
 ### 2.7.2. Comparação com a Solução Proposta
 
 Apresenta-se uma análise comparativa entre as soluções existentes e o sistema proposto neste trabalho. Os critérios de comparação foram seleccionados com base nas dimensões técnicas mais relevantes para o contexto organizacional angolano, nomeadamente o custo de entrada, o suporte linguístico, a granularidade do controlo de acessos e a capacidade de auto-hospedagem. O Quadro 2.1 sintetiza estas diferenças fundamentais.
 
-| Critério | SharePoint | Confluence | Notion AI | Glean | Danswer | **Sistema Proposto** |
-|---|---|---|---|---|---|---|
-| Busca semântica (RAG) | Parcial | Não | Parcial | Sim | Sim | **Sim** |
-| Multi-tenancy | Sim | Sim | Sim | Sim | Sim | **Sim** |
-| RBAC departamental | Parcial | Parcial | Não | Parcial | Sim | **Sim (granular)** |
-| Código aberto | Não | Não | Não | Não | Sim | **Sim** |
-| Auto-hospedagem | Parcial | Parcial | Não | Não | Sim | **Sim** |
-| Ingestão multi-fonte | Parcial | Parcial | Não | Sim | Sim | **Sim** |
-| Custo de entrada | Elevado | Elevado | Médio | Elevado | Baixo | **Baixo** |
-| Personalização | Limitada | Limitada | Limitada | Limitada | Elevada | **Elevada** |
-| Optimização nativa de \textit{Embeddings} para PT | Não | Não | Parcial | Não | Não | **Sim** |
-| Personalização de Pipelines sem Código | Não | Não | Não | Não | Não | **Sim** |
-
-Table: Quadro 2.1: Comparação entre soluções existentes e o sistema proposto. Fonte: Elaboração própria.
+\begin{tabela}[htbp]
+\small
+\centering
+\begin{tabular}{|p{3cm}|p{1.6cm}|p{1.7cm}|p{1.5cm}|p{1.5cm}|p{1.5cm}|p{2.5cm}|}
+\hline
+\textbf{Critério} & \textbf{SharePoint} & \textbf{Confluence} & \textbf{Notion AI} & \textbf{Glean} & \textbf{Danswer} & \textbf{Sistema Proposto} \\
+\hline
+Busca semântica (RAG) & Parcial & Não & Parcial & Sim & Sim & \textbf{Sim} \\
+\hline
+Multi-tenancy & Sim & Sim & Sim & Sim & Sim & \textbf{Sim} \\
+\hline
+RBAC departamental & Parcial & Parcial & Não & Parcial & Sim & \textbf{Sim} \\
+\hline
+Código aberto & Não & Não & Não & Não & Sim & \textbf{Sim} \\
+\hline
+Auto-hospedagem & Parcial & Parcial & Não & Não & Sim & \textbf{Sim} \\
+\hline
+Ingestão multi-fonte & Parcial & Parcial & Não & Sim & Sim & \textbf{Sim} \\
+\hline
+Custo de entrada & Elevado & Elevado & Médio & Elevado & Baixo & \textbf{Baixo} \\
+\hline
+Personalização & Limitada & Limitada & Limitada & Limitada & Elevada & \textbf{Elevada} \\
+\hline
+Optimização nativa de \textit{Embeddings} para PT & Não & Não & Parcial & Não & Não & \textbf{Sim} \\
+\hline
+Personalização de Pipelines sem Código & Não & Não & Não & Não & Não & \textbf{Sim} \\
+\hline
+\end{tabular}
+\caption{Quadro 2.1: Comparação entre soluções existentes e o sistema proposto. Fonte: Elaboração própria.}
+\end{tabela}
 
 A análise comparativa evidencia que o sistema proposto neste trabalho se diferencia das soluções existentes em aspectos fundamentais. O principal factor distintivo da solução proposta reside na personalização de pipelines sem código através do n8n, permitindo total flexibilidade na ingestão e processamento de dados sem necessidade de alterar o código-fonte da aplicação. Adicionalmente, a plataforma é construída maioritariamente sobre componentes open-source (PostgreSQL, Next.js, n8n, Supabase), complementada por serviços de IA externos (Cohere para \textit{embeddings} e geração via LLM), possibilitando a auto-hospedagem da infraestrutura nuclear e permitindo que organizações com requisitos de soberania de dados controlem o armazenamento e o processamento local, embora a camada de IA mantenha uma dependência de APIs proprietárias. O sistema oferece também multi-tenancy nativo com isolamento por empresa, permitindo que a mesma instância da plataforma sirva múltiplas organizações. Do ponto de vista linguístico, a utilização de modelos de \textit{embeddings} multilíngues que suportam o português adequa a solução ao contexto angolano.
 
-Estas características posicionam o sistema proposto como uma solução que optimiza determinadas dimensões — nomeadamente a busca semântica com controlo de acesso granular, a auto-hospedagem e a adequação ao contexto lusófono —, reconhecendo limitações noutras, em particular na maturidade do protótipo e na validação em ambiente organizacional real. No contexto angolano, onde os custos de licenciamento de plataformas proprietárias, a limitação de largura de banda para soluções exclusivamente na nuvem e a necessidade de processar documentação em língua portuguesa constituem barreiras significativas, a arquitectura proposta oferece um ponto de partida promissor que futuros trabalhos poderão consolidar e validar em cenários de produção.
+Estas características posicionam o sistema proposto como uma solução que optimiza determinadas dimensões — nomeadamente a busca semântica com controlo de acesso refinado, a auto-hospedagem e a adequação ao contexto lusófono —, reconhecendo limitações noutras, em particular na maturidade do protótipo e na validação em ambiente organizacional real. No contexto angolano, onde os custos de licenciamento de plataformas proprietárias, a limitação de largura de banda para soluções exclusivamente na nuvem e a necessidade de processar documentação em língua portuguesa constituem barreiras significativas, a arquitectura proposta oferece um ponto de partida promissor que futuros trabalhos poderão consolidar e validar em cenários de produção.

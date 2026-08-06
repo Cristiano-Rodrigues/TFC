@@ -26,32 +26,57 @@ A especificação dos requisitos seguiu a norma ISO/IEC 25010 para a qualidade d
 
 Os Requisitos Funcionais (RF) definem os serviços que o sistema deve fornecer aos utilizadores. O Quadro 4.1 descreve os requisitos funcionais prioritários identificados para o protótipo.
 
-| Identificador | Requisito Funcional | Descrição |
-|:---|:---|:---|
-| **RF-01** | Autenticação e Multi-tenancy | O sistema deve permitir que novos utilizadores registem a sua organização (*tenant*) e façam login num ambiente de dados estritamente isolado. |
-| **RF-02** | Gestão de Departamentos | O utilizador administrador deve ser capaz de criar, ler, actualizar e eliminar os departamentos internos da empresa. |
-| **RF-03** | Gestão de Cargos e Permissões | O administrador deve poder criar cargos organizacionais e associar-lhes permissões específicas do sistema (ex: visualização, upload, eliminação). |
-| **RF-04** | Upload de Conteúdo e Documentos | O sistema deve suportar o upload de documentos de texto (PDFs, TXT) e permitir a introdução manual de conhecimento (artigos/páginas de Wiki), catalogando-os sob a classificação `source_type`. |
-| **RF-05** | Configuração de Acesso a Conteúdo | O utilizador que realiza o upload deve poder limitar o acesso do documento ou página Wiki a departamentos específicos e a cargos específicos. |
-| **RF-06** | Pesquisa Inteligente (Chat RAG) | O utilizador deve poder submeter perguntas em linguagem natural na interface de chat e obter uma resposta baseada no contexto dos documentos a que tem acesso. |
-| **RF-07** | Atribuição de Fontes | A interface de chat da IA deve listar de forma clara os documentos de origem utilizados pelo LLM para sintetizar a resposta, permitindo a validação da informação. |
-| **RF-08** | Gestão de Utilizadores | O administrador deve poder gerir os utilizadores da empresa, associando-os a um departamento e a um cargo específico. |
-
-Table: Quadro 4.1: Requisitos Funcionais do Sistema. Fonte: Elaboração própria.
+\begin{tabela}[htbp]
+\small
+\centering
+\begin{tabular}{|p{1.5cm}|>{\raggedright\arraybackslash}p{4cm}|p{9.5cm}|}
+\hline
+\textbf{ID} & \textbf{Requisito Funcional} & \textbf{Descrição} \\
+\hline
+\textbf{RF-01} & Autenticação e Multi-tenancy & O sistema deve permitir que novos utilizadores registem a sua organização (\textit{tenant}) e façam login num ambiente de dados estritamente isolado. \\
+\hline
+\textbf{RF-02} & Gestão de Departamentos & O utilizador administrador deve ser capaz de criar, ler, actualizar e eliminar os departamentos internos da empresa. \\
+\hline
+\textbf{RF-03} & Gestão de Cargos e Permissões & O administrador deve poder criar cargos organizacionais e associar-lhes permissões específicas do sistema (ex: visualização, upload, eliminação). \\
+\hline
+\textbf{RF-04} & Upload de Conteúdo e Documentos & O sistema deve suportar o upload de documentos de texto (PDFs, TXT) e permitir a introdução manual de conhecimento (artigos/páginas de Wiki), catalogando-os sob a classificação \texttt{source\_type}. \\
+\hline
+\textbf{RF-05} & Configuração de Acesso a Conteúdo & O utilizador que realiza o upload deve poder limitar o acesso do documento ou página Wiki a departamentos específicos e a cargos específicos. \\
+\hline
+\textbf{RF-06} & Pesquisa Inteligente (Chat RAG) & O utilizador deve poder submeter perguntas em linguagem natural na interface de chat e obter uma resposta baseada no contexto dos documentos a que tem acesso. \\
+\hline
+\textbf{RF-07} & Atribuição de Fontes & A interface de chat da IA deve listar de forma clara os documentos de origem utilizados pelo LLM para sintetizar a resposta, permitindo a validação da informação. \\
+\hline
+\textbf{RF-08} & Gestão de Utilizadores & O administrador deve poder gerir os utilizadores da empresa, associando-os a um departamento e a um cargo específico. \\
+\hline
+\end{tabular}
+\caption{Quadro 4.1: Requisitos Funcionais do Sistema. Fonte: Elaboração própria.}
+\end{tabela}
 
 #### 4.1.2.2. Requisitos Não Funcionais
 
 Os Requisitos Não Funcionais (RNF) especificam critérios que qualificam o funcionamento do sistema. O Quadro 4.2 apresenta os requisitos não funcionais.
 
-| Identificador | Categoria | Descrição |
-|:---|:---|:---|
-| **RNF-01** | Segurança (Isolamento) | O isolamento entre diferentes empresas (*tenants*) deve ser garantido nativamente ao nível da base de dados através de políticas de *Row Level Security* (RLS) no PostgreSQL. |
-| **RNF-02** | Desempenho (Pesquisa) | O tempo médio de resposta do pipeline de busca semântica e geração de resposta da IA não deve ultrapassar os 4-10 segundos sob condições estáveis de conectividade à internet. |
-| **RNF-03** | Compatibilidade Linguística | O modelo de \textit{embeddings} utilizado pelo sistema deve possuir suporte nativo e optimizado para a língua portuguesa para assegurar a relevância das pesquisas vectoriais. |
-| **RNF-04** | Usabilidade (Interface) | A interface deve apresentar-se responsiva, fluida e incluir transições e animações visuais curtas para guiar a navegação do utilizador (*Framer Motion*). |
-| **RNF-05** | Disponibilidade e Extensibilidade | A lógica de ingestão documental e recuperação RAG deve correr numa infraestrutura modular externa (n8n), facilitando a adição de novos conectores sem necessidade de recompilar o frontend Next.js. |
-
-Table: Quadro 4.2: Requisitos Não Funcionais do Sistema. Fonte: Elaboração própria.
+\begin{tabela}[htbp]
+\small
+\centering
+\begin{tabular}{|p{1.5cm}|p{4.5cm}|p{9cm}|}
+\hline
+\textbf{ID} & \textbf{Categoria} & \textbf{Descrição} \\
+\hline
+\textbf{RNF-01} & Segurança (Isolamento) & O isolamento entre diferentes empresas (\textit{tenants}) deve ser garantido nativamente ao nível da base de dados através de políticas de \textit{Row Level Security} (RLS) no PostgreSQL. \\
+\hline
+\textbf{RNF-02} & Desempenho (Pesquisa) & O tempo médio de resposta do pipeline de busca semântica e geração de resposta da IA não deve ultrapassar os 4-10 segundos sob condições estáveis de conectividade à internet. \\
+\hline
+\textbf{RNF-03} & Compatibilidade Linguística & O modelo de \textit{embeddings} utilizado pelo sistema deve possuir suporte nativo e optimizado para a língua portuguesa para assegurar a relevância das pesquisas vectoriais. \\
+\hline
+\textbf{RNF-04} & Usabilidade (Interface) & A interface deve apresentar-se responsiva, fluida e incluir transições e animações visuais curtas para guiar a navegação do utilizador (\textit{Framer Motion}). \\
+\hline
+\textbf{RNF-05} & Disponibilidade e Extensibilidade & A lógica de ingestão documental e recuperação RAG deve correr numa infraestrutura modular externa (n8n), facilitando a adição de novos conectores sem necessidade de recompilar o frontend Next.js. \\
+\hline
+\end{tabular}
+\caption{Quadro 4.2: Requisitos Não Funcionais do Sistema. Fonte: Elaboração própria.}
+\end{tabela}
 
 ### 4.1.3. Modelagem do Sistema
 
@@ -142,85 +167,67 @@ Admin --> UC7
 
 A especificação detalhada dos casos de uso principais do sistema fornece uma descrição passo-a-passo das acções executadas pelos actores e as correspondentes reacções do sistema. O Quadro 4.3 especifica o caso de uso principal de Pesquisa Inteligente.
 
-+--------------------------+----------------------------------------------------------------------------------+
-| Campo                    | Descrição                                                                        |
-+==========================+==================================================================================+
-| **Caso de Uso:**         | UC3 — Consultar Base de Conhecimento (Chat)                                      |
-+--------------------------+----------------------------------------------------------------------------------+
-| **Actor Principal:**     | Utilizador                                                                       |
-+--------------------------+----------------------------------------------------------------------------------+
-| **Pré-condições:**       | Utilizador autenticado e associado a uma empresa, departamento e cargo activo.   |
-+--------------------------+----------------------------------------------------------------------------------+
-| **Fluxo Principal:**     | 1. O utilizador acede à vista "Chat Inteligente" no menu lateral.                |
-|                          |                                                                                  |
-|                          | 2. O utilizador escreve uma pergunta em linguagem natural e clica em enviar.     |
-|                          |                                                                                  |
-|                          | 3. O sistema valida as credenciais da sessão (token JWT) e extrai o `user_id`,   |
-|                          | `department_id` e `role_id` do utilizador.                                       |
-|                          |                                                                                  |
-|                          | 4. O sistema encaminha a pergunta e o contexto de segurança para o pipeline do   |
-|                          | n8n.                                                                             |
-|                          |                                                                                  |
-|                          | 5. O pipeline obtém o embedding da pergunta, efectua a pesquisa na base de dados |
-|                          | PostgreSQL através de `match_chunks()`, limitando os resultados ao tenant e às   |
-|                          | permissões RBAC/departamento do utilizador.                                      |
-|                          |                                                                                  |
-|                          | 6. O pipeline envia o contexto obtido para a LLM, que gera uma resposta          |
-|                          | estruturada.                                                                     |
-|                          |                                                                                  |
-|                          | 7. A interface apresenta a resposta ao utilizador juntamente com a lista de      |
-|                          | fontes citadas.                                                                  |
-+--------------------------+----------------------------------------------------------------------------------+
-| **Fluxo Alternativo:**   | **5a. Sem resultados autorizados:** Se nenhum fragmento relevante estiver        |
-|                          | disponível para o departamento/cargo do utilizador, a base de dados retorna um   |
-|                          | conjunto vazio e a LLM informa que não localizou dados para responder à          |
-|                          | pergunta.                                                                        |
-+--------------------------+----------------------------------------------------------------------------------+
-| **Pós-condições:**       | A sessão do chat é registada na base de dados e a resposta contendo a referência |
-|                          | às fontes é mostrada ao utilizador.                                              |
-+--------------------------+----------------------------------------------------------------------------------+
-
-Table: Quadro 4.3: Especificação do Caso de Uso - Consultar Base de Conhecimento (Chat). Fonte: Elaboração própria.
+\begin{tabela}[htbp]
+\small
+\centering
+\begin{tabular}{|p{3.5cm}|p{11.5cm}|}
+\hline
+\textbf{Campo} & \textbf{Descrição} \\
+\hline
+\textbf{Caso de Uso:} & UC3 — Consultar Base de Conhecimento (Chat) \\
+\hline
+\textbf{Actor Principal:} & Utilizador \\
+\hline
+\textbf{Pré-condições:} & Utilizador autenticado e associado a uma empresa, departamento e cargo activo. \\
+\hline
+\textbf{Fluxo Principal:} & 
+1. O utilizador acede à vista "Chat Inteligente" no menu lateral. \newline
+2. O utilizador escreve uma pergunta em linguagem natural e clica em enviar. \newline
+3. O sistema valida as credenciais da sessão (token JWT) e extrai o \texttt{user\_id}, \texttt{department\_id} e \texttt{role\_id} do utilizador. \newline
+4. O sistema encaminha a pergunta e o contexto de segurança para o pipeline do n8n. \newline
+5. O pipeline obtém o embedding da pergunta, efectua a pesquisa na base de dados PostgreSQL através de \texttt{match\_chunks()}, limitando os resultados ao tenant e às permissões RBAC/departamento do utilizador. \newline
+6. O pipeline envia o contexto obtido para a LLM, que gera uma resposta estruturada. \newline
+7. A interface apresenta a resposta ao utilizador juntamente com a lista de fontes citadas. \\
+\hline
+\textbf{Fluxo Alternativo:} & \textbf{5a. Sem resultados autorizados:} Se nenhum fragmento relevante estiver disponível para o departamento/cargo do utilizador, a base de dados retorna um conjunto vazio e a LLM informa que não localizou dados para responder à pergunta. \\
+\hline
+\textbf{Pós-condições:} & A sessão do chat é registada na base de dados e a resposta contendo a referência às fontes é mostrada ao utilizador. \\
+\hline
+\end{tabular}
+\caption{Quadro 4.3: Especificação do Caso de Uso - Consultar Base de Conhecimento (Chat). Fonte: Elaboração própria.}
+\end{tabela}
 
 O Quadro 4.4 descreve a especificação do caso de uso de Upload de Conteúdo e Configuração de Acesso.
 
-+--------------------------+----------------------------------------------------------------------------------+
-| Campo                    | Descrição                                                                        |
-+==========================+==================================================================================+
-| **Caso de Uso:**         | UC2 — Fazer Upload de Documento / Criar Wiki                                     |
-+--------------------------+----------------------------------------------------------------------------------+
-| **Actor Principal:**     | Utilizador (com permissão `doc:upload` activa no cargo)                          |
-+--------------------------+----------------------------------------------------------------------------------+
-| **Pré-condições:**       | Utilizador autenticado e cargo do utilizador contém a permissão `doc:upload`.    |
-+--------------------------+----------------------------------------------------------------------------------+
-| **Fluxo Principal:**     | 1. O utilizador acede à vista "Upload" ou "Wiki".                                |
-|                          |                                                                                  |
-|                          | 2. O utilizador selecciona o ficheiro PDF/texto ou redige o artigo da Wiki.      |
-|                          |                                                                                  |
-|                          | 3. O utilizador preenche os filtros de controlo de acessos (se deseja restringir |
-|                          | o acesso a determinados departamentos e/ou cargos).                              |
-|                          |                                                                                  |
-|                          | 4. O utilizador submete o conteúdo.                                              |
-|                          |                                                                                  |
-|                          | 5. O sistema regista o metadado na tabela `documents` associando-o ao            |
-|                          | `company_id` do utilizador e define o estado do n8n como `pending`.              |
-|                          |                                                                                  |
-|                          | 6. O Next.js invoca o webhook de processamento documental do n8n de forma        |
-|                          | assíncrona.                                                                      |
-|                          |                                                                                  |
-|                          | 7. O pipeline do n8n processa o texto, divide-o em chunks,                       |
-|                          | gera \textit{embeddings} e insere na tabela `chunks`. Ao concluir, actualiza o   |
-|                          | estado em `documents` para `success`.                                            |
-+--------------------------+----------------------------------------------------------------------------------+
-| **Fluxo Alternativo:**   | **3a. Sem restrições de acesso:** Se o utilizador não seleccionar departamentos  |
-|                          | ou cargos, o documento é marcado como público, sendo acessível por qualquer      |
-|                          | utilizador autenticado pertencente à mesma empresa (tenant).                     |
-+--------------------------+----------------------------------------------------------------------------------+
-| **Pós-condições:**       | O conteúdo encontra-se guardado, vectorizado e pronto a ser recuperado em        |
-|                          | pesquisas semânticas pelas pessoas autorizadas.                                  |
-+--------------------------+----------------------------------------------------------------------------------+
-
-Table: Quadro 4.4: Especificação do Caso de Uso - Upload de Conteúdo e Acessos. Fonte: Elaboração própria.
+\begin{tabela}[htbp]
+\small
+\centering
+\begin{tabular}{|p{3.5cm}|p{11.5cm}|}
+\hline
+\textbf{Campo} & \textbf{Descrição} \\
+\hline
+\textbf{Caso de Uso:} & UC2 — Fazer Upload de Documento / Criar Wiki \\
+\hline
+\textbf{Actor Principal:} & Utilizador (com permissão \texttt{doc:upload} activa no cargo) \\
+\hline
+\textbf{Pré-condições:} & Utilizador autenticado e cargo do utilizador contém a permissão \texttt{doc:upload}. \\
+\hline
+\textbf{Fluxo Principal:} & 
+1. O utilizador acede à vista "Upload" ou "Wiki". \newline
+2. O utilizador selecciona o ficheiro PDF/texto ou redige o artigo da Wiki. \newline
+3. O utilizador preenche os filtros de controlo de acessos (se deseja restringir o acesso a determinados departamentos e/ou cargos). \newline
+4. O utilizador submete o conteúdo. \newline
+5. O sistema regista o metadado na tabela \texttt{documents} associando-o ao \texttt{company\_id} do utilizador e define o estado do n8n como \texttt{pending}. \newline
+6. O Next.js invoca o webhook de processamento documental do n8n de forma assíncrona. \newline
+7. O pipeline do n8n processa o texto, divide-o em chunks, gera \textit{embeddings} e insere na tabela \texttt{chunks}. Ao concluir, actualiza o estado em \texttt{documents} para \texttt{success}. \\
+\hline
+\textbf{Fluxo Alternativo:} & \textbf{3a. Sem restrições de acesso:} Se o utilizador não seleccionar departamentos ou cargos, o documento é marcado como público, sendo acessível por qualquer utilizador autenticado pertencente à mesma empresa (tenant). \\
+\hline
+\textbf{Pós-condições:} & O conteúdo encontra-se guardado, vectorizado e pronto a ser recuperado em pesquisas semânticas pelas pessoas autorizadas. \\
+\hline
+\end{tabular}
+\caption{Quadro 4.4: Especificação do Caso de Uso - Upload de Conteúdo e Acessos. Fonte: Elaboração própria.}
+\end{tabela}
 
 #### 4.1.3.4. Diagrama de Classes
 
@@ -469,7 +476,7 @@ O escopo do protótipo desenvolvido delimita as fronteiras da prova de conceito,
 
 *   **Administração Geral:** Gestão de uma única instância multi-tenant onde é simulado o isolamento de dados entre empresas distintas, com criação autónoma de utilizadores, departamentos e cargos.
 *   **Mecanismo de Ingestão:** Upload de ficheiros em formato de texto estruturado ou PDF. O processamento realiza o fatiamento (*chunking*) em blocos lógicos de 500 caracteres e gera \textit{embeddings} com suporte multilíngue.
-*   **Controlo de Acesso Granular:** Implementação de políticas de acesso ao nível do documento ou página Wiki. As restrições de visibilidade podem ser departamentais (ex: restrito ao departamento de Recursos Humanos) ou hierárquicas por cargo (ex: apenas visível por Directores).
+*   **Controlo de Acesso:** Implementação de políticas de acesso ao nível do documento ou página Wiki. As restrições de visibilidade podem ser departamentais (ex: restrito ao departamento de Recursos Humanos) ou hierárquicas por cargo (ex: apenas visível por Directores).
 *   **Recuperação e Síntese de Informação:** Canal de chat interactivo que recebe a consulta do utilizador, filtra os fragmentos de documentos usando o perfil do utilizador (empresa, departamento e cargo) e sintetiza a resposta final recorrendo a um LLM.
 
 #### 4.1.5.2. Descrição dos Módulos
@@ -532,20 +539,36 @@ Rel(n8nApp, chatAPI, "Gera respostas RAG", "REST API")
 
 A stack tecnológica seleccionada para a implementação do protótipo baseia-se em soluções maioritariamente open-source e com baixo custo de entrada operacional, maximizando a viabilidade financeira e a escalabilidade técnica em organizações angolanas.
 
-| Camada | Tecnologia / Serviço | Papel e Justificação da Escolha |
-|:---------|:---------------------|:------------------------------------------------|
-| **Frontend** | Next.js 15 (React 19) | Framework para construção da interface de utilizador interactiva e navegação nativa, tirando partido do *App Router* (arquitetura multi-rota) e rotas de API integradas. |
-| **Styling** | TailwindCSS | Permite desenhar uma interface moderna, limpa e responsiva sem sobrecarregar a largura de banda de ligação à rede do cliente. |
-| **Backend API** | Next.js API Routes | Processa a lógica de negócio local, lida com autenticação JWT e actua como proxy seguro nas chamadas ao servidor de orquestração n8n. |
-| **Base de Dados** | Supabase (PostgreSQL) | Fornece uma base de dados relacional robusta com suporte nativo a políticas de segurança RLS (*Row Level Security*) por inquilino. |
-| **Vector Store** | Extensão `pgvector` | Armazena e indexa vectores de \textit{embeddings} na base de dados PostgreSQL existente, dispensando a contratação e manutenção de um serviço de banco de dados vectorial autónomo. |
-| **Armazenamento** | Supabase Storage Bucket | Repositório físico seguro para guardar os documentos originais em formato PDF ou texto carregados pelos utilizadores. |
-| **Orquestração RAG** | n8n (Visual Workflow) | Plataforma de automação que actua como o motor dos pipelines de ingestão e pesquisa, permitindo alterar a lógica de processamento documental de forma visual e rápida. |
-| **Modelo de \textit{Embeddings}** | Cohere API (`embed-multilingual-v3.0`) | Modelo vectorial multilíngue com optimização específica e excelente suporte para o idioma português, crucial para processar os documentos organizacionais angolanos. |
-| **Otimização de Busca (Re-Ranking)** | Cohere Rerank API (modelo `rerank-multilingual-v3.0`) | Avalia e reordena os fragmentos devolvidos pelo PostgreSQL pela sua relevância semântica real face à pergunta do utilizador, antes do envio ao LLM, materializando o paradigma de RAG Avançado. |
-| **Síntese LLM** | Cohere Chat (`command-r-plus`) | Modelo de linguagem optimizado para tarefas RAG com forte capacidade de raciocínio, formatação estruturada e citação transparente de fontes do contexto. |
-
-Table: Quadro 4.5: Stack Tecnológica do Sistema. Fonte: Elaboração própria.
+\begin{tabela}[htbp]
+\small
+\centering
+\begin{tabular}{|p{3cm}|>{\raggedright\arraybackslash}p{3.5cm}|p{8.5cm}|}
+\hline
+\textbf{Camada} & \textbf{Tecnologia / Serviço} & \textbf{Papel e Justificação da Escolha} \\
+\hline
+\textbf{Frontend} & Next.js 15 (React 19) & Framework para construção da interface de utilizador interactiva e navegação nativa, tirando partido do \textit{App Router} (arquitetura multi-rota) e rotas de API integradas. \\
+\hline
+\textbf{Styling} & TailwindCSS & Permite desenhar uma interface moderna, limpa e responsiva sem sobrecarregar a largura de banda de ligação à rede do cliente. \\
+\hline
+\textbf{Backend API} & Next.js API Routes & Processa a lógica de negócio local, lida com autenticação JWT e actua como proxy seguro nas chamadas ao servidor de orquestração n8n. \\
+\hline
+\textbf{Base de Dados} & Supabase (PostgreSQL) & Fornece uma base de dados relacional robusta com suporte nativo a políticas de segurança RLS (\textit{Row Level Security}) por inquilino. \\
+\hline
+\textbf{Vector Store} & Extensão \texttt{pgvector} & Armazena e indexa vectores de \textit{embeddings} na base de dados PostgreSQL existente, dispensando a contratação e manutenção de um serviço de banco de dados vectorial autónomo. \\
+\hline
+\textbf{Armazenamento} & Supabase Storage Bucket & Repositório físico seguro para guardar os documentos originais em formato PDF ou texto carregados pelos utilizadores. \\
+\hline
+\textbf{Orquestração RAG} & n8n (Visual Workflow) & Plataforma de automação que actua como o motor dos pipelines de ingestão e pesquisa, permitindo alterar a lógica de processamento documental de forma visual e rápida. \\
+\hline
+\textbf{Modelo de \textit{Embeddings}} & Cohere API (\texttt{embed\-multilingual\-v3.0}) & Modelo vectorial multilíngue com optimização específica e excelente suporte para o idioma português, crucial para processar os documentos organizacionais angolanos. \\
+\hline
+\textbf{Otimização de Busca (Re-Ranking)} & Cohere Rerank API (modelo \texttt{rerank\-multilingual\-v3.0}) & Avalia e reordena os fragmentos devolvidos pelo PostgreSQL pela sua relevância semântica real face à pergunta do utilizador, antes do envio ao LLM, materializando o paradigma de RAG Avançado. \\
+\hline
+\textbf{Síntese LLM} & Cohere Chat (\texttt{command\-r\-plus}) & Modelo de linguagem optimizado para tarefas RAG com forte capacidade de raciocínio, formatação estruturada e citação transparente de fontes do contexto. \\
+\hline
+\end{tabular}
+\caption{Quadro 4.5: Stack Tecnológica do Sistema. Fonte: Elaboração própria.}
+\end{tabela}
 
 #### 4.1.5.5. Testes Realizados
 
@@ -556,17 +579,18 @@ Os testes do protótipo focaram-se em validar duas dimensões fundamentais estab
 Os testes de eficiência temporal mediram o tempo de resposta (em segundos) em dois fluxos essenciais: a ingestão documental assíncrona (do upload até à inserção vectorial) e a recuperação em tempo real de informação (da submissão da pergunta à síntese final da resposta). Os dados foram recolhidos num ambiente de teste com ligação de rede simétrica padrão, utilizando ficheiros de texto e PDFs de dimensões variadas. Os resultados das simulações iniciais encontram-se sumarizados na Tabela 4.1. Para garantir a fiabilidade dos dados, cada operação foi executada em 10 iterações independentes, sendo o valor reportado na Tabela 4.1 correspondente à média aritmética dos tempos de resposta obtidos, atenuando assim flutuações pontuais de latência da rede.
 
 \begin{tabela}[htbp]
+\small
 \centering
-\begin{tabular}{p{2cm} p{3.5cm} p{5.5cm} c c}
+\begin{tabular}{p{1cm} p{3.5cm} p{5.5cm} c c}
 \hline
-\textbf{ID do Teste} & \textbf{Operação Realizada} & \textbf{Descrição da Carga de Teste} & \textbf{Tempo Médio (s)} & \textbf{Estado do Teste} \\
+\textbf{ID} & \textbf{Operação Realizada} & \textbf{Descrição da Carga de Teste} & \textbf{Tempo Médio (s)} & \textbf{Resultado} \\
 \hline
-\textbf{T-TEMP-01} & Ingestão Documental & Ficheiro PDF Simples (2 páginas, 4.5 KB de texto) & 1.84 & Sucesso \\
-\textbf{T-TEMP-02} & Ingestão Documental & Relatório Técnico Médio (15 páginas, 45 KB de texto) & 4.92 & Sucesso \\
-\textbf{T-TEMP-03} & Ingestão Documental & Manual de Procedimentos Longo (50 páginas, 180 KB) & 12.35 & Sucesso \\
-\textbf{T-TEMP-04} & Ingestão Documental & Página Wiki (Texto editado directamente, $\sim$2000 caracteres) & 0.95 & Sucesso \\
-\textbf{T-TEMP-05} & Pesquisa Semântica & Consulta de 1 linha ("Qual é o prazo de entrega do relatório?") & 1.88 & Sucesso \\
-\textbf{T-TEMP-06} & Pesquisa Semântica & Consulta de 2 linhas ("Como solicitar reembolso de despesas?") & 2.15 & Sucesso \\
+\textbf{T-01} & Ingestão Documental & Ficheiro PDF Simples (2 páginas, 4.5 KB de texto) & 1.84 & Sucesso \\
+\textbf{T-02} & Ingestão Documental & Relatório Técnico Médio (15 páginas, 45 KB de texto) & 4.92 & Sucesso \\
+\textbf{T-03} & Ingestão Documental & Manual de Procedimentos Longo (50 páginas, 180 KB) & 12.35 & Sucesso \\
+\textbf{T-04} & Ingestão Documental & Página Wiki (Texto editado directamente, $\sim$2000 caracteres) & 0.95 & Sucesso \\
+\textbf{T-05} & Pesquisa Semântica & Consulta de 1 linha ("Qual é o prazo de entrega do relatório?") & 1.88 & Sucesso \\
+\textbf{T-06} & Pesquisa Semântica & Consulta de 2 linhas ("Como solicitar reembolso de despesas?") & 2.15 & Sucesso \\
 \hline
 \end{tabular}
 \caption{Tabela 4.1: Resultados dos Testes de Eficiência Temporal. Fonte: Elaboração própria.}
@@ -582,14 +606,24 @@ O Quadro 4.6 apresenta uma selecção das avaliações qualitativas registadas d
 
 A avaliação qualitativa seguiu uma rubrica padronizada: 'Excelente' (o sistema forneceu uma resposta factualmente correcta, suportada pelo contexto e com citação exacta da fonte), 'Parcial' (a resposta é coerente mas omite detalhes do contexto), e 'Nula' (o sistema bloqueia o acesso à informação por restrições de segurança ou o LLM recusa-se a responder por falta de contexto autorizado).
 
-| ID | Perfil Utilizador (Cargo / Dept / Empresa) | Pergunta Submetida | Contexto Esperado | Filtro de Segurança | Relevância Qualitativa da Resposta | Citação de Fontes |
-|:---|:-------------------------|:-------------------|:------------------|:--------------------|:-----------------------------------|:----------------|
-| **QA-01** | Director / RH / Empresa A | "Quais as regras para férias?" | Acede ao documento `politica_ferias_A.pdf` público na Empresa A. | **Permitido:** Sem restrições no tenant A. | **Excelente:** Resumiu correctamente os dias de licença conforme a política. | Sim (`politica_ferias_A.pdf`) |
-| **QA-02** | Assistente / RH / Empresa A | "Qual o salário da administração?" | Tenta aceder a `folha_salarial_admin.pdf` restrito a Directores do departamento Financeiro. | **Bloqueado:** Cargo não possui permissão de acesso. | **Nula:** O LLM informou educadamente não possuir dados para responder. | Não (Bloqueado na DB) |
-| **QA-03** | Director / Finanças / Empresa B | "Quais as regras para férias?" | Tenta fazer uma pergunta idêntica à do teste QA-01. | **Bloqueado:** Documento pertence a um inquilino diferente (Empresa A). | **Nula:** O LLM respondeu que não tem conhecimento destas directivas. | Não (Isolamento de Tenant) |
-| **QA-04** | Operador / Produção / Empresa B | "Como iniciar a máquina X?" | Acede à página Wiki `Procedimento_Maquina_X` do departamento de Produção. | **Permitido:** Pertence ao departamento do utilizador. | **Excelente:** Passos descritos de forma coerente e estruturada. | Sim (`Procedimento_Maquina_X`) |
-
-Table: Quadro 4.6: Matriz de Testes de Relevância Qualitativa e Segurança. Fonte: Elaboração própria.
+\begin{tabela}[htbp]
+\small
+\centering
+\begin{tabular}{|>{\raggedright\arraybackslash}p{0.8cm}|>{\raggedright\arraybackslash}p{2cm}|>{\raggedright\arraybackslash}p{2.5cm}|>{\raggedright\arraybackslash}p{2.1cm}|>{\raggedright\arraybackslash}p{2.2cm}|>{\raggedright\arraybackslash}p{2.4cm}|>{\raggedright\arraybackslash}p{2.7cm}|}
+\hline
+\textbf{ID} & \textbf{Perfil Utilizador} & \textbf{Pergunta Submetida} & \textbf{Contexto Esperado} & \textbf{Filtro de Segurança} & \textbf{Relevância Qualitativa} & \textbf{Citação de Fontes} \\
+\hline
+\textbf{QA-01} & Director / RH / Empresa A & "Quais as regras para férias?" & Acede ao documento \texttt{politica\_ferias\_A.pdf} público na Empresa A. & \textbf{Permitido:} Sem restrições no tenant A. & \textbf{Excelente:} Resumiu correctamente os dias de licença. & Sim (\texttt{politica\_ferias\_A.pdf}) \\
+\hline
+\textbf{QA-02} & Assistente / RH / Empresa A & "Qual o salário da administração?" & Tenta aceder a \texttt{folha\_salarial\_}\newline \texttt{admin.pdf} restrito a Directores Fin. & \textbf{Bloqueado:} Cargo não possui permissão de acesso. & \textbf{Nula:} O LLM informou não possuir dados. & Não (Bloqueado na DB) \\
+\hline
+\textbf{QA-03} & Director / Finanças / Empresa B & "Quais as regras para férias?" & Tenta fazer pergunta idêntica à do teste QA-01. & \textbf{Bloqueado:} Documento pertence à Empresa A. & \textbf{Nula:} O LLM respondeu que não tem conhecimento. & Não (Isolamento) \\
+\hline
+\textbf{QA-04} & Operador / Produção / Empresa B & "Como iniciar a máquina X?" & Acede à página Wiki \texttt{Proc\_}\newline\texttt{Maquina\_X} (Produção). & \textbf{Permitido:} Pertence ao departamento do utilizador. & \textbf{Excelente:} Passos descritos de forma coerente. & Sim (\texttt{Proc\_}\newline\texttt{Maquina\_X}) \\
+\hline
+\end{tabular}
+\caption{Quadro 4.6: Matriz de Testes de Relevância Qualitativa e Segurança. Fonte: Elaboração própria.}
+\end{tabela}
 
 A análise qualitativa das simulações confirma a robustez das políticas de segurança: a base de dados PostgreSQL actua como um guarda-barreiras eficiente, impedindo o envio de dados não-autorizados para o LLM, mitigando significativamente a possibilidade de fuga de informação inter-tenant (dentro do perímetro dos testes realizados) e minimizando alucinações ao limitar o contexto apenas a dados fidedignos e autorizados.
 

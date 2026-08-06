@@ -384,7 +384,7 @@ As referências bibliográficas da investigação encontram-se integralmente cen
 - **n8n vs código custom:** Uso de n8n para orquestração visual do pipeline RAG, facilitando iteração rápida.
 - **Cohere vs OpenAI:** Uso do Cohere para embeddings multilíngues (suporte a português) e custo mais acessível.
 - **Next.js App Router:** Escolha do App Router para API routes server-side e SSR.
-- **RBAC granular:** Sistema de permissões com lógica AND/OR entre departamentos e cargos para máxima flexibilidade.
+- **RBAC refinado:** Sistema de permissões com lógica AND/OR entre departamentos e cargos para máxima flexibilidade.
 - **Multi-Tenant:** Isolamento de dados por `company_id` em todas as tabelas.
 - **Pandoc para monografia:** Permite escrever em Markdown com citações BibTeX e gerar PDF formatado.
 

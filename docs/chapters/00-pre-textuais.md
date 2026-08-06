@@ -108,9 +108,6 @@ This final degree project presents the development and evaluation of an Artifici
 \listoftables
 \newpage
 
-\listoftabelas
-\newpage
-
 \section*{Lista de Abreviaturas e Siglas}
 
 \begin{itemize}

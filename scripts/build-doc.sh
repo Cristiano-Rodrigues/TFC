@@ -13,6 +13,9 @@ pandoc docs/metadata.yaml $FILES \
   --citeproc \
   --csl=$CSL \
   --lua-filter=scripts/filter-bib.lua \
+  --lua-filter=scripts/fix-tables.lua \
+  -H docs/styles/header.tex \
+  -V lang=pt-PT \
   --highlight-style=tango \
   --pdf-engine=xelatex \
   -V mainfont="Times New Roman" \

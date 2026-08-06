@@ -13,7 +13,7 @@ pandoc docs/metadata.yaml $FILES \
   --citeproc \
   --csl=$CSL \
   --lua-filter=scripts/filter-bib.lua \
-  --syntax-highlighting=idiomatic \
+  --highlight-style=tango \
   --pdf-engine=xelatex \
   -V mainfont="Times New Roman" \
   -V fontsize=12pt \

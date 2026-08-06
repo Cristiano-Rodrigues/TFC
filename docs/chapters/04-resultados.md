@@ -47,7 +47,7 @@ Os Requisitos Não Funcionais (RNF) especificam critérios que qualificam o func
 |:---|:---|:---|
 | **RNF-01** | Segurança (Isolamento) | O isolamento entre diferentes empresas (*tenants*) deve ser garantido nativamente ao nível da base de dados através de políticas de *Row Level Security* (RLS) no PostgreSQL. |
 | **RNF-02** | Desempenho (Pesquisa) | O tempo médio de resposta do pipeline de busca semântica e geração de resposta da IA não deve ultrapassar os 5 segundos sob condições estáveis de conectividade à internet. |
-| **RNF-03** | Compatibilidade Linguística | O modelo de embeddings utilizado pelo sistema deve possuir suporte nativo e optimizado para a língua portuguesa para assegurar a relevância das pesquisas vectoriais. |
+| **RNF-03** | Compatibilidade Linguística | O modelo de \textit{embeddings} utilizado pelo sistema deve possuir suporte nativo e optimizado para a língua portuguesa para assegurar a relevância das pesquisas vectoriais. |
 | **RNF-04** | Usabilidade (Interface) | A interface deve apresentar-se responsiva, fluida e incluir transições e animações visuais curtas para guiar a navegação do utilizador (*Framer Motion*). |
 | **RNF-05** | Disponibilidade e Extensibilidade | A lógica de ingestão documental e recuperação RAG deve correr numa infraestrutura modular externa (n8n), facilitando a adição de novos conectores sem necessidade de recompilar o frontend Next.js. |
 
@@ -208,7 +208,7 @@ O Quadro 4.4 descreve a especificação do caso de uso de Upload de Conteúdo e 
 |                          | 6. O Next.js invoca o webhook de processamento documental do n8n de forma        |
 |                          | assíncrona.                                                                      |
 |                          |                                                                                  |
-|                          | 7. O pipeline do n8n processa o texto, divide-o em chunks, gera embeddings e     |
+|                          | 7. O pipeline do n8n processa o texto, divide-o em chunks, gera \textit{embeddings} e     |
 |                          | insere na tabela `chunks`. Ao concluir, actualiza o estado em `documents` para   |
 |                          | `success`.                                                                       |
 +--------------------------+----------------------------------------------------------------------------------+
@@ -453,7 +453,7 @@ ai_chat_sessions ||--o{ ai_chat_messages : "contém"
 Para assegurar que o protótipo cumpre os padrões mínimos de qualidade aceitáveis para uso em organizações angolanas, foram definidos critérios baseados nas características da norma ISO/IEC 25010:
 
 1. **Adequação Funcional:** O sistema cumpre o seu propósito de centralizar dados através de uma interface web intuitiva de upload e wiki, mantendo a capacidade de pesquisa por linguagem natural associada à respectiva fonte.
-2. **Fiabilidade:** O pipeline RAG foi concebido recorrendo a processamento assíncrono (webhooks n8n). Se um upload de ficheiro grande demorar a processar, o estado do documento é actualizado para `pending` na interface, evitando bloquear o utilizador e garantindo tolerância a quebras na ligação de rede com a API de embeddings.
+2. **Fiabilidade:** O pipeline RAG foi concebido recorrendo a processamento assíncrono (webhooks n8n). Se um upload de ficheiro grande demorar a processar, o estado do documento é actualizado para `pending` na interface, evitando bloquear o utilizador e garantindo tolerância a quebras na ligação de rede com a API de \textit{embeddings}.
 3. **Usabilidade:** A interface Next.js utiliza componentes React responsivos e animações curtas com Framer Motion. Isto assegura que utilizadores com pouca literacia em sistemas baseados em inteligência artificial compreendam visualmente o estado das suas operações e as fontes das respostas.
 4. **Segurança:** O acesso é estritamente controlado através do fluxo abaixo:
     *   Autenticação por JSON Web Tokens (JWT) gerados no backend Next.js.
@@ -468,7 +468,7 @@ Para assegurar que o protótipo cumpre os padrões mínimos de qualidade aceitá
 O escopo do protótipo desenvolvido delimita as fronteiras da prova de conceito, focando nas funcionalidades necessárias para demonstrar a viabilidade técnica de uma solução multi-tenant com controlo relacional para busca semântica em organizações angolanas:
 
 *   **Administração Geral:** Gestão de uma única instância multi-tenant onde é simulado o isolamento de dados entre empresas distintas, com criação autónoma de utilizadores, departamentos e cargos.
-*   **Mecanismo de Ingestão:** Upload de ficheiros em formato de texto estruturado ou PDF. O processamento realiza o fatiamento (*chunking*) em blocos lógicos de 500 caracteres e gera embeddings com suporte multilíngue.
+*   **Mecanismo de Ingestão:** Upload de ficheiros em formato de texto estruturado ou PDF. O processamento realiza o fatiamento (*chunking*) em blocos lógicos de 500 caracteres e gera \textit{embeddings} com suporte multilíngue.
 *   **Controlo de Acesso Granular:** Implementação de políticas de acesso ao nível do documento ou página Wiki. As restrições de visibilidade podem ser departamentais (ex: restrito ao departamento de Recursos Humanos) ou hierárquicas por cargo (ex: apenas visível por Directores).
 *   **Recuperação e Síntese de Informação:** Canal de chat interactivo que recebe a consulta do utilizador, filtra os fragmentos de documentos usando o perfil do utilizador (empresa, departamento e cargo) e sintetiza a resposta final recorrendo a um LLM.
 
@@ -500,11 +500,11 @@ System_Boundary(c1, "Sistema RAG Multi-Tenant") {
     Container(nextServer, "Servidor Next.js Node.js", "Next.js API", "Gere autenticação JWT, CRUD e proxy")
     Container(n8nApp, "n8n Workflow Engine", "Plataforma Visual", "Orquestra pipelines RAG assíncronos")
     ContainerDb(database, "PostgreSQL DB", "Supabase", "Base de dados relacional e RLS")
-    ContainerDb(vectorDb, "PostgreSQL pgvector", "Extensão", "Armazena vectores embeddings")
+    ContainerDb(vectorDb, "PostgreSQL pgvector", "Extensão", "Armazena vectores \textit{embeddings}")
     ContainerDb(storage, "Supabase Storage", "Bucket", "Armazena documentos")
 }
 
-System_Ext(embedAPI, "Cohere Embeddings API", "Serviço IA")
+System_Ext(embedAPI, "Cohere \textit{Embeddings} API", "Serviço IA")
 System_Ext(rerankAPI, "Cohere Rerank API", "Serviço IA")
 System_Ext(chatAPI, "Cohere Chat LLM API", "Serviço IA")
 
@@ -518,7 +518,7 @@ Rel(n8nApp, database, "Consultas e RPC", "PostgreSQL TCP")
 Rel(n8nApp, vectorDb, "Insere Chunks", "PostgreSQL TCP")
 Rel(n8nApp, storage, "Lê ficheiros", "REST API")
 
-Rel(n8nApp, embedAPI, "Gera embeddings", "REST API")
+Rel(n8nApp, embedAPI, "Gera \textit{embeddings}", "REST API")
 Rel(n8nApp, rerankAPI, "Re-ranking semântico", "REST API")
 Rel(n8nApp, chatAPI, "Gera respostas RAG", "REST API")
 @enduml
@@ -538,10 +538,10 @@ A stack tecnológica seleccionada para a implementação do protótipo baseia-se
 | **Styling** | TailwindCSS | Permite desenhar uma interface moderna, limpa e responsiva sem sobrecarregar a largura de banda de ligação à rede do cliente. |
 | **Backend API** | Next.js API Routes | Processa a lógica de negócio local, lida com autenticação JWT e actua como proxy seguro nas chamadas ao servidor de orquestração n8n. |
 | **Base de Dados** | Supabase (PostgreSQL) | Fornece uma base de dados relacional robusta com suporte nativo a políticas de segurança RLS (*Row Level Security*) por inquilino. |
-| **Vector Store** | Extensão `pgvector` | Armazena e indexa vectores de embeddings na base de dados PostgreSQL existente, dispensando a contratação e manutenção de um serviço de banco de dados vectorial autónomo. |
+| **Vector Store** | Extensão `pgvector` | Armazena e indexa vectores de \textit{embeddings} na base de dados PostgreSQL existente, dispensando a contratação e manutenção de um serviço de banco de dados vectorial autónomo. |
 | **Armazenamento** | Supabase Storage Bucket | Repositório físico seguro para guardar os documentos originais em formato PDF ou texto carregados pelos utilizadores. |
 | **Orquestração RAG** | n8n (Visual Workflow) | Plataforma de automação que actua como o motor dos pipelines de ingestão e pesquisa, permitindo alterar a lógica de processamento documental de forma visual e rápida. |
-| **Modelo de Embeddings** | Cohere API (`embed-multilingual-v3.0`) | Modelo vectorial multilíngue com optimização específica e excelente suporte para o idioma português, crucial para processar os documentos organizacionais angolanos. |
+| **Modelo de \textit{Embeddings}** | Cohere API (`embed-multilingual-v3.0`) | Modelo vectorial multilíngue com optimização específica e excelente suporte para o idioma português, crucial para processar os documentos organizacionais angolanos. |
 | **Otimização de Busca (Re-Ranking)** | Cohere Rerank API (modelo `rerank-multilingual-v3.0`) | Avalia e reordena os fragmentos devolvidos pelo PostgreSQL pela sua relevância semântica real face à pergunta do utilizador, antes do envio ao LLM, materializando o paradigma de RAG Avançado. |
 | **Síntese LLM** | Cohere Chat (`command-r-plus`) | Modelo de linguagem optimizado para tarefas RAG com forte capacidade de raciocínio, formatação estruturada e citação transparente de fontes do contexto. |
 
@@ -572,7 +572,7 @@ Os testes de eficiência temporal mediram o tempo de resposta (em segundos) em d
 \caption{Tabela 4.1: Resultados dos Testes de Eficiência Temporal. Fonte: Elaboração própria.}
 \end{tabela}
 
-Os resultados demonstram que, mesmo com a latência de rede associada à invocação assíncrona de webhooks no n8n e à geração remota de embeddings pela API da Cohere, o tempo médio para obter uma resposta inteligente manteve-se confortavelmente abaixo do limiar não-funcional de 5 segundos definido no requisito **RNF-02**.
+Os resultados demonstram que, mesmo com a latência de rede associada à invocação assíncrona de webhooks no n8n e à geração remota de \textit{embeddings} pela API da Cohere, o tempo médio para obter uma resposta inteligente manteve-se confortavelmente abaixo do limiar não-funcional de 5 segundos definido no requisito **RNF-02**.
 
 ##### B. Avaliação da Relevância Qualitativa e Filtros de Segurança
 

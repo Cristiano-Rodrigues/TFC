@@ -87,6 +87,13 @@ O trabalho seminal de @mikolovEfficientEstimationWord2013 introduziu os modelos 
 
 Embora os \textit{embeddings} ao nível da palavra tenham representado um avanço significativo, a representação de frases e documentos inteiros requer abordagens mais sofisticadas. @reimersSentenceBERTSentenceEmbeddings2019 propuseram o Sentence-BERT (SBERT), uma modificação da arquitectura BERT que utiliza redes siamesas para gerar \textit{embeddings} ao nível da frase de forma eficiente. O SBERT demonstrou que é possível produzir representações semânticas de frases que mantêm a qualidade dos modelos baseados em *Transformer*, com um custo computacional significativamente inferior, tornando viável a busca semântica em grandes colecções de documentos.
 
+A representação de um texto em \textit{embedding} vectorial codifica o significado semântico global da informação. A Figura 2.1 ilustra conceptualmente como estes \textit{embeddings} operam matematicamente. Em vez de depender de correspondências exactas de palavras-chave, o modelo posiciona conceitos num espaço multidimensional. Como exemplificado, a relação entre duas entidades (como "Termo A" e "Termo B") pode ser avaliada quer pela distância física entre os pontos (Distância Euclidiana), quer pelo ângulo formado pelos seus vectores em relação à origem (Similaridade do Cosseno, denotada por $\theta$). Em um sistema RAG, consultas e documentos com contexto semelhante apresentarão um ângulo $\theta$ reduzido, indicando uma elevada afinidade semântica, o que permite a recuperação da informação de forma eficaz.
+
+\begin{figure}[htbp]
+  \makebox[\textwidth][c]{\includegraphics[width=0.7\textwidth]{docs/images/embeddings-concept.png}}
+  \caption{Representação geométrica do conceito de \textit{word embeddings}. A similaridade semântica traduz-se matematicamente num menor ângulo $\theta$ ou menor distância espacial. Fonte: Elaboração própria.}
+\end{figure}
+
 Na prática, o protótipo desenvolvido recorre à API da Cohere para a geração de \textit{embeddings}, utilizando o modelo *embed-multilingual-v3.0*, que produz vectores de 1024 dimensões e suporta múltiplas línguas, incluindo o português. Os \textit{embeddings} gerados são armazenados na base de dados PostgreSQL através da extensão pgvector, permitindo a realização de buscas por similaridade vectorial em tempo real.
 
 ## 2.3. \textit{Retrieval-Augmented Generation} (RAG)
@@ -101,7 +108,37 @@ O conceito de \textit{Retrieval-Augmented Generation} foi introduzido por @lewis
 
 @asaiReliableAdaptableAttributable2024 defendem que os modelos de linguagem aumentados por recuperação devem substituir os modelos puramente paramétricos como a próxima geração de sistemas de IA linguística, uma vez que oferecem três vantagens fundamentais: fiabilidade (respostas ancoradas em fontes verificáveis), adaptabilidade (capacidade de incorporar novos dados sem re-treino) e atribuibilidade (possibilidade de rastrear as fontes utilizadas na geração). Os autores propõem um roteiro para o desenvolvimento de sistemas RAG de propósito geral, destacando a necessidade de melhorar a interacção entre os componentes de recuperação e de geração.
 
-A implementação concreta deste trabalho adopta uma arquitectura RAG que segue o paradigma avançado: os documentos e páginas Wiki organizacionais são processados, segmentados em *chunks*, convertidos em \textit{embeddings} vectoriais e armazenados numa base de dados vectorial. Quando o utilizador submete uma consulta, esta é igualmente convertida em embedding, e os *chunks* semanticamente mais relevantes são recuperados e fornecidos ao LLM como contexto para a geração da resposta.
+A arquitectura RAG segue um fluxo de funcionamento universal que pode ser aplicado de forma genérica a qualquer domínio intensivo em conhecimento. Como ilustrado na Figura 2.2, o processo inicia-se quando o utilizador submete uma pergunta. Esta pergunta é convertida numa representação matemática (\textit{embedding} da consulta), que permite ao sistema realizar uma busca por similaridade semântica numa base de dados vectorial. O sistema recupera então os fragmentos de texto (*chunks*) mais relevantes previamente indexados. Por fim, constrói-se um *prompt* enriquecido que combina a pergunta original com o contexto recuperado, instruindo o LLM a gerar uma resposta precisa e fundamentada exclusivamente nas fontes citadas.
+
+```plantuml
+@startuml
+skinparam rectangle {
+    BackgroundColor white
+    BorderColor black
+    RoundCorner 10
+}
+skinparam defaultFontSize 11
+
+rectangle "1. Pergunta\ndo Utilizador" as q
+rectangle "2. Geração de\nEmbedding" as embed
+rectangle "3. Busca por\nSimilaridade" as search
+rectangle "4. Recuperação\nde Chunks" as retrieve
+rectangle "5. Construção\ndo Prompt" as prompt
+rectangle "6. Geração\npelo LLM" as llm
+rectangle "7. Resposta +\nFontes" as answer
+
+q -right-> embed
+embed -right-> search
+search -down-> retrieve
+retrieve -left-> prompt
+prompt -left-> llm
+llm -down-> answer
+@enduml
+```
+
+\begin{center}
+\captionof{figure}{Fluxo simplificado do funcionamento genérico da arquitectura RAG. Adaptado de Lewis et al. (2020).}
+\end{center}
 
 ### 2.3.2. Processo de Chunking e Indexação
 
@@ -109,13 +146,24 @@ O processo de *chunking* (segmentação) constitui uma etapa crítica na constru
 
 A escolha da dimensão e da estratégia de segmentação dos *chunks* tem um impacto significativo na qualidade da recuperação. *Chunks* demasiado pequenos podem perder o contexto necessário para a compreensão, enquanto *chunks* demasiado grandes podem diluir a informação relevante e reduzir a precisão da busca semântica. @barnettSevenFailurePoints2024 identificam a segmentação inadequada como um dos sete pontos de falha em sistemas RAG, observando que a perda de informação durante o *chunking* pode resultar na incapacidade do sistema de recuperar contexto relevante, mesmo quando este existe na base documental.
 
-As estratégias de segmentação mais comuns incluem a divisão por número fixo de caracteres ou tokens, a divisão por parágrafos ou secções do documento, e abordagens semânticas que procuram manter a coerência temática de cada *chunk*. Adicionalmente, a utilização de sobreposição (*overlap*) entre *chunks* consecutivos permite preservar o contexto nas fronteiras de segmentação, mitigando a perda de informação [@gaoRetrievalAugmentedGenerationLarge2023].
+As estratégias de segmentação mais comuns incluem a divisão por número fixo de caracteres ou tokens, a divisão por parágrafos ou secções do documento, e abordagens semânticas que procuram manter a coerência temática de cada *chunk*. Adicionalmente, a utilização de sobreposição (*overlap*) entre *chunks* consecutivos permite preservar o contexto nas fronteiras de segmentação, mitigando a perda de informação [@gaoRetrievalAugmentedGenerationLarge2023]. A Figura 2.3 exemplifica graficamente o processo de segmentação de um documento com sobreposição.
+
+\begin{figure}[htbp]
+  \makebox[\textwidth][c]{\includegraphics[width=1.0\textwidth]{docs/images/chunking-processo.png}}
+  \caption{Ilustração do processo de chunking com sobreposição (overlap). Fonte: Elaboração própria.}
+\end{figure}
 
 No sistema proposto, o processo de *chunking* é orquestrado pelo workflow n8n, que extrai o texto dos documentos carregados, segmenta-o em unidades coerentes e gera os respectivos \textit{embeddings} através da API da Cohere, armazenando-os na base de dados PostgreSQL com a extensão pgvector.
 
 ### 2.3.3. Busca Semântica e Bases de Dados Vectoriais
 
 A busca semântica distingue-se fundamentalmente da busca tradicional por palavras-chave ao operar sobre representações vectoriais do significado, em vez de correspondências lexicais exactas. @karpukhinDensePassageRetrieval2020 propuseram o *Dense Passage Retrieval* (DPR), demonstrando que a recuperação densa baseada em \textit{embeddings} supera significativamente os métodos esparsos tradicionais como o BM25 em tarefas de pergunta-resposta em domínio aberto. O DPR utiliza dois encoders BERT independentes --- um para codificar as consultas e outro para codificar as passagens --- treinados de forma a maximizar a similaridade entre consultas e passagens relevantes no espaço vectorial.
+
+A métrica de similaridade mais amplamente utilizada em sistemas de busca semântica é a **similaridade do coseno**, que mede o ângulo entre dois vectores no espaço de \textit{embeddings}, independentemente da sua magnitude [@karpukhinDensePassageRetrieval2020]:
+
+$$\text{similaridade}(\vec{a}, \vec{b}) = \cos(\theta) = \frac{\vec{a} \cdot \vec{b}}{||\vec{a}|| \times ||\vec{b}||} = \frac{\sum_{i=1}^{n} a_i b_i}{\sqrt{\sum_{i=1}^{n} a_i^2} \times \sqrt{\sum_{i=1}^{n} b_i^2}}$$
+
+Valores próximos de 1 indicam alta similaridade semântica entre os textos, enquanto valores próximos de 0 indicam que os textos são semanticamente distintos. No protótipo desenvolvido, o PostgreSQL calcula esta métrica através do operador `<=>` da extensão pgvector.
 
 @izacardLeveragingPassageRetrieval2021 demonstraram que a combinação de recuperação densa com modelos generativos (*Fusion-in-Decoder*) produz resultados superiores, ao permitir que o modelo generativo processe simultaneamente múltiplas passagens recuperadas, extraindo e sintetizando informação relevante de forma mais eficaz do que abordagens que se limitam a uma única passagem.
 

@@ -44,7 +44,7 @@
 \begin{flushright}
 \begin{minipage}{8cm}
 \small
-Trabalho Final de Curso apresentado ao Instituto Superior de Administração e Finanças como parte dos requisitos para obtenção do grau académico de Licenciado em Informática de Gestão Financeira.\\[0.5cm]
+Projecto de pesquisa apresentado ao Instituto Superior de Administração e Finanças – ISAF, exigência para obtenção do grau de Licenciatura em Informática de Gestão Financeira.\\[0.5cm]
 \textbf{Orientador:} Msc. Lírio Ramalheira
 \end{minipage}
 \end{flushright}
@@ -53,6 +53,70 @@ Trabalho Final de Curso apresentado ao Instituto Superior de Administração e F
 {\large \textbf{Luanda, 2026}}
 \end{center}
 \end{titlepage}
+
+\newpage
+\begin{titlepage}
+\begin{center}
+\includegraphics[width=6cm]{docs/images/isaf-logo.png}
+
+\vspace{0.1cm}
+{\Large \textbf{INSTITUTO SUPERIOR DE ADMINISTRAÇÃO E FINANÇAS}}\\[0.1cm]
+{\large \textbf{CURSO DE INFORMÁTICA DE GESTÃO FINANCEIRA}}
+
+\vspace{0.3cm}
+{\large \textbf{SISTEMA DE GESTÃO DA INFORMAÇÃO ORGANIZACIONAL BASEADO EM AGENTES DE INTELIGÊNCIA ARTIFICIAL PARA ORGANIZAÇÕES ANGOLANAS}}
+
+\vspace{0.2cm}
+{\large \textbf{CRISTIANO VLADMIR RODRIGUES}}
+
+\vspace{0.1cm}
+\begin{flushright}
+\begin{minipage}{8cm}
+\small
+Projecto de pesquisa apresentado ao Instituto Superior de Administração e Finanças – ISAF, exigência para obtenção do grau de Licenciatura em Informática de Gestão Financeira.
+\end{minipage}
+\end{flushright}
+
+\vspace{0.2cm}
+BANCA EXAMINADORA
+
+\vspace{0.2cm}
+\rule{\linewidth}{1pt}\\[-0.1cm]
+Prof. - Presidente da Banca\\[-0.1cm]
+IGF/ISAF
+
+\vspace{0.15cm}
+\rule{\linewidth}{1pt}\\[-0.1cm]
+Prof. - Primeiro oponente\\[-0.1cm]
+IGF/ISAF
+
+\vspace{0.15cm}
+\rule{\linewidth}{1pt}\\[-0.1cm]
+Prof. - Segundo oponente\\[-0.1cm]
+IGF/ISAF
+
+\vspace{0.15cm}
+\rule{\linewidth}{1pt}\\[-0.1cm]
+Secretário
+
+\vfill
+{\large \textbf{Luanda, 2026}}
+\end{center}
+\end{titlepage}
+
+\newpage
+\thispagestyle{empty}
+
+\section*{Compromisso do Autor}
+
+\noindent Eu, Cristiano Vladmir Rodrigues, portador do documento de identidade 006863777LA044 e estudante do curso de Licenciatura em Informática de Gestão Financeira, declaro que:
+
+\noindent O conteúdo do presente documento é um reflexo do meu trabalho pessoal e manifesto que, diante de qualquer notificação de plágio, cópia ou prejuízo à fonte original, sou responsável direito legal, financeira e administrativamente, sem afectar o orientador do trabalho, o ISAF e as demais instituições que colaboraram neste trabalho, assumindo as consequências derivadas de tais práticas.
+
+\noindent E venho por meio desta, autorizar a disponibilização da versão aprovada do meu trabalho de fim de curso, SISTEMA DE GESTÃO DA INFORMAÇÃO ORGANIZACIONAL BASEADO EM AGENTES DE INTELIGÊNCIA ARTIFICIAL PARA ORGANIZAÇÕES ANGOLANAS, na biblioteca do ISAF e em outros meios de divulgação electrónica da referida Instituição.
+
+\vspace{3cm}
+\noindent Assinatura: \rule{9cm}{0.5pt}
 
 \newpage
 \pagenumbering{roman}

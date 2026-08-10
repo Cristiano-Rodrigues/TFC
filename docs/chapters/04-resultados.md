@@ -492,6 +492,8 @@ O protótipo divide-se em oito módulos funcionais interligados:
 7.  **Módulo de Cargos e Permissões:** Permite ao utilizador administrador criar perfis internos de permissões e atribuir cargos aos colaboradores, assegurando a flexibilidade de papéis do RBAC.
 8.  **Módulo de Departamentos:** CRUD de departamentos internos para agrupar logicamente utilizadores e delimitar os ecrãs e documentos que podem ser consultados por equipa.
 
+Para garantir que o agente de inteligência artificial produza respostas formatadas e estritamente alinhadas ao contexto empresarial das fontes, foram desenvolvidas instruções de sistema (*system prompts*) especializadas e parametrizadas as configurações chave do modelo. O detalhe destes *prompts* e a configuração dos parâmetros mais importantes encontram-se documentados no **Anexo II**.
+
 #### 4.1.5.3. Arquitectura Física e Lógica do Sistema
 
 A arquitetura do sistema segue um modelo de camadas descentralizado, separando a interface do utilizador, a lógica da aplicação, a base de dados relacional e vectorial, e a orquestração assíncrona dos pipelines de Inteligência Artificial.
@@ -570,13 +572,15 @@ A stack tecnológica seleccionada para a implementação do protótipo baseia-se
 \caption{Quadro 4.5: Stack Tecnológica do Sistema. Fonte: Elaboração própria.}
 \end{tabela}
 
+Adicionalmente, os detalhes das \textit{system prompts} utilizadas e as configurações específicas de hiperparâmetros dos modelos Cohere, essenciais para a reprodutibilidade dos resultados, encontram-se detalhados no **Anexo II**.
+
 #### 4.1.5.5. Testes Realizados
 
 Os testes do protótipo focaram-se em validar duas dimensões fundamentais estabelecidas na metodologia de investigação reformulada: a eficiência temporal na execução dos pipelines RAG e a relevância qualitativa das respostas geradas pelo LLM sob as restrições impostas pelas regras de controlo de acessos.
 
 ##### A. Testes de Eficiência Temporal
 
-Os testes de eficiência temporal mediram o tempo de resposta (em segundos) em dois fluxos essenciais: a ingestão documental assíncrona (do upload até à inserção vectorial) e a recuperação em tempo real de informação (da submissão da pergunta à síntese final da resposta). Os dados foram recolhidos num ambiente de teste com ligação de rede simétrica padrão, utilizando ficheiros de texto e PDFs de dimensões variadas. Os resultados das simulações iniciais encontram-se sumarizados na Tabela 4.1. Para garantir a fiabilidade dos dados, cada operação foi executada em 10 iterações independentes, sendo o valor reportado na Tabela 4.1 correspondente à média aritmética dos tempos de resposta obtidos, atenuando assim flutuações pontuais de latência da rede.
+Os testes de eficiência temporal mediram o tempo de resposta (em segundos) em dois fluxos essenciais: a ingestão documental assíncrona (do upload até à inserção vectorial) e a recuperação em tempo real de informação (da submissão da pergunta à síntese final da resposta). Os dados foram recolhidos num ambiente de teste com ligação de rede simétrica padrão, utilizando ficheiros de texto e PDFs de dimensões variadas provenientes de publicações e documentos empresariais públicos reais (simulando, assim, a realidade corporativa autêntica de empresas públicas e privadas). Os resultados das simulações encontram-se sumarizados na Tabela 4.1. Para garantir a fiabilidade dos dados, cada operação foi executada em 10 iterações independentes, sendo o valor reportado na Tabela 4.1 correspondente à média aritmética dos tempos de resposta obtidos, atenuando assim flutuações pontuais de latência da rede.
 
 \begin{tabela}[htbp]
 \small
@@ -585,15 +589,15 @@ Os testes de eficiência temporal mediram o tempo de resposta (em segundos) em d
 \hline
 \textbf{ID} & \textbf{Operação Realizada} & \textbf{Descrição da Carga de Teste} & \textbf{Tempo Médio (s)} & \textbf{Resultado} \\
 \hline
-\textbf{T-01} & Ingestão Documental & Ficheiro PDF Simples (2 páginas, 4.5 KB de texto) & 1.84 & Sucesso \\
-\textbf{T-02} & Ingestão Documental & Relatório Técnico Médio (15 páginas, 45 KB de texto) & 4.92 & Sucesso \\
-\textbf{T-03} & Ingestão Documental & Manual de Procedimentos Longo (50 páginas, 180 KB) & 12.35 & Sucesso \\
+\textbf{T-01} & Ingestão Documental & Comunicado Oficial (2 páginas, 4.5 KB de texto) & 1.84 & Sucesso \\
+\textbf{T-02} & Ingestão Documental & Regulamento Interno (15 páginas, 45 KB de texto) & 4.92 & Sucesso \\
+\textbf{T-03} & Ingestão Documental & Relatório e Contas Anual (50 páginas, 180 KB) & 12.35 & Sucesso \\
 \textbf{T-04} & Ingestão Documental & Página Wiki (Texto editado directamente, $\sim$2000 caracteres) & 0.95 & Sucesso \\
 \textbf{T-05} & Pesquisa Semântica & Consulta de 1 linha ("Qual é o prazo de entrega do relatório?") & 1.88 & Sucesso \\
 \textbf{T-06} & Pesquisa Semântica & Consulta de 2 linhas ("Como solicitar reembolso de despesas?") & 2.15 & Sucesso \\
 \hline
 \end{tabular}
-\caption{Tabela 4.1: Resultados dos Testes de Eficiência Temporal. Fonte: Elaboração própria.}
+\caption{Tabela 4.1: Resultados dos Testes de Eficiência Temporal com Documentos Empresariais. Fonte: Elaboração própria.}
 \end{tabela}
 
 Os resultados demonstram que, mesmo com a latência de rede associada à invocação assíncrona de webhooks no n8n e à geração remota de \textit{embeddings} pela API da Cohere, o tempo médio para obter uma resposta inteligente manteve-se confortavelmente abaixo do limiar de 10 segundos definido no requisito **RNF-02**.
@@ -703,4 +707,5 @@ A arquitetura de segurança do protótipo baseia-se numa abordagem de defesa em 
 2.  **Isolamento Físico de Ficheiros:** Os uploads no Supabase Storage são organizados em estruturas de directórios virtuais segmentados pelo identificador do tenant (`/storage/rag_documents/{company_id}/{document_id}`).
 3.  **Políticas RLS na Base de Dados:** Configuração de regras Row Level Security no PostgreSQL para garantir que operações simples de leitura e escrita (SELECT, UPDATE, DELETE) em tabelas administrativas (ex: listar utilizadores ou listar departamentos) estão logicamente bloqueadas apenas a registos que possuam o mesmo `company_id` do utilizador autenticado.
 4.  **Lógica Híbrida RBAC + ABAC:** Conforme descrito na secção 2.6.2, o modelo de autorização implementado combina o controlo baseado no papel do utilizador com atributos organizacionais contextuais (tenant e departamento). Na prática, esta lógica é executada diretamente na base de dados PostgreSQL pela função `match_chunks()`, que filtra os fragmentos de texto antes de qualquer envio ao modelo LLM externo, assegurando que o modelo nunca recebe contexto não-autorizado para o perfil do utilizador solicitante.
+5.  **Auditoria de Conformidade (APD) e Revisão via *Prompts*:** Para assegurar o estrito alinhamento com a Lei de Proteção de Dados Pessoais (APD) vigente em Angola, a arquitetura RAG utiliza *prompts* de sistema dedicadas para inspeção de conteúdo. Estas *prompts* instruem o modelo LLM a avaliar iterativamente tanto o texto de entrada (a intenção do utilizador) como o conteúdo dos fragmentos recuperados da base de dados e a resposta final gerada, detetando e mitigando a exposição indevida de Dados Pessoais Sensíveis (PII) antes de apresentar qualquer resultado ao utilizador final.
 

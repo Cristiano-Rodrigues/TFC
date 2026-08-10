@@ -6,13 +6,14 @@ O código integral do protótipo desenvolvido encontra-se disponível em reposit
 
 ### I.1. Função PL/pgSQL para Pesquisa Semântica com RBAC (`match_chunks`)
 
+*Nota: A validação da identidade do utilizador (e da verificação de que o seu papel e departamento lhe pertencem de facto) é efectuada na camada aplicacional (Next.js) antes da invocação desta função, que recebe apenas os atributos já resolvidos e autenticados.*
+
 \begin{lstlisting}[breaklines=true, language=SQL, basicstyle=\small\ttfamily]
 CREATE OR REPLACE FUNCTION public.match_chunks(
   p_embedding vector, 
   p_threshold double precision, 
   p_count integer, 
   p_company_id uuid DEFAULT NULL::uuid,
-  p_user_id uuid DEFAULT NULL::uuid, 
   p_department_id uuid DEFAULT NULL::uuid, 
   p_role_id uuid DEFAULT NULL::uuid
 )
@@ -181,7 +182,7 @@ REGRAS ESTritas:
 2. Se a resposta não estiver no contexto, diz categoricamente: 
    "Não possuo informações nos meus registos para responder a esta questão."
 3. Não inventes, não deduza nem acrescentes informações externas.
-4. AUDITORIA DE PRIVACIDADE (APD): Se o contexto recuperado contiver Dados 
+4. AUDITORIA DE PRIVACIDADE: Se o contexto recuperado contiver Dados 
    Pessoais Sensíveis (PII) explícitos que não tenham relação direta e 
    estritamente necessária com a pergunta do utilizador, deves mascará-los 
    (ex: [DADO OCULTO]) na tua resposta.
@@ -193,7 +194,7 @@ CONTEXTO FORNECIDO:
 {{ $json.contexto_recuperado }}
 \end{lstlisting}
 
-**Configurações Chave do Modelo (Cohere Command-R-Plus):**
+**Configurações Chave do Modelo (Cohere command-r-plus-08-2024):**
 *   **Temperature:** 0.1 (Garante consistência e previsibilidade, reduzindo criatividade desnecessária ou alucinações).
 *   **Max Tokens:** 1024 (Suficiente para respostas abrangentes sem sobrecarregar a janela de contexto de saída).
 *   **Presence Penalty:** 0.0 (O modelo não é penalizado por reutilizar vocabulário, mantendo o jargão técnico das fontes inalterado).

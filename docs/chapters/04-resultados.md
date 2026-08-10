@@ -64,9 +64,9 @@ Os Requisitos Não Funcionais (RNF) especificam critérios que qualificam o func
 \hline
 \textbf{ID} & \textbf{Categoria} & \textbf{Descrição} \\
 \hline
-\textbf{RNF-01} & Segurança (Isolamento) & O isolamento entre diferentes empresas (\textit{tenants}) deve ser garantido nativamente ao nível da base de dados através de políticas de \textit{Row Level Security} (RLS) no PostgreSQL. \\
+\textbf{RNF-01} & Segurança (Isolamento) & O isolamento entre diferentes empresas (\textit{tenants}) deve ser implementado através de uma combinação de políticas RLS para operações relacionais directas e de filtragem de autorização parametrizada na função \texttt{match\_chunks()} para a recuperação semântica. \\
 \hline
-\textbf{RNF-02} & Desempenho (Pesquisa) & O tempo médio de resposta do pipeline de busca semântica e geração de resposta da IA não deve ultrapassar os 4-10 segundos sob condições estáveis de conectividade à internet. \\
+\textbf{RNF-02} & Desempenho (Pesquisa) & O tempo médio de resposta do pipeline de busca semântica e geração de resposta da IA não deve ultrapassar os 10 segundos sob condições estáveis de conectividade à internet. \\
 \hline
 \textbf{RNF-03} & Compatibilidade Linguística & O modelo de \textit{embeddings} utilizado pelo sistema deve possuir suporte nativo e optimizado para a língua portuguesa para assegurar a relevância das pesquisas vectoriais. \\
 \hline
@@ -487,7 +487,7 @@ O protótipo divide-se em oito módulos funcionais interligados:
 2.  **Módulo de Dashboard:** Apresenta indicadores consolidados da organização, tais como volume de documentos processados, quantidade de utilizadores ativos por departamento e estatísticas básicas de utilização do chat.
 3.  **Módulo de Documentos:** Permite a visualização dos ficheiros armazenados no sistema em formato de listagem, exibindo o metadado do ficheiro, o autor do upload, o estado do processamento n8n (`pending`, `success` ou `error`) e o tipo de fonte (`source_type`).
 4.  **Módulo de Upload:** Interface dedicada ao carregamento de novos conteúdos. Permite selecionar ficheiros locais ou criar novas páginas de conhecimento (Wiki). Inclui caixas de seleção multiseleção para associar permissões de acesso por departamentos e cargos.
-5.  **Módulo de Chat IA:** Interface de conversação em linguagem natural. Mostra o histórico de mensagens da sessão e as referências clicáveis para os documentos fontes originais que suportaram a resposta gerada.
+5.  **Módulo de Chat IA:** Interface de conversação em linguagem natural. Mostra o histórico de mensagens da sessão e as referências clicáveis para os documentos fontes originais que suportaram a resposta gerada. Importa clarificar que a etapa de optimização de busca (*reranking*) não ocorre dentro da função SQL da base de dados, mas sim fora desta, dentro do workflow n8n, entre a recuperação de fragmentos e a construção do *prompt* enviado ao LLM.
 6.  **Módulo de Wiki (Base de Conhecimento):** Permite aos utilizadores criarem páginas de documentação textual interna directamente no browser. O texto introduzido é guardado na tabela `documents` com a flag `source_type = 'wiki'`, integrando de imediato o pipeline de indexação vectorial.
 7.  **Módulo de Cargos e Permissões:** Permite ao utilizador administrador criar perfis internos de permissões e atribuir cargos aos colaboradores, assegurando a flexibilidade de papéis do RBAC.
 8.  **Módulo de Departamentos:** CRUD de departamentos internos para agrupar logicamente utilizadores e delimitar os ecrãs e documentos que podem ser consultados por equipa.
@@ -566,7 +566,7 @@ A stack tecnológica seleccionada para a implementação do protótipo baseia-se
 \hline
 \textbf{Otimização de Busca (Re-Ranking)} & Cohere Rerank API (modelo \texttt{rerank\-multilingual\-v3.0}) & Avalia e reordena os fragmentos devolvidos pelo PostgreSQL pela sua relevância semântica real face à pergunta do utilizador, antes do envio ao LLM, materializando o paradigma de RAG Avançado. \\
 \hline
-\textbf{Síntese LLM} & Cohere Chat (\texttt{command\-r\-plus}) & Modelo de linguagem optimizado para tarefas RAG com forte capacidade de raciocínio, formatação estruturada e citação transparente de fontes do contexto. \\
+\textbf{Síntese LLM} & Cohere Chat (\texttt{command\-r\-plus\-08\-2024}) & Modelo de linguagem optimizado para tarefas RAG com forte capacidade de raciocínio, formatação estruturada e citação transparente de fontes do contexto. \\
 \hline
 \end{tabular}
 \caption{Quadro 4.5: Stack Tecnológica do Sistema. Fonte: Elaboração própria.}
@@ -600,7 +600,7 @@ Os testes de eficiência temporal mediram o tempo de resposta (em segundos) em d
 \caption{Tabela 4.1: Resultados dos Testes de Eficiência Temporal com Documentos Empresariais. Fonte: Elaboração própria.}
 \end{tabela}
 
-Os resultados demonstram que, mesmo com a latência de rede associada à invocação assíncrona de webhooks no n8n e à geração remota de \textit{embeddings} pela API da Cohere, o tempo médio para obter uma resposta inteligente manteve-se confortavelmente abaixo do limiar de 10 segundos definido no requisito **RNF-02**.
+Os resultados demonstram que, mesmo com a latência de rede associada à invocação assíncrona de webhooks no n8n e à geração remota de \textit{embeddings} pela API da Cohere, o tempo médio para obter uma resposta inteligente manteve-se confortavelmente abaixo do limiar de 10 segundos definido no requisito **RNF-02**. O requisito RNF-02 aplica-se exclusivamente ao fluxo de consulta semântica e geração de resposta (T-05, T-06). Os testes T-01 a T-04 correspondem ao fluxo de ingestão documental, não abrangido por este requisito.
 
 ##### B. Avaliação da Relevância Qualitativa e Filtros de Segurança
 
@@ -629,7 +629,7 @@ A avaliação qualitativa seguiu uma rubrica padronizada: 'Excelente' (o sistema
 \caption{Quadro 4.6: Matriz de Testes de Relevância Qualitativa e Segurança. Fonte: Elaboração própria.}
 \end{quadro}
 
-A análise qualitativa das simulações confirma a robustez das políticas de segurança: a base de dados PostgreSQL actua como um guarda-barreiras eficiente, impedindo o envio de dados não-autorizados para o LLM, mitigando significativamente a possibilidade de fuga de informação inter-tenant (dentro do perímetro dos testes realizados) e minimizando alucinações ao limitar o contexto apenas a dados fidedignos e autorizados.
+A análise qualitativa das simulações fornece evidências preliminares da eficácia das políticas implementadas: nos cenários avaliados, os mecanismos actuaram de forma a não permitir o envio de dados não-autorizados para o LLM, nem permitiram o acesso a documentos de outro tenant nem a documentos fora do perímetro de autorização do utilizador, mitigando a possibilidade de fuga de informação inter-tenant e minimizando alucinações ao limitar o contexto apenas a dados autorizados.
 
 #### 4.1.5.6. Protótipo das Telas
 
@@ -707,5 +707,5 @@ A arquitetura de segurança do protótipo baseia-se numa abordagem de defesa em 
 2.  **Isolamento Físico de Ficheiros:** Os uploads no Supabase Storage são organizados em estruturas de directórios virtuais segmentados pelo identificador do tenant (`/storage/rag_documents/{company_id}/{document_id}`).
 3.  **Políticas RLS na Base de Dados:** Configuração de regras Row Level Security no PostgreSQL para garantir que operações simples de leitura e escrita (SELECT, UPDATE, DELETE) em tabelas administrativas (ex: listar utilizadores ou listar departamentos) estão logicamente bloqueadas apenas a registos que possuam o mesmo `company_id` do utilizador autenticado.
 4.  **Lógica Híbrida RBAC + ABAC:** Conforme descrito na secção 2.6.2, o modelo de autorização implementado combina o controlo baseado no papel do utilizador com atributos organizacionais contextuais (tenant e departamento). Na prática, esta lógica é executada diretamente na base de dados PostgreSQL pela função `match_chunks()`, que filtra os fragmentos de texto antes de qualquer envio ao modelo LLM externo, assegurando que o modelo nunca recebe contexto não-autorizado para o perfil do utilizador solicitante.
-5.  **Auditoria de Conformidade (APD) e Revisão via *Prompts*:** Para assegurar o estrito alinhamento com a Lei de Proteção de Dados Pessoais (APD) vigente em Angola, a arquitetura RAG utiliza *prompts* de sistema dedicadas para inspeção de conteúdo. Estas *prompts* instruem o modelo LLM a avaliar iterativamente tanto o texto de entrada (a intenção do utilizador) como o conteúdo dos fragmentos recuperados da base de dados e a resposta final gerada, detetando e mitigando a exposição indevida de Dados Pessoais Sensíveis (PII) antes de apresentar qualquer resultado ao utilizador final.
+5.  **Revisão via *Prompts*:** A arquitetura RAG utiliza *prompts* de sistema dedicadas que instruem o modelo LLM a mascarar e mitigar a exposição de Dados Pessoais Sensíveis (PII) na fase de geração da resposta, com o objectivo de mitigar a exposição indevida destes dados no texto final, antes de apresentar qualquer resultado ao utilizador final.
 

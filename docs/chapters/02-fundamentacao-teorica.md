@@ -300,7 +300,7 @@ No mercado actual, diversas soluções abordam parcialmente o problema da gestã
 
 Apresenta-se uma análise comparativa entre as soluções existentes e o sistema proposto neste trabalho. Os critérios de comparação foram seleccionados com base nas dimensões técnicas mais relevantes para o contexto organizacional angolano, nomeadamente o custo de entrada, o suporte linguístico, a granularidade do controlo de acessos e a capacidade de auto-hospedagem. O Quadro 2.1 sintetiza estas diferenças fundamentais.
 
-\begin{tabela}[htbp]
+\begin{quadro}[htbp]
 \small
 \centering
 \begin{tabular}{|p{3cm}|p{1.6cm}|p{1.7cm}|p{1.5cm}|p{1.5cm}|p{1.5cm}|p{2.5cm}|}
@@ -329,7 +329,7 @@ Personalização de Pipelines sem Código & Não & Não & Não & Não & Não & \
 \hline
 \end{tabular}
 \caption{Quadro 2.1: Comparação entre soluções existentes e o sistema proposto. Fonte: Elaboração própria.}
-\end{tabela}
+\end{quadro}
 
 A análise comparativa evidencia que o sistema proposto neste trabalho se diferencia das soluções existentes em aspectos fundamentais. O principal factor distintivo da solução proposta reside na personalização de pipelines sem código através do n8n, permitindo total flexibilidade na ingestão e processamento de dados sem necessidade de alterar o código-fonte da aplicação. Adicionalmente, a plataforma é construída maioritariamente sobre componentes open-source (PostgreSQL, Next.js, n8n, Supabase), complementada por serviços de IA externos (Cohere para \textit{embeddings} e geração via LLM), possibilitando a auto-hospedagem da infraestrutura nuclear e permitindo que organizações com requisitos de soberania de dados controlem o armazenamento e o processamento local, embora a camada de IA mantenha atualmente uma dependência de APIs proprietárias (opção adotada essencialmente por motivos financeiros e de limitação de infraestrutura computacional durante a fase de prototipagem). É, contudo, perfeitamente viável evoluir para uma solução totalmente local sem comprometer os dados e informações organizacionais, através da adoção de modelos de linguagem \textit{open-source} (como Llama ou Mistral) executados \textit{on-premise} na própria infraestrutura da organização. O sistema oferece também multi-tenancy nativo com isolamento por empresa, permitindo que a mesma instância da plataforma sirva múltiplas organizações. Do ponto de vista linguístico, a utilização de modelos de \textit{embeddings} multilíngues que suportam o português adequa a solução ao contexto angolano.
 

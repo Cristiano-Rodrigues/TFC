@@ -97,7 +97,6 @@ This final degree project presents the development and evaluation of an Artifici
 
 \renewcommand{\contentsname}{Índice}
 \renewcommand{\listfigurename}{Índice de Figuras}
-\renewcommand{\listtablename}{Índice de Quadros}
 
 \tableofcontents
 \newpage
@@ -105,7 +104,10 @@ This final degree project presents the development and evaluation of an Artifici
 \listoffigures
 \newpage
 
-\listoftables
+\listofquadros
+\newpage
+
+\listoftabelas
 \newpage
 
 \section*{Lista de Abreviaturas e Siglas}

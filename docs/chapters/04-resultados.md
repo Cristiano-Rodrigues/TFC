@@ -26,7 +26,7 @@ A especificação dos requisitos seguiu a norma ISO/IEC 25010 para a qualidade d
 
 Os Requisitos Funcionais (RF) definem os serviços que o sistema deve fornecer aos utilizadores. O Quadro 4.1 descreve os requisitos funcionais prioritários identificados para o protótipo.
 
-\begin{tabela}[htbp]
+\begin{quadro}[htbp]
 \small
 \centering
 \begin{tabular}{|p{1.5cm}|>{\raggedright\arraybackslash}p{4cm}|p{9.5cm}|}
@@ -51,13 +51,13 @@ Os Requisitos Funcionais (RF) definem os serviços que o sistema deve fornecer a
 \hline
 \end{tabular}
 \caption{Quadro 4.1: Requisitos Funcionais do Sistema. Fonte: Elaboração própria.}
-\end{tabela}
+\end{quadro}
 
 #### 4.1.2.2. Requisitos Não Funcionais
 
 Os Requisitos Não Funcionais (RNF) especificam critérios que qualificam o funcionamento do sistema. O Quadro 4.2 apresenta os requisitos não funcionais.
 
-\begin{tabela}[htbp]
+\begin{quadro}[htbp]
 \small
 \centering
 \begin{tabular}{|p{1.5cm}|p{4.5cm}|p{9cm}|}
@@ -76,7 +76,7 @@ Os Requisitos Não Funcionais (RNF) especificam critérios que qualificam o func
 \hline
 \end{tabular}
 \caption{Quadro 4.2: Requisitos Não Funcionais do Sistema. Fonte: Elaboração própria.}
-\end{tabela}
+\end{quadro}
 
 ### 4.1.3. Modelagem do Sistema
 
@@ -167,7 +167,7 @@ Admin --> UC7
 
 A especificação detalhada dos casos de uso principais do sistema fornece uma descrição passo-a-passo das acções executadas pelos actores e as correspondentes reacções do sistema. O Quadro 4.3 especifica o caso de uso principal de Pesquisa Inteligente.
 
-\begin{tabela}[htbp]
+\begin{quadro}[htbp]
 \small
 \centering
 \begin{tabular}{|p{3.5cm}|p{11.5cm}|}
@@ -195,11 +195,11 @@ A especificação detalhada dos casos de uso principais do sistema fornece uma d
 \hline
 \end{tabular}
 \caption{Quadro 4.3: Especificação do Caso de Uso - Consultar Base de Conhecimento (Chat). Fonte: Elaboração própria.}
-\end{tabela}
+\end{quadro}
 
 O Quadro 4.4 descreve a especificação do caso de uso de Upload de Conteúdo e Configuração de Acesso.
 
-\begin{tabela}[htbp]
+\begin{quadro}[htbp]
 \small
 \centering
 \begin{tabular}{|p{3.5cm}|p{11.5cm}|}
@@ -227,7 +227,7 @@ O Quadro 4.4 descreve a especificação do caso de uso de Upload de Conteúdo e 
 \hline
 \end{tabular}
 \caption{Quadro 4.4: Especificação do Caso de Uso - Upload de Conteúdo e Acessos. Fonte: Elaboração própria.}
-\end{tabela}
+\end{quadro}
 
 #### 4.1.3.4. Diagrama de Classes
 
@@ -541,7 +541,7 @@ Rel(n8nApp, chatAPI, "Gera respostas RAG", "REST API")
 
 A stack tecnológica seleccionada para a implementação do protótipo baseia-se em soluções maioritariamente open-source e com baixo custo de entrada operacional, maximizando a viabilidade financeira e a escalabilidade técnica em organizações angolanas.
 
-\begin{tabela}[htbp]
+\begin{quadro}[htbp]
 \small
 \centering
 \begin{tabular}{|p{3cm}|>{\raggedright\arraybackslash}p{3.5cm}|p{8.5cm}|}
@@ -570,7 +570,7 @@ A stack tecnológica seleccionada para a implementação do protótipo baseia-se
 \hline
 \end{tabular}
 \caption{Quadro 4.5: Stack Tecnológica do Sistema. Fonte: Elaboração própria.}
-\end{tabela}
+\end{quadro}
 
 Adicionalmente, os detalhes das \textit{system prompts} utilizadas e as configurações específicas de hiperparâmetros dos modelos Cohere, essenciais para a reprodutibilidade dos resultados, encontram-se detalhados no **Anexo II**.
 
@@ -610,7 +610,7 @@ O Quadro 4.6 apresenta uma selecção das avaliações qualitativas registadas d
 
 A avaliação qualitativa seguiu uma rubrica padronizada: 'Excelente' (o sistema forneceu uma resposta factualmente correcta, suportada pelo contexto e com citação exacta da fonte), 'Parcial' (a resposta é coerente mas omite detalhes do contexto), e 'Nula' (o sistema bloqueia o acesso à informação por restrições de segurança ou o LLM recusa-se a responder por falta de contexto autorizado).
 
-\begin{tabela}[htbp]
+\begin{quadro}[htbp]
 \small
 \centering
 \begin{tabular}{|>{\raggedright\arraybackslash}p{0.8cm}|>{\raggedright\arraybackslash}p{2cm}|>{\raggedright\arraybackslash}p{2.5cm}|>{\raggedright\arraybackslash}p{2.1cm}|>{\raggedright\arraybackslash}p{2.2cm}|>{\raggedright\arraybackslash}p{2.4cm}|>{\raggedright\arraybackslash}p{2.7cm}|}
@@ -627,7 +627,7 @@ A avaliação qualitativa seguiu uma rubrica padronizada: 'Excelente' (o sistema
 \hline
 \end{tabular}
 \caption{Quadro 4.6: Matriz de Testes de Relevância Qualitativa e Segurança. Fonte: Elaboração própria.}
-\end{tabela}
+\end{quadro}
 
 A análise qualitativa das simulações confirma a robustez das políticas de segurança: a base de dados PostgreSQL actua como um guarda-barreiras eficiente, impedindo o envio de dados não-autorizados para o LLM, mitigando significativamente a possibilidade de fuga de informação inter-tenant (dentro do perímetro dos testes realizados) e minimizando alucinações ao limitar o contexto apenas a dados fidedignos e autorizados.
 

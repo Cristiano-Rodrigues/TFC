@@ -5,3 +5,4 @@ chapters/03-procedimentos-metodologicos.md
 chapters/04-resultados.md
 chapters/05-consideracoes-finais.md
 chapters/bibliografia.md
+chapters/06-anexos.md

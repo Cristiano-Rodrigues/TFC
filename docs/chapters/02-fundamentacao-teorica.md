@@ -91,7 +91,7 @@ A representação de um texto em \textit{embedding} vectorial codifica o signifi
 
 \begin{figure}[htbp]
   \makebox[\textwidth][c]{\includegraphics[width=0.7\textwidth]{docs/images/embeddings-concept.png}}
-  \caption{Representação geométrica do conceito de \textit{word embeddings}. A similaridade semântica traduz-se matematicamente num menor ângulo $\theta$ ou menor distância espacial. Fonte: Elaboração própria.}
+  \caption[Representação geométrica do conceito de \textit{word embeddings}.]{Representação geométrica do conceito de \textit{word embeddings}. A similaridade semântica traduz-se matematicamente num menor ângulo $\theta$ ou menor distância espacial. Fonte: Elaboração própria.}
 \end{figure}
 
 Na prática, o protótipo desenvolvido recorre à API da Cohere para a geração de \textit{embeddings}, utilizando o modelo *embed-multilingual-v3.0*, que produz vectores de 1024 dimensões e suporta múltiplas línguas, incluindo o português. Os \textit{embeddings} gerados são armazenados na base de dados PostgreSQL através da extensão pgvector, permitindo a realização de buscas por similaridade vectorial em tempo real.
@@ -110,6 +110,7 @@ O conceito de \textit{Retrieval-Augmented Generation} foi introduzido por @lewis
 
 A arquitectura RAG segue um fluxo de funcionamento universal que pode ser aplicado de forma genérica a qualquer domínio intensivo em conhecimento. Como ilustrado na Figura 2.2, o processo inicia-se quando o utilizador submete uma pergunta. Esta pergunta é convertida numa representação matemática (\textit{embedding} da consulta), que permite ao sistema realizar uma busca por similaridade semântica numa base de dados vectorial. O sistema recupera então os fragmentos de texto (*chunks*) mais relevantes previamente indexados. Por fim, constrói-se um *prompt* enriquecido que combina a pergunta original com o contexto recuperado, instruindo o LLM a gerar uma resposta precisa e fundamentada exclusivamente nas fontes citadas.
 
+::: {.keep-together}
 ```plantuml
 @startuml
 skinparam rectangle {
@@ -135,10 +136,10 @@ prompt -left-> llm
 llm -down-> answer
 @enduml
 ```
-
-\begin{center}
-\captionof{figure}{Fluxo simplificado do funcionamento genérico da arquitectura RAG. Adaptado de Lewis et al. (2020).}
-\end{center}
+```{=latex}
+\caption[Fluxo simplificado do funcionamento genérico da arquitectura RAG.]{Fluxo simplificado do funcionamento genérico da arquitectura RAG. Adaptado de Lewis et al. (2020).}
+```
+:::
 
 ### 2.3.2. Processo de Chunking e Indexação
 
@@ -150,7 +151,7 @@ As estratégias de segmentação mais comuns incluem a divisão por número fixo
 
 \begin{figure}[htbp]
   \makebox[\textwidth][c]{\includegraphics[width=1.0\textwidth]{docs/images/chunking-processo.png}}
-  \caption{Ilustração do processo de chunking com sobreposição (overlap). Fonte: Elaboração própria.}
+  \caption[Ilustração do processo de chunking com sobreposição (overlap).]{Ilustração do processo de chunking com sobreposição (overlap). Fonte: Elaboração própria.}
 \end{figure}
 
 No sistema proposto, o processo de *chunking* é orquestrado pelo workflow n8n, que extrai o texto dos documentos carregados, segmenta-o em unidades coerentes e gera os respectivos \textit{embeddings} através da API da Cohere, armazenando-os na base de dados PostgreSQL com a extensão pgvector.
@@ -191,7 +192,7 @@ O conceito de agente de software constitui um dos pilares da Inteligência Artif
 
 @russellArtificialIntelligenceModern2021 adoptam uma perspectiva centrada no agente racional, definindo-o como uma entidade que percebe o seu ambiente através de sensores e actua sobre ele através de actuadores, de forma a maximizar uma medida de desempenho. Os autores classificam os agentes segundo a sua complexidade interna em cinco tipos: agentes reactivos simples, agentes reactivos baseados em modelo, agentes baseados em objectivos, agentes baseados em utilidade e agentes com aprendizagem. Esta taxonomia é útil para compreender o espectro de capacidades que os agentes podem exibir, desde respostas reflexas simples até comportamentos sofisticados com planeamento e adaptação.
 
-No contexto deste trabalho, adopta-se a concepção fraca de agente proposta por @wooldridgeIntroductionMultiagentSystems2012, definindo operacionalmente um "agente" como um componente de software especializado, orientado a um objectivo específico, que recebe informação de entrada, processa-a segundo regras ou modelos definidos e produz resultados que alimentam outros componentes do sistema. Esta definição não reivindica autonomia no sentido cognitivo forte (crenças, desejos, intenções), mas satisfaz os critérios da concepção fraca: cada componente exibe *autonomia* (executa a sua tarefa sem intervenção humana directa), *reactividade* (responde a eventos do ambiente, como a chegada de um novo documento ou de uma consulta), *pro-actividade* (inicia acções orientadas ao seu objectivo, como segmentar texto ou gerar \textit{embeddings}) e *capacidade social* (comunica resultados a outros agentes do pipeline). Concretamente, os workflows do n8n que compõem o pipeline — ingestão, extracção de texto, segmentação em *chunks*, geração de \textit{embeddings}, indexação vectorial, recuperação semântica e geração de respostas — cumprem estes critérios e constituem, cada um, um agente na acepção aqui adoptada. A plataforma n8n actua como mecanismo de orquestração que coordena a interacção entre estes agentes, configurando, na prática, um Sistema Multiagente reactivo com orquestração centralizada.
+No contexto deste trabalho, adopta-se a concepção fraca de agente proposta por @wooldridgeIntroductionMultiagentSystems2012, considerando-se agente um componente de software especializado, orientado para um objectivo específico, capaz de perceber informação do seu ambiente, tomar decisões relativamente à tarefa que lhe foi atribuída e executar acções através de mecanismos internos ou ferramentas externas. Esta definição não pressupõe autonomia cognitiva forte, nomeadamente crenças, desejos ou intenções, mas requer que o componente possua um grau de autonomia operacional, reactividade e capacidade de interagir com outros componentes do sistema. Com base nesta definição, o sistema proposto distingue os agentes de software da infraestrutura responsável pela sua coordenação. Os agentes são componentes especializados baseados em modelos de linguagem, enquanto a plataforma n8n desempenha a função de orquestrador central, responsável por desencadear os agentes, encaminhar os resultados entre eles e integrar as respectivas ferramentas e serviços externos.
 
 ### 2.4.2. Arquitecturas Multiagentes
 
@@ -328,7 +329,7 @@ Optimização nativa de \textit{Embeddings} para PT & Não & Não & Parcial & N�
 Personalização de Pipelines sem Código & Não & Não & Não & Não & Não & \textbf{Sim} \\
 \hline
 \end{tabular}
-\caption{Quadro 2.1: Comparação entre soluções existentes e o sistema proposto. Fonte: Elaboração própria.}
+\caption[Quadro 2.1: Comparação entre soluções existentes e o sistema proposto.]{Quadro 2.1: Comparação entre soluções existentes e o sistema proposto. Fonte: Elaboração própria.}
 \end{quadro}
 
 A análise comparativa evidencia que o sistema proposto neste trabalho se diferencia das soluções existentes em aspectos fundamentais. O principal factor distintivo da solução proposta reside na personalização de pipelines sem código através do n8n, permitindo total flexibilidade na ingestão e processamento de dados sem necessidade de alterar o código-fonte da aplicação. Adicionalmente, a plataforma é construída maioritariamente sobre componentes open-source e *fair-code* (PostgreSQL, Next.js, Supabase e a plataforma n8n, que adopta uma licença *source-available* com restrições comerciais), complementada por serviços de IA externos (Cohere para \textit{embeddings} e geração via LLM), possibilitando a auto-hospedagem da infra-estrutura nuclear e permitindo que organizações com requisitos de soberania de dados controlem o armazenamento e o processamento local, embora a camada de IA mantenha actualmente uma dependência de APIs proprietárias (opção adoptada essencialmente por motivos financeiros e de limitação de infra-estrutura computacional durante a fase de prototipagem). É, contudo, perfeitamente viável evoluir para uma solução totalmente local sem comprometer os dados e informações organizacionais, através da adopção de modelos de linguagem \textit{open-source} (como Llama ou Mistral) executados \textit{on-premise} na própria infra-estrutura da organização. O sistema oferece também multi-tenancy nativo com isolamento por empresa, permitindo que a mesma instância da plataforma sirva múltiplas organizações. Do ponto de vista linguístico, a utilização de modelos de \textit{embeddings} multilíngues que suportam o português adequa a solução ao contexto angolano.

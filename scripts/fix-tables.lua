@@ -102,7 +102,8 @@ function Table(el)
     if el.caption and el.caption.long and #el.caption.long > 0 then
         local cap_latex = pandoc.write(pandoc.Pandoc(el.caption.long), 'latex')
         cap_latex = cap_latex:gsub("%s+$", "")
-        latex = latex .. "\\caption{" .. cap_latex .. "}\n"
+        local short_cap = cap_latex:gsub("%.?%s*Fonte:.*$", ""):gsub("%s+$", "")
+        latex = latex .. "\\caption[" .. short_cap .. "]{" .. cap_latex .. "}\n"
     end
 
     latex = latex .. "\\end{tabela}\n"

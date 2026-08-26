@@ -22,7 +22,7 @@ No contexto das organizações angolanas, a gestão da informação apresenta de
 
 O Ministério das Telecomunicações, Tecnologias de Informação e Comunicação Social (MTTI) reconhece esta lacuna, sublinhando a necessidade urgente de transição para serviços digitais mais eficientes no seu Livro Branco sobre as TIC [@mttiLivroBrancoTIC2019]. Adicionalmente, @quialaGOVERNOELETRONICOUMA2023 evidenciam que a modernização administrativa em Angola carece de sistemas integrados que superem as barreiras da burocracia documental tradicional. Apesar da evolução global, a Inteligência Artificial é ainda frequentemente percepcionada nestas organizações como uma ferramenta futurista ou inacessível, e não como uma necessidade operacional imediata para a gestão do conhecimento.
 
-Diante deste cenário, a presente investigação estrutura-se em torno da seguinte **pergunta central**: *Como avaliar a viabilidade técnica de um protótipo de sistema de gestão da informação organizacional, baseado em orquestração de inteligência artificial, capaz de centralizar, classificar e facilitar a recuperação de dados em ambientes empresariais angolanos?*
+Diante deste cenário, a presente investigação estrutura-se em torno da seguinte **pergunta central**: *Como avaliar a viabilidade técnica de um protótipo de sistema de gestão da informação organizacional, baseado em agentes de inteligência artificial, capaz de centralizar, classificar e facilitar a recuperação de dados em ambientes empresariais angolanos?*
 
 ## 1.2. Objectivo da Pesquisa
 
@@ -32,8 +32,8 @@ Para alcançar este propósito, definiram-se os seguintes objectivos específico
 
 *   Identificar e caracterizar os principais desafios na gestão da informação no contexto empresarial angolano;
 *   Analisar as soluções tecnológicas existentes para a gestão documental e a recuperação de conhecimento (estado da arte);
-*   Modelar a arquitectura técnica de um sistema baseado em agentes de Inteligência Artificial, desenhando a interacção entre os módulos de ingestão, indexação vectorial e síntese de respostas;
-*   Implementar um protótipo funcional do sistema proposto, assegurando requisitos de segurança, suporte *multi-tenant* e controlo de acessos baseado em papéis (RBAC);
+*   Modelar a arquitectura técnica de um sistema baseado em agentes de Inteligência Artificial, desenhando a interacção entre os agentes especializados responsáveis pela ingestão, indexação vectorial e síntese de respostas;
+*   Implementar um protótipo funcional do sistema proposto, assegurando a colaboração entre agentes especializados, a ingestão autónoma de informação proveniente de fontes organizacionais, o suporte *multi-tenant* e o controlo de acessos baseado em papéis (RBAC);
 *   Avaliar o desempenho do sistema construído, aferindo a relevância qualitativa das respostas geradas e a eficiência temporal na recuperação de informação.
 
 ## 1.3. Justificativa

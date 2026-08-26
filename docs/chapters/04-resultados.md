@@ -50,7 +50,7 @@ Os Requisitos Funcionais (RF) definem os serviços que o sistema deve fornecer a
 \textbf{RF-08} & Gestão de Utilizadores & O administrador deve poder gerir os utilizadores da empresa, associando-os a um departamento e a um cargo específico. \\
 \hline
 \end{tabular}
-\caption{Quadro 4.1: Requisitos Funcionais do Sistema. Fonte: Elaboração própria.}
+\caption[Quadro 4.1: Requisitos Funcionais do Sistema.]{Quadro 4.1: Requisitos Funcionais do Sistema. Fonte: Elaboração própria.}
 \end{quadro}
 
 #### 4.1.2.2. Requisitos Não Funcionais
@@ -75,7 +75,7 @@ Os Requisitos Não Funcionais (RNF) especificam critérios que qualificam o func
 \textbf{RNF-05} & Disponibilidade e Extensibilidade & A lógica de ingestão documental e recuperação RAG deve correr numa infra-estrutura modular externa (n8n), facilitando a adição de novos conectores sem necessidade de recompilar o frontend Next.js. \\
 \hline
 \end{tabular}
-\caption{Quadro 4.2: Requisitos Não Funcionais do Sistema. Fonte: Elaboração própria.}
+\caption[Quadro 4.2: Requisitos Não Funcionais do Sistema.]{Quadro 4.2: Requisitos Não Funcionais do Sistema. Fonte: Elaboração própria.}
 \end{quadro}
 
 ### 4.1.3. Modelação do Sistema
@@ -86,6 +86,7 @@ A modelação gráfica do sistema foi elaborada recorrendo à linguagem UML (*Un
 
 O Diagrama de Contexto define a fronteira entre a aplicação desenvolvida e as entidades ou sistemas externos com os quais interage directamente para assegurar as funcionalidades requeridas.
 
+::: {.keep-together}
 ```plantuml
 @startuml
 skinparam rectangle {
@@ -120,15 +121,16 @@ n8n --> cohere : "Textos para Processamento"
 cohere --> n8n : "Vectores / Respostas"
 @enduml
 ```
-
-\begin{center}
-\captionof{figure}{Diagrama de Contexto do Sistema. Fonte: Elaboração própria.}
-\end{center}
+```{=latex}
+\caption[Diagrama de Contexto do Sistema.]{Diagrama de Contexto do Sistema. Fonte: Elaboração própria.}
+```
+:::
 
 #### 4.1.3.2. Diagrama de Casos de Uso
 
 O Diagrama de Casos de Uso detalha as interacções dos actores principais (Utilizador e Administrador) com o sistema, mapeando o escopo funcional do protótipo desenvolvido.
 
+::: {.keep-together}
 ```plantuml
 @startuml
 left to right direction
@@ -158,10 +160,10 @@ Admin --> UC6
 Admin --> UC7
 @enduml
 ```
-
-\begin{center}
-\captionof{figure}{Diagrama de Casos de Uso do Sistema. Fonte: Elaboração própria.}
-\end{center}
+```{=latex}
+\caption[Diagrama de Casos de Uso do Sistema.]{Diagrama de Casos de Uso do Sistema. Fonte: Elaboração própria.}
+```
+:::
 
 #### 4.1.3.3. Especificação dos Casos de Uso
 
@@ -194,7 +196,7 @@ A especificação detalhada dos casos de uso principais do sistema fornece uma d
 \textbf{Pós-condições:} & A sessão do chat é registada na base de dados e a resposta contendo a referência às fontes é mostrada ao utilizador. \\
 \hline
 \end{tabular}
-\caption{Quadro 4.3: Especificação do Caso de Uso - Consultar Base de Conhecimento (Chat). Fonte: Elaboração própria.}
+\caption[Quadro 4.3: Especificação do Caso de Uso - Consultar Base de Conhecimento (Chat).]{Quadro 4.3: Especificação do Caso de Uso - Consultar Base de Conhecimento (Chat). Fonte: Elaboração própria.}
 \end{quadro}
 
 O Quadro 4.4 descreve a especificação do caso de uso de Upload de Conteúdo e Configuração de Acesso.
@@ -226,13 +228,14 @@ O Quadro 4.4 descreve a especificação do caso de uso de Upload de Conteúdo e 
 \textbf{Pós-condições:} & O conteúdo encontra-se guardado, vectorizado e pronto a ser recuperado em pesquisas semânticas pelas pessoas autorizadas. \\
 \hline
 \end{tabular}
-\caption{Quadro 4.4: Especificação do Caso de Uso - Upload de Conteúdo e Acessos. Fonte: Elaboração própria.}
+\caption[Quadro 4.4: Especificação do Caso de Uso - Upload de Conteúdo e Acessos.]{Quadro 4.4: Especificação do Caso de Uso - Upload de Conteúdo e Acessos. Fonte: Elaboração própria.}
 \end{quadro}
 
 #### 4.1.3.4. Diagrama de Classes
 
 O Diagrama de Classes apresenta a estrutura lógica do sistema ao nível do domínio dos dados, modelando as entidades principais, os seus atributos e os relacionamentos de associação e multiplicidade que sustentam o funcionamento da plataforma.
 
+::: {.keep-together}
 ```plantuml
 @startuml
 class Company {
@@ -319,10 +322,10 @@ Document "*" o-- "*" Department : restrito por DocumentDepartment >
 Document "*" o-- "*" Role : restrito por DocumentPermission >
 @enduml
 ```
-
-\begin{center}
-\captionof{figure}{Diagrama de Classes do Domínio do Sistema. Fonte: Elaboração própria.}
-\end{center}
+```{=latex}
+\caption[Diagrama de Classes do Domínio do Sistema.]{Diagrama de Classes do Domínio do Sistema. Fonte: Elaboração própria.}
+```
+:::
 
 #### 4.1.3.5. Diagrama Entidade-Relacional
 
@@ -330,6 +333,7 @@ O Diagrama Entidade-Relacional (DER) detalha a modelação lógica e física da 
 
 A modelação inclui adicionalmente a chave estrangeira `company_id` na tabela `documents` para impor um isolamento estrito de múltiplos inquilinos (*multi-tenancy*) ao nível relacional, mitigando o risco de vazamento de dados exposto em fases anteriores de teste.
 
+::: {.keep-together}
 ```plantuml
 @startuml
 !define Table(name,desc) entity name as "desc" << (T,#FFAAAA) >>
@@ -450,10 +454,10 @@ documents ||--o{ chunks : "fragmentado em"
 ai_chat_sessions ||--o{ ai_chat_messages : "contém"
 @enduml
 ```
-
-\begin{center}
-\captionof{figure}{Diagrama Entidade-Relacional (DER) da Base de Dados. Fonte: Elaboração própria.}
-\end{center}
+```{=latex}
+\caption[Diagrama Entidade-Relacional (DER) da Base de Dados.]{Diagrama Entidade-Relacional (DER) da Base de Dados. Fonte: Elaboração própria.}
+```
+:::
 
 ### 4.1.4. Qualidade do Software
 
@@ -498,6 +502,7 @@ Para garantir que o agente de inteligência artificial produza respostas formata
 
 A arquitectura do sistema segue um modelo de camadas descentralizado, separando a interface do utilizador, a lógica da aplicação, a base de dados relacional e vectorial, e a orquestração assíncrona dos pipelines de Inteligência Artificial.
 
+::: {.keep-together}
 ```plantuml
 @startuml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
@@ -532,10 +537,10 @@ Rel(n8nApp, rerankAPI, "Re-ranking semântico", "REST API")
 Rel(n8nApp, chatAPI, "Gera respostas RAG", "REST API")
 @enduml
 ```
-
-\begin{center}
-\captionof{figure}{Arquitectura Física e Lógica do Sistema. Fonte: Elaboração própria.}
-\end{center}
+```{=latex}
+\caption[Arquitectura Física e Lógica do Sistema.]{Arquitectura Física e Lógica do Sistema. Fonte: Elaboração própria.}
+```
+:::
 
 #### 4.1.5.4. Ferramentas e Tecnologias Utilizadas
 
@@ -569,7 +574,7 @@ A stack tecnológica seleccionada para a implementação do protótipo baseia-se
 \textbf{Síntese LLM} & Cohere Chat (\texttt{command\-r\-plus\-08\-2024}) & Modelo de linguagem optimizado para tarefas RAG com forte capacidade de raciocínio, formatação estruturada e citação transparente de fontes do contexto. \\
 \hline
 \end{tabular}
-\caption{Quadro 4.5: Stack Tecnológica do Sistema. Fonte: Elaboração própria.}
+\caption[Quadro 4.5: Stack Tecnológica do Sistema.]{Quadro 4.5: Stack Tecnológica do Sistema. Fonte: Elaboração própria.}
 \end{quadro}
 
 Adicionalmente, os detalhes das \textit{system prompts} utilizadas e as configurações específicas de hiperparâmetros dos modelos Cohere, essenciais para a reprodutibilidade dos resultados, encontram-se detalhados no **Anexo II**.
@@ -597,7 +602,7 @@ Os testes de eficiência temporal mediram o tempo de resposta (em segundos) em d
 \textbf{T-06} & Pesquisa Semântica & Consulta de 2 linhas ("Como solicitar reembolso de despesas?") & 2.15 & Sucesso \\
 \hline
 \end{tabular}
-\caption{Tabela 4.1: Resultados dos Testes de Eficiência Temporal com Documentos Empresariais. Fonte: Elaboração própria.}
+\caption[Tabela 4.1: Resultados dos Testes de Eficiência Temporal com Documentos Empresariais.]{Tabela 4.1: Resultados dos Testes de Eficiência Temporal com Documentos Empresariais. Fonte: Elaboração própria.}
 \end{tabela}
 
 Os resultados demonstram que, mesmo com a latência de rede associada à invocação assíncrona de webhooks no n8n e à geração remota de \textit{embeddings} pela API da Cohere, o tempo médio para obter uma resposta inteligente manteve-se confortavelmente abaixo do limiar de 10 segundos definido no requisito **RNF-02**. O requisito RNF-02 aplica-se exclusivamente ao fluxo de consulta semântica e geração de resposta (T-05, T-06). Os testes T-01 a T-04 correspondem ao fluxo de ingestão documental, não abrangido por este requisito.
@@ -626,7 +631,7 @@ A avaliação qualitativa seguiu uma rubrica padronizada: 'Excelente' (o sistema
 \textbf{QA-04} & Operador / Produção / Empresa B & "Como iniciar a máquina X?" & Acede à página Wiki \texttt{Proc\_}\newline\texttt{Maquina\_X} (Produção). & \textbf{Permitido:} Pertence ao departamento do utilizador. & \textbf{Excelente:} Passos descritos de forma coerente. & Sim (\texttt{Proc\_}\newline\texttt{Maquina\_X}) \\
 \hline
 \end{tabular}
-\caption{Quadro 4.6: Matriz de Testes de Relevância Qualitativa e Segurança. Fonte: Elaboração própria.}
+\caption[Quadro 4.6: Matriz de Testes de Relevância Qualitativa e Segurança.]{Quadro 4.6: Matriz de Testes de Relevância Qualitativa e Segurança. Fonte: Elaboração própria.}
 \end{quadro}
 
 A análise qualitativa das simulações fornece evidências preliminares da eficácia das políticas implementadas: nos cenários avaliados, os mecanismos actuaram de forma a não permitir o envio de dados não autorizados para o LLM, nem permitiram o acesso a documentos de outro tenant nem a documentos fora do perímetro de autorização do utilizador, mitigando a possibilidade de fuga de informação inter-tenant e minimizando alucinações ao limitar o contexto apenas a dados autorizados.
@@ -641,7 +646,7 @@ Apresenta um formulário unificado e responsivo com divisão visual (imagem conc
 
 \begin{figure}[htbp]
   \makebox[\textwidth][c]{\includegraphics[width=1.2\textwidth]{docs/images/login.png}}
-  \caption{Ecrã de Autenticação e registo Multi-tenant. Fonte: Elaboração própria.}
+  \caption[Ecrã de Autenticação e registo Multi-tenant.]{Ecrã de Autenticação e registo Multi-tenant. Fonte: Elaboração própria.}
 \end{figure}
 
 ##### b) Painel Administrativo (RBAC e Departamentos)
@@ -650,7 +655,7 @@ Fornece interfaces centralizadas para gestão de acesso relacional. Através des
 
 \begin{figure}[htbp]
   \makebox[\textwidth][c]{\includegraphics[width=1.2\textwidth]{docs/images/administracao.png}}
-  \caption{Interface do Painel Administrativo (RBAC e Departamentos). Fonte: Elaboração própria.}
+  \caption[Interface do Painel Administrativo (RBAC e Departamentos).]{Interface do Painel Administrativo (RBAC e Departamentos). Fonte: Elaboração própria.}
 \end{figure}
 
 ##### c) Módulo de Gestão Documental e Upload
@@ -661,14 +666,14 @@ O módulo de documentos subdivide-se no ecossistema de carregamento e na tabela 
 
 \begin{figure}[htbp]
   \makebox[\textwidth][c]{\includegraphics[width=1.2\textwidth]{docs/images/upload-arquivos.png}}
-  \caption{Módulo de Carregamento de Documentos (\textit{Drag-and-Drop}). Fonte: Elaboração própria.}
+  \caption[Módulo de Carregamento de Documentos (\textit{Drag-and-Drop}).]{Módulo de Carregamento de Documentos (\textit{Drag-and-Drop}). Fonte: Elaboração própria.}
 \end{figure}
 
 *   **Tabela de Base Documental:** Exibe o repositório centralizado de ficheiros da organização, listando metadados como tamanho, departamento associado, data de criação e o estado de conversão e vectorização em tempo real (`pending`, `processed`, `error`).
 
 \begin{figure}[htbp]
   \makebox[\textwidth][c]{\includegraphics[width=1.2\textwidth]{docs/images/base-documental.png}}
-  \caption{Tabela da Base Documental Organizacional. Fonte: Elaboração própria.}
+  \caption[Tabela da Base Documental Organizacional.]{Tabela da Base Documental Organizacional. Fonte: Elaboração própria.}
 \end{figure}
 
 ##### d) Módulo de Wiki Corporativa
@@ -677,7 +682,7 @@ Consiste num editor de texto incorporado directamente na plataforma. Permite aos
 
 \begin{figure}[htbp]
   \makebox[\textwidth][c]{\includegraphics[width=1.2\textwidth]{docs/images/wiki.png}}
-  \caption{Módulo de Wiki e Edição de Conteúdo Interno. Fonte: Elaboração própria.}
+  \caption[Módulo de Wiki e Edição de Conteúdo Interno.]{Módulo de Wiki e Edição de Conteúdo Interno. Fonte: Elaboração própria.}
 \end{figure}
 
 ##### e) Interface de Chat IA (Pesquisa Inteligente)
@@ -686,7 +691,7 @@ Representa a interface principal de interacção do utilizador com o agente de i
 
 \begin{figure}[htbp]
   \makebox[\textwidth][c]{\includegraphics[width=1.2\textwidth]{docs/images/chat-ia.png}}
-  \caption{Interface de Pesquisa Inteligente e Inspeção de Fontes Bibliográficas. Fonte: Elaboração própria.}
+  \caption[Interface de Pesquisa Inteligente e Inspeção de Fontes Bibliográficas.]{Interface de Pesquisa Inteligente e Inspeção de Fontes Bibliográficas. Fonte: Elaboração própria.}
 \end{figure}
 
 #### 4.1.5.7. Codificação

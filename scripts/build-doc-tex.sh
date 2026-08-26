@@ -23,6 +23,6 @@ pandoc $FILES \
   -V fontsize=12pt \
   -V linestretch=1.5 \
   -V geometry:top=2.5cm,bottom=2.5cm,right=2.5cm,left=3.5cm,headsep=1.5cm,headheight=15pt \
-  -o $OUTPUT
+  -o dist/output.tex
 
 echo "Document successfully generated in $OUTPUT"

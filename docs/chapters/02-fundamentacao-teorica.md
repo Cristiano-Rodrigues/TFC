@@ -301,9 +301,9 @@ No mercado actual, diversas soluções abordam parcialmente o problema da gestã
 
 Apresenta-se uma análise comparativa entre as soluções existentes e o sistema proposto neste trabalho. Os critérios de comparação foram seleccionados com base nas dimensões técnicas mais relevantes para o contexto organizacional angolano, nomeadamente o custo de entrada, o suporte linguístico, a granularidade do controlo de acessos e a capacidade de auto-hospedagem. O Quadro 2.1 sintetiza estas diferenças fundamentais.
 
-\begin{quadro}[htbp]
+\begin{quadro}[!htbp]
+\caption[Quadro 2.1: Comparação entre soluções existentes e o sistema proposto.]{Quadro 2.1: Comparação entre soluções existentes e o sistema proposto. Fonte: Elaboração própria.}
 \small
-\centering
 \begin{tabular}{|p{3cm}|p{1.6cm}|p{1.7cm}|p{1.5cm}|p{1.5cm}|p{1.5cm}|p{2.5cm}|}
 \hline
 \textbf{Critério} & \textbf{SharePoint} & \textbf{Confluence} & \textbf{Notion AI} & \textbf{Glean} & \textbf{Danswer} & \textbf{Sistema Proposto} \\
@@ -329,7 +329,6 @@ Optimização nativa de \textit{Embeddings} para PT & Não & Não & Parcial & N�
 \textbf{Autonomia Multiagente} & Não & Não & Não & Não & Não & \textbf{Sim} \\
 \hline
 \end{tabular}
-\caption[Quadro 2.1: Comparação entre soluções existentes e o sistema proposto.]{Quadro 2.1: Comparação entre soluções existentes e o sistema proposto. Fonte: Elaboração própria.}
 \end{quadro}
 
 A análise comparativa evidencia que o sistema proposto neste trabalho se diferencia das soluções existentes em aspectos fundamentais. O principal factor distintivo da solução proposta reside na adopção de uma arquitectura baseada em autonomia multiagente, delegando a avaliação, estruturação e raciocínio crítico a agentes especializados coordenados pelo orquestrador, permitindo total flexibilidade na ingestão inteligente de dados sem necessidade de intervenção humana constante. Adicionalmente, a plataforma é construída maioritariamente sobre componentes open-source e *fair-code* (PostgreSQL, Next.js, Supabase e a plataforma n8n, que adopta uma licença *source-available* com restrições comerciais), complementada por serviços de IA externos (Cohere para \textit{embeddings} e geração via LLM), possibilitando a auto-hospedagem da infra-estrutura nuclear e permitindo que organizações com requisitos de soberania de dados controlem o armazenamento e o processamento local, embora a camada de IA mantenha actualmente uma dependência de APIs proprietárias (opção adoptada essencialmente por motivos financeiros e de limitação de infra-estrutura computacional durante a fase de prototipagem). É, contudo, perfeitamente viável evoluir para uma solução totalmente local sem comprometer os dados e informações organizacionais, através da adopção de modelos de linguagem \textit{open-source} (como Llama ou Mistral) executados \textit{on-premise} na própria infra-estrutura da organização. O sistema oferece também multi-tenancy nativo, permitindo que a mesma instância da plataforma sirva múltiplas organizações. Do ponto de vista linguístico, a utilização de modelos de \textit{embeddings} multilíngues que suportam o português adequa a solução ao contexto angolano.

@@ -14,7 +14,8 @@
 {\Large \textbf{SISTEMA DE GESTÃO DA INFORMAÇÃO ORGANIZACIONAL BASEADO EM AGENTES DE INTELIGÊNCIA ARTIFICIAL PARA ORGANIZAÇÕES ANGOLANAS}}
 
 \vspace{4cm}
-{\large \textbf{CRISTIANO VLADMIR RODRIGUES}}
+{\large \textbf{CRISTIANO VLADMIR RODRIGUES}}\\[0.5cm]
+\textbf{Orientador:} Msc. Lírio Ramalheira
 
 \vfill
 {\large \textbf{Luanda, 2026}}

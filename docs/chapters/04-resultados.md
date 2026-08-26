@@ -26,9 +26,9 @@ A especificação dos requisitos seguiu a norma ISO/IEC 25010 para a qualidade d
 
 Os Requisitos Funcionais (RF) definem os serviços que o sistema deve fornecer aos utilizadores. O Quadro 4.1 descreve os requisitos funcionais prioritários identificados para o protótipo.
 
-\begin{quadro}[htbp]
+\begin{quadro}[!htbp]
+\caption[Quadro 4.1: Requisitos Funcionais do Sistema.]{Quadro 4.1: Requisitos Funcionais do Sistema. Fonte: Elaboração própria.}
 \small
-\centering
 \begin{tabular}{|p{1.5cm}|>{\raggedright\arraybackslash}p{4cm}|p{9.5cm}|}
 \hline
 \textbf{ID} & \textbf{Requisito Funcional} & \textbf{Descrição} \\
@@ -56,16 +56,15 @@ Os Requisitos Funcionais (RF) definem os serviços que o sistema deve fornecer a
 \textbf{RF-11} & Validação de Conhecimento & O sistema deve permitir que um agente determine se a informação extraída deve ser criada, actualizada, rejeitada ou encaminhada para revisão. \\
 \hline
 \end{tabular}
-\caption[Quadro 4.1: Requisitos Funcionais do Sistema.]{Quadro 4.1: Requisitos Funcionais do Sistema. Fonte: Elaboração própria.}
 \end{quadro}
 
 #### 4.1.2.2. Requisitos Não Funcionais
 
 Os Requisitos Não Funcionais (RNF) especificam critérios que qualificam o funcionamento do sistema. O Quadro 4.2 apresenta os requisitos não funcionais.
 
-\begin{quadro}[htbp]
+\begin{quadro}[!htbp]
+\caption[Quadro 4.2: Requisitos Não Funcionais do Sistema.]{Quadro 4.2: Requisitos Não Funcionais do Sistema. Fonte: Elaboração própria.}
 \small
-\centering
 \begin{tabular}{|p{1.5cm}|p{4.5cm}|p{9cm}|}
 \hline
 \textbf{ID} & \textbf{Categoria} & \textbf{Descrição} \\
@@ -81,7 +80,6 @@ Os Requisitos Não Funcionais (RNF) especificam critérios que qualificam o func
 \textbf{RNF-05} & Disponibilidade e Extensibilidade & A lógica de ingestão documental e recuperação RAG deve correr numa infra-estrutura modular externa (n8n), facilitando a adição de novos conectores sem necessidade de recompilar o frontend Next.js. \\
 \hline
 \end{tabular}
-\caption[Quadro 4.2: Requisitos Não Funcionais do Sistema.]{Quadro 4.2: Requisitos Não Funcionais do Sistema. Fonte: Elaboração própria.}
 \end{quadro}
 
 ### 4.1.3. Modelação do Sistema
@@ -175,9 +173,9 @@ Admin --> UC7
 
 A especificação detalhada dos casos de uso principais do sistema fornece uma descrição passo-a-passo das acções executadas pelos actores e as correspondentes reacções do sistema. O Quadro 4.3 especifica o caso de uso principal de Pesquisa Inteligente.
 
-\begin{quadro}[htbp]
+\begin{quadro}[!htbp]
+\caption[Quadro 4.3: Especificação do Caso de Uso - Consultar Base de Conhecimento (Chat).]{Quadro 4.3: Especificação do Caso de Uso - Consultar Base de Conhecimento (Chat). Fonte: Elaboração própria.}
 \small
-\centering
 \begin{tabular}{|p{3.5cm}|p{11.5cm}|}
 \hline
 \textbf{Campo} & \textbf{Descrição} \\
@@ -202,14 +200,13 @@ A especificação detalhada dos casos de uso principais do sistema fornece uma d
 \textbf{Pós-condições:} & A sessão do chat é registada na base de dados e a resposta contendo a referência às fontes é mostrada ao utilizador. \\
 \hline
 \end{tabular}
-\caption[Quadro 4.3: Especificação do Caso de Uso - Consultar Base de Conhecimento (Chat).]{Quadro 4.3: Especificação do Caso de Uso - Consultar Base de Conhecimento (Chat). Fonte: Elaboração própria.}
 \end{quadro}
 
 O Quadro 4.4 descreve a especificação do caso de uso de Upload de Conteúdo e Configuração de Acesso.
 
-\begin{quadro}[htbp]
+\begin{quadro}[!htbp]
+\caption[Quadro 4.4: Especificação do Caso de Uso - Upload de Conteúdo e Acessos.]{Quadro 4.4: Especificação do Caso de Uso - Upload de Conteúdo e Acessos. Fonte: Elaboração própria.}
 \small
-\centering
 \begin{tabular}{|p{3.5cm}|p{11.5cm}|}
 \hline
 \textbf{Campo} & \textbf{Descrição} \\
@@ -234,14 +231,13 @@ O Quadro 4.4 descreve a especificação do caso de uso de Upload de Conteúdo e 
 \textbf{Pós-condições:} & O conteúdo encontra-se guardado, vectorizado e pronto a ser recuperado em pesquisas semânticas pelas pessoas autorizadas. \\
 \hline
 \end{tabular}
-\caption[Quadro 4.4: Especificação do Caso de Uso - Upload de Conteúdo e Acessos.]{Quadro 4.4: Especificação do Caso de Uso - Upload de Conteúdo e Acessos. Fonte: Elaboração própria.}
 \end{quadro}
 
 O Quadro 4.5 descreve o caso de uso de extracção autónoma de conhecimento a partir de um canal de comunicação corporativa.
 
-\begin{quadro}[htbp]
+\begin{quadro}[!htbp]
+\caption[Quadro 4.5: Especificação do Caso de Uso - Extrair Conhecimento de Canal de Comunicação.]{Quadro 4.5: Especificação do Caso de Uso - Extrair Conhecimento de Canal. Fonte: Elaboração própria.}
 \small
-\centering
 \begin{tabular}{|p{3.5cm}|p{11.5cm}|}
 \hline
 \textbf{Campo} & \textbf{Descrição} \\
@@ -270,7 +266,6 @@ O Quadro 4.5 descreve o caso de uso de extracção autónoma de conhecimento a p
 \textbf{Pós-condições:} & O património informacional da organização é enriquecido, de forma estruturada e em tempo real, sem necessidade de entrada manual de dados. \\
 \hline
 \end{tabular}
-\caption[Quadro 4.5: Especificação do Caso de Uso - Extrair Conhecimento de Canal de Comunicação.]{Quadro 4.5: Especificação do Caso de Uso - Extrair Conhecimento de Canal. Fonte: Elaboração própria.}
 \end{quadro}
 
 #### 4.1.3.4. Diagrama de Classes
@@ -608,9 +603,9 @@ Rel(agentSearch, reactUI, "Gera resposta RAG", "HTTPS")
 
 A stack tecnológica seleccionada para a implementação do protótipo baseia-se em soluções maioritariamente open-source e com baixo custo de entrada operacional, maximizando a viabilidade financeira e a escalabilidade técnica em organizações angolanas.
 
-\begin{quadro}[htbp]
+\begin{quadro}[!htbp]
+\caption[Quadro 4.6: Stack Tecnológica do Sistema.]{Quadro 4.6: Stack Tecnológica do Sistema. Fonte: Elaboração própria.}
 \small
-\centering
 \begin{tabular}{|p{3cm}|>{\raggedright\arraybackslash}p{3.5cm}|p{8.5cm}|}
 \hline
 \textbf{Camada} & \textbf{Tecnologia / Serviço} & \textbf{Papel e Justificação da Escolha} \\
@@ -638,7 +633,6 @@ A stack tecnológica seleccionada para a implementação do protótipo baseia-se
 \textbf{Síntese LLM} & Cohere Chat (\texttt{command\-r\-plus\-08\-2024}) & Modelo de linguagem optimizado para tarefas RAG com forte capacidade de raciocínio, formatação estruturada e citação transparente de fontes do contexto. \\
 \hline
 \end{tabular}
-\caption[Quadro 4.5: Stack Tecnológica do Sistema.]{Quadro 4.5: Stack Tecnológica do Sistema. Fonte: Elaboração própria.}
 \end{quadro}
 
 Adicionalmente, os detalhes das \textit{system prompts} utilizadas e as configurações específicas de hiperparâmetros dos modelos Cohere, essenciais para a reprodutibilidade dos resultados, encontram-se detalhados no **Anexo II**.
@@ -647,9 +641,10 @@ Adicionalmente, os detalhes das \textit{system prompts} utilizadas e as configur
 
 Os testes do protótipo focaram-se em validar duas dimensões fundamentais estabelecidas na metodologia de investigação reformulada: a eficiência temporal na execução dos pipelines RAG e a relevância qualitativa das respostas geradas pelo LLM sob as restrições impostas pelas regras de controlo de acessos.
 
-Para assegurar a reprodutibilidade e a correcta interpretação dos resultados, o Quadro 4.6 detalha as especificações do ambiente de execução e da máquina onde as simulações foram executadas, permitindo aos leitores contextualizar o desempenho técnico alcançado.
+Para assegurar a reprodutibilidade e a correcta interpretação dos resultados, o Quadro 4.7 detalha as especificações do ambiente de execução e da máquina onde as simulações foram executadas, permitindo aos leitores contextualizar o desempenho técnico alcançado.
 
-\begin{quadro}[htbp]
+\begin{quadro}[!htbp]
+\caption[Quadro 4.7: Especificações do Ambiente de Testes.]{Quadro 4.7: Especificações do Ambiente de Testes. Fonte: Elaboração própria.}
 \small
 \begin{tabular}{|>{\raggedright\arraybackslash}p{4.5cm}|p{8.5cm}|}
 \hline
@@ -672,16 +667,15 @@ Embeddings & Cohere \\
 Processamento LLM & API externa \\
 \hline
 \end{tabular}
-\caption[Quadro 4.6: Especificações do Ambiente de Testes.]{Quadro 4.6: Especificações do Ambiente de Testes. Fonte: Elaboração própria.}
 \end{quadro}
 
 ##### A. Testes de Eficiência Temporal
 
 Os testes de eficiência temporal mediram o tempo de resposta (em segundos) em dois fluxos essenciais: a ingestão documental assíncrona (do upload até à inserção vectorial) e a recuperação em tempo real de informação (da submissão da pergunta à síntese final da resposta). Os dados foram recolhidos num ambiente de teste com ligação de rede simétrica padrão, utilizando ficheiros de texto e PDFs de dimensões variadas provenientes de publicações e documentos empresariais públicos reais (simulando, assim, a realidade corporativa autêntica de empresas públicas e privadas). Os resultados das simulações encontram-se sumarizados na Tabela 4.1. Para garantir a fiabilidade dos dados, cada operação foi executada em 10 iterações independentes, sendo o valor reportado na Tabela 4.1 correspondente à média aritmética dos tempos de resposta obtidos, atenuando assim flutuações pontuais de latência da rede.
 
-\begin{tabela}[htbp]
+\begin{tabela}[!htbp]
+\caption[Tabela 4.1: Resultados dos Testes de Eficiência Temporal com Documentos Empresariais.]{Tabela 4.1: Resultados dos Testes de Eficiência Temporal com Documentos Empresariais. Fonte: Elaboração própria.}
 \small
-\centering
 \begin{tabular}{p{1cm} p{3.5cm} p{5.5cm} c c}
 \hline
 \textbf{ID} & \textbf{Operação Realizada} & \textbf{Descrição da Carga de Teste} & \textbf{Tempo Médio (s)} & \textbf{Resultado} \\
@@ -694,7 +688,6 @@ Os testes de eficiência temporal mediram o tempo de resposta (em segundos) em d
 \textbf{T-06} & Pesquisa Semântica & Consulta de 2 linhas ("Como solicitar reembolso de despesas?") & 2.15 & Sucesso \\
 \hline
 \end{tabular}
-\caption[Tabela 4.1: Resultados dos Testes de Eficiência Temporal com Documentos Empresariais.]{Tabela 4.1: Resultados dos Testes de Eficiência Temporal com Documentos Empresariais. Fonte: Elaboração própria.}
 \end{tabela}
 
 Os resultados demonstram que, mesmo com a latência de rede associada à invocação assíncrona de webhooks no n8n e à geração remota de \textit{embeddings} pela API da Cohere, o tempo médio para obter uma resposta inteligente manteve-se confortavelmente abaixo do limiar de 10 segundos definido no requisito **RNF-02**. O requisito RNF-02 aplica-se exclusivamente ao fluxo de consulta semântica e geração de resposta (T-05, T-06). Os testes T-01 a T-04 correspondem ao fluxo de ingestão documental, não abrangido por este requisito.
@@ -703,13 +696,13 @@ Os resultados demonstram que, mesmo com a latência de rede associada à invoca�
 
 Para atestar a eficácia do isolamento multi-tenant e das restrições de visibilidade por departamento e cargo, foi executado um conjunto de simulações com perfis de utilizadores fictícios pertencentes a organizações distintas. O critério de sucesso consistia em verificar se a resposta gerada pelo LLM era qualitativamente correcta, se citava a fonte devida e se respeitava o perímetro de segurança.
 
-O Quadro 4.7 apresenta uma selecção das avaliações qualitativas registadas durante as sessões de teste.
+O Quadro 4.8 apresenta uma selecção das avaliações qualitativas registadas durante as sessões de teste.
 
 A avaliação qualitativa seguiu uma rubrica padronizada: 'Excelente' (o sistema forneceu uma resposta factualmente correcta, suportada pelo contexto e com citação exacta da fonte), 'Parcial' (a resposta é coerente mas omite detalhes do contexto), e 'Nula' (o sistema bloqueia o acesso à informação por restrições de segurança ou o LLM recusa-se a responder por falta de contexto autorizado).
 
-\begin{quadro}[htbp]
+\begin{quadro}[!htbp]
+\caption[Quadro 4.8: Matriz de Testes de Relevância Qualitativa e Segurança.]{Quadro 4.8: Matriz de Testes de Relevância Qualitativa e Segurança. Fonte: Elaboração própria.}
 \small
-\centering
 \begin{tabular}{|>{\raggedright\arraybackslash}p{0.8cm}|>{\raggedright\arraybackslash}p{2cm}|>{\raggedright\arraybackslash}p{2.5cm}|>{\raggedright\arraybackslash}p{2.1cm}|>{\raggedright\arraybackslash}p{2.2cm}|>{\raggedright\arraybackslash}p{2.4cm}|>{\raggedright\arraybackslash}p{2.7cm}|}
 \hline
 \textbf{ID} & \textbf{Perfil Utilizador} & \textbf{Pergunta Submetida} & \textbf{Contexto Esperado} & \textbf{Filtro de Segurança} & \textbf{Relevância Qualitativa} & \textbf{Citação de Fontes} \\
@@ -723,7 +716,6 @@ A avaliação qualitativa seguiu uma rubrica padronizada: 'Excelente' (o sistema
 \textbf{QA-04} & Operador / Produção / Empresa B & "Como iniciar a máquina X?" & Acede à página Wiki \texttt{Proc\_}\newline\texttt{Maquina\_X} (Produção). & \textbf{Permitido:} Pertence ao departamento do utilizador. & \textbf{Excelente:} Passos descritos de forma coerente. & Sim (\texttt{Proc\_}\newline\texttt{Maquina\_X}) \\
 \hline
 \end{tabular}
-\caption[Quadro 4.7: Matriz de Testes de Relevância Qualitativa e Segurança.]{Quadro 4.7: Matriz de Testes de Relevância Qualitativa e Segurança. Fonte: Elaboração própria.}
 \end{quadro}
 
 A análise qualitativa das simulações fornece evidências preliminares da eficácia das políticas implementadas: nos cenários avaliados, os mecanismos actuaram de forma a não permitir o envio de dados não autorizados para o LLM, nem permitiram o acesso a documentos de outro *tenant* nem a documentos fora do perímetro de autorização do utilizador, mitigando a possibilidade de fuga de informação inter-tenant e minimizando alucinações ao limitar o contexto apenas a dados autorizados.

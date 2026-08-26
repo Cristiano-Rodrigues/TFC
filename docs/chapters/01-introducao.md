@@ -32,7 +32,7 @@ Para alcançar este propósito, definiram-se os seguintes objectivos específico
 
 *   Identificar e caracterizar os principais desafios na gestão da informação no contexto empresarial angolano;
 *   Analisar as soluções tecnológicas existentes para a gestão documental e a recuperação de conhecimento (estado da arte);
-*   Modelar a arquitectura técnica de um sistema baseado em agentes de Inteligência Artificial, desenhando a interacção entre os agentes especializados responsáveis pela ingestão, indexação vectorial e síntese de respostas;
+*   Modelar a arquitectura técnica de um sistema baseado em agentes de Inteligência Artificial, definindo a interacção entre agentes especializados responsáveis pela ingestão, análise, estruturação e recuperação da informação organizacional;
 *   Implementar um protótipo funcional do sistema proposto, assegurando a colaboração entre agentes especializados, a ingestão autónoma de informação proveniente de fontes organizacionais, o suporte *multi-tenant* e o controlo de acessos baseado em papéis (RBAC);
 *   Avaliar o desempenho do sistema construído, aferindo a relevância qualitativa das respostas geradas e a eficiência temporal na recuperação de informação.
 

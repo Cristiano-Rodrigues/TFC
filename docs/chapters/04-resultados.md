@@ -49,6 +49,12 @@ Os Requisitos Funcionais (RF) definem os serviços que o sistema deve fornecer a
 \hline
 \textbf{RF-08} & Gestão de Utilizadores & O administrador deve poder gerir os utilizadores da empresa, associando-os a um departamento e a um cargo específico. \\
 \hline
+\textbf{RF-09} & Ingestão Autónoma de Informação & O sistema deve permitir que agentes de IA analisem mensagens provenientes de canais organizacionais e identifiquem conteúdos relevantes para a base de conhecimento. \\
+\hline
+\textbf{RF-10} & Estruturação Autónoma & O sistema deve transformar automaticamente informação relevante em conhecimento estruturado, preservando origem, categoria e metadados. \\
+\hline
+\textbf{RF-11} & Validação de Conhecimento & O sistema deve permitir que um agente determine se a informação extraída deve ser criada, actualizada, rejeitada ou encaminhada para revisão. \\
+\hline
 \end{tabular}
 \caption[Quadro 4.1: Requisitos Funcionais do Sistema.]{Quadro 4.1: Requisitos Funcionais do Sistema. Fonte: Elaboração própria.}
 \end{quadro}
@@ -229,6 +235,42 @@ O Quadro 4.4 descreve a especificação do caso de uso de Upload de Conteúdo e 
 \hline
 \end{tabular}
 \caption[Quadro 4.4: Especificação do Caso de Uso - Upload de Conteúdo e Acessos.]{Quadro 4.4: Especificação do Caso de Uso - Upload de Conteúdo e Acessos. Fonte: Elaboração própria.}
+\end{quadro}
+
+O Quadro 4.5 descreve o caso de uso de extracção autónoma de conhecimento a partir de um canal de comunicação corporativa.
+
+\begin{quadro}[htbp]
+\small
+\centering
+\begin{tabular}{|p{3.5cm}|p{11.5cm}|}
+\hline
+\textbf{Campo} & \textbf{Descrição} \\
+\hline
+\textbf{Caso de Uso:} & UC4 — Extrair Conhecimento de Canal de Comunicação \\
+\hline
+\textbf{Actor Principal:} & Agente de IA / Orquestrador (processo de \textit{background}) \\
+\hline
+\textbf{Pré-condições:} & Canal de comunicação corporativa integrado (via \textit{webhook} ou escuta activa) com o sistema. \\
+\hline
+\textbf{Fluxo Principal:} & 
+1. Uma nova mensagem corporativa é recebida no canal monitorizado. \newline
+2. A plataforma de orquestração captura o evento e activa o agente de extracção. \newline
+3. O agente avalia a mensagem e decide se possui relevância e validade como conhecimento organizacional (filtrando o ruído). \newline
+4. A informação considerada relevante transita para a etapa de estruturação. \newline
+5. O agente produz uma representação estruturada do conhecimento, mantendo a origem, categoria e outros metadados. \newline
+6. O agente de validação acede à base de conhecimento existente e compara a nova informação. \newline
+7. O agente decide, com base nas regras estabelecidas, se deve criar um novo registo, actualizar um existente ou rejeitar a informação (ex. contraditória). \newline
+8. A informação aprovada é submetida à tabela \texttt{documents} com a devida fonte. \newline
+9. O pipeline orquestrado encarrega-se da geração de \textit{chunks} e \textit{embeddings}. \newline
+10. O conteúdo inserido torna-se imediatamente disponível para as rotinas de pesquisa (RAG) da organização. \\
+\hline
+\textbf{Fluxo Alternativo:} & \textbf{3a. Mensagem Irrelevante:} Se o agente classificar a mensagem como irrelevante (ex: saudações triviais), o processamento é cancelado e nenhuma acção é tomada. \newline
+\textbf{7a. Conflito Crítico:} Se a nova informação contradizer criticamente um dado existente verificado, o agente encaminha a informação para um fluxo de revisão humana (estado \texttt{needs\_review}). \\
+\hline
+\textbf{Pós-condições:} & O património informacional da organização é enriquecido, de forma estruturada e em tempo real, sem necessidade de entrada manual de dados. \\
+\hline
+\end{tabular}
+\caption[Quadro 4.5: Especificação do Caso de Uso - Extrair Conhecimento de Canal de Comunicação.]{Quadro 4.5: Especificação do Caso de Uso - Extrair Conhecimento de Canal. Fonte: Elaboração própria.}
 \end{quadro}
 
 #### 4.1.3.4. Diagrama de Classes
@@ -485,7 +527,7 @@ O escopo do protótipo desenvolvido delimita as fronteiras da prova de conceito,
 
 #### 4.1.5.2. Descrição dos Módulos
 
-O protótipo divide-se em oito módulos funcionais interligados:
+O protótipo divide-se em nove módulos funcionais e lógicos interligados:
 
 1.  **Módulo de Login e registo:** Responsável pela autenticação e criação de novos tenants. Garante que cada utilizador é associado de forma unívoca à empresa criada, gerando o contexto relacional do utilizador na sessão.
 2.  **Módulo de Dashboard:** Apresenta indicadores consolidados da organização, tais como volume de documentos processados, quantidade de utilizadores activos por departamento e estatísticas básicas de utilização do chat.
@@ -495,46 +537,66 @@ O protótipo divide-se em oito módulos funcionais interligados:
 6.  **Módulo de Wiki (Base de Conhecimento):** Permite aos utilizadores criarem páginas de documentação textual interna directamente no browser. O texto introduzido é guardado na tabela `documents` com a flag `source_type = 'wiki'`, integrando de imediato o pipeline de indexação vectorial.
 7.  **Módulo de Cargos e Permissões:** Permite ao utilizador administrador criar perfis internos de permissões e atribuir cargos aos colaboradores, assegurando a flexibilidade de papéis do RBAC.
 8.  **Módulo de Departamentos:** CRUD de departamentos internos para agrupar logicamente utilizadores e delimitar os ecrãs e documentos que podem ser consultados por equipa.
+9.  **Módulo de Agentes de Gestão do Conhecimento:** Trata-se de um módulo lógico (sem interface directa associada) constituído pelos agentes especializados (baseados em LLMs e *tool use*). A sua responsabilidade centra-se na análise, avaliação de relevância, estruturação e validação autónoma da informação organizacional proveniente de múltiplas fontes, colaborando em conjunto para assegurar a coesão da base de conhecimento gerada.
 
 Para garantir que o agente de inteligência artificial produza respostas formatadas e estritamente alinhadas ao contexto empresarial das fontes, foram desenvolvidas instruções de sistema (*system prompts*) especializadas e parametrizadas as configurações chave do modelo. O detalhe destes *prompts* e a configuração dos parâmetros mais importantes encontram-se documentados no **Anexo II**.
 
 #### 4.1.5.3. Arquitectura Física e Lógica do Sistema
 
-A arquitectura do sistema segue um modelo de camadas descentralizado, separando a interface do utilizador, a lógica da aplicação, a base de dados relacional e vectorial, e a orquestração assíncrona dos pipelines de Inteligência Artificial.
+A arquitectura do sistema baseia-se num modelo descentralizado organizado estruturalmente em cinco camadas: (1) Fontes organizacionais (documentos PDF, Wiki e canais de conversação), (2) Orquestração (n8n), (3) Agentes especializados, (4) Base de conhecimento (tabela \texttt{documents}, \textit{chunks} e \textit{embeddings} no PostgreSQL) e (5) Pipeline RAG e interface do utilizador. Nesta configuração, os agentes de IA especializados colaboram entre si para processar a informação, enquanto a plataforma n8n coordena e encaminha exclusivamente os fluxos assíncronos de dados. O mecanismo de RAG, posteriormente acedido pela interface web, consome estritamente a base de conhecimento estruturada e produzida pela acção dos agentes.
 
 ::: {.keep-together}
 ```plantuml
 @startuml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
-Person(browser, "Navegador Web", "Acedido pelo Utilizador")
-
-System_Boundary(c1, "Sistema RAG Multi-Tenant") {
-    Container(reactUI, "Interface React / Next.js 15", "Next.js App Router", "Fornece interface de utilizador via HTTPS")
-    Container(nextServer, "Servidor Next.js Node.js", "Next.js API", "Gere autenticação JWT, CRUD e proxy")
-    Container(n8nApp, "n8n Workflow Engine", "Plataforma Visual", "Orquestra pipelines RAG assíncronos")
-    ContainerDb(database, "PostgreSQL DB", "Supabase", "Base de dados relacional e RLS")
-    ContainerDb(vectorDb, "PostgreSQL pgvector", "Extensão", "Armazena vectores \textit{embeddings}")
-    ContainerDb(storage, "Supabase Storage", "Bucket", "Armazena documentos")
+System_Boundary(layer1, "1. Fontes Organizacionais") {
+    Container(docs, "PDF / TXT", "Ficheiros", "Upload documental")
+    Container(wiki, "Wiki", "Texto", "Redação manual")
+    Container(chat_src, "Canais de Comunicação", "Mensagens", "Webhooks")
 }
 
-System_Ext(embedAPI, "Cohere \textit{Embeddings} API", "Serviço IA")
-System_Ext(rerankAPI, "Cohere Rerank API", "Serviço IA")
-System_Ext(chatAPI, "Cohere Chat LLM API", "Serviço IA")
+System_Boundary(layer2, "2. Orquestração") {
+    Container(n8nApp, "n8n Workflow Engine", "Plataforma", "Coordena fluxos de eventos")
+}
+
+System_Boundary(layer3, "3. Agentes Especializados") {
+    Container(agentExtract, "Agente de Extracção", "LLM", "Analisa e estrutura dados")
+    Container(agentValidate, "Agente de Validação", "LLM", "Decide criar/actualizar/rejeitar")
+    Container(agentSearch, "Agente de Resposta", "LLM", "Sintetiza respostas")
+}
+
+System_Boundary(layer4, "4. Base de Conhecimento") {
+    ContainerDb(database, "PostgreSQL DB", "Supabase", "Tabela documents e RLS")
+    ContainerDb(vectorDb, "PostgreSQL pgvector", "Extensão", "Armazena vectores embeddings")
+    ContainerDb(storage, "Supabase Storage", "Bucket", "Armazena binários")
+}
+
+System_Boundary(layer5, "5. Pipeline RAG e UI") {
+    Person(browser, "Utilizador", "Acesso Web")
+    Container(reactUI, "Interface Next.js", "App Router", "Pesquisa inteligente")
+}
+
+System_Ext(embedAPI, "Cohere Embeddings", "API")
+
+Rel(docs, n8nApp, "Upload", "HTTPS")
+Rel(wiki, n8nApp, "Criação", "HTTPS")
+Rel(chat_src, n8nApp, "Webhook de nova mensagem", "HTTPS")
+
+Rel(n8nApp, agentExtract, "Encaminha para análise")
+Rel(agentExtract, agentValidate, "Colabora")
+Rel(agentValidate, database, "Valida contexto")
+Rel(agentValidate, n8nApp, "Retorna decisão")
+
+Rel(n8nApp, storage, "Armazena ficheiro", "API")
+Rel(n8nApp, embedAPI, "Solicita vectores", "API")
+Rel(n8nApp, vectorDb, "Guarda chunks e vectores", "TCP")
 
 Rel(browser, reactUI, "Interage", "HTTPS")
-Rel(reactUI, nextServer, "Chamadas API", "HTTPS/JSON")
-
-Rel(nextServer, n8nApp, "Invoca webhooks (Upload/Chat)", "HTTPS/JSON")
-Rel(nextServer, database, "Lê/Escreve dados", "PostgreSQL TCP")
-
-Rel(n8nApp, database, "Consultas e RPC", "PostgreSQL TCP")
-Rel(n8nApp, vectorDb, "Insere Chunks", "PostgreSQL TCP")
-Rel(n8nApp, storage, "Lê ficheiros", "REST API")
-
-Rel(n8nApp, embedAPI, "Gera \textit{embeddings}", "REST API")
-Rel(n8nApp, rerankAPI, "Re-ranking semântico", "REST API")
-Rel(n8nApp, chatAPI, "Gera respostas RAG", "REST API")
+Rel(reactUI, n8nApp, "Inicia pesquisa", "HTTPS")
+Rel(n8nApp, vectorDb, "match_chunks()", "TCP")
+Rel(n8nApp, agentSearch, "Fornece contexto")
+Rel(agentSearch, reactUI, "Gera resposta RAG", "HTTPS")
 @enduml
 ```
 ```{=latex}
@@ -565,7 +627,9 @@ A stack tecnológica seleccionada para a implementação do protótipo baseia-se
 \hline
 \textbf{Armazenamento} & Supabase Storage Bucket & Repositório físico seguro para guardar os documentos originais em formato PDF ou texto carregados pelos utilizadores. \\
 \hline
-\textbf{Orquestração RAG} & n8n (Visual Workflow) & Plataforma de automação que actua como o motor dos pipelines de ingestão e pesquisa, permitindo alterar a lógica de processamento documental de forma visual e rápida. \\
+\textbf{Orquestração de Eventos} & n8n (Visual Workflow) & Plataforma de automação e integração que actua estritamente como orquestrador dos eventos do sistema, encaminhando os dados e coordenando o fluxo assíncrono entre a interface web e os agentes de IA. \\
+\hline
+\textbf{Agentes IA (LLM + Tools)} & Modelos de Linguagem & Entidades com autonomia cognitiva e capacidade de utilização de ferramentas (\textit{tool use}), responsáveis por avaliar a relevância, estruturar o conhecimento e validar a consistência da informação. \\
 \hline
 \textbf{Modelo de \textit{Embeddings}} & Cohere API (\texttt{embed\-multilingual\-v3.0}) & Modelo vectorial multilíngue com optimização específica e excelente suporte para o idioma português, crucial para processar os documentos organizacionais angolanos. \\
 \hline
@@ -582,6 +646,34 @@ Adicionalmente, os detalhes das \textit{system prompts} utilizadas e as configur
 #### 4.1.5.5. Testes Realizados
 
 Os testes do protótipo focaram-se em validar duas dimensões fundamentais estabelecidas na metodologia de investigação reformulada: a eficiência temporal na execução dos pipelines RAG e a relevância qualitativa das respostas geradas pelo LLM sob as restrições impostas pelas regras de controlo de acessos.
+
+Para assegurar a reprodutibilidade e a correcta interpretação dos resultados, o Quadro 4.6 detalha as especificações do ambiente de execução e da máquina onde as simulações foram executadas, permitindo aos leitores contextualizar o desempenho técnico alcançado.
+
+\begin{quadro}[htbp]
+\small
+\begin{tabular}{|>{\raggedright\arraybackslash}p{4.5cm}|p{8.5cm}|}
+\hline
+\textbf{Componente} & \textbf{Especificação} \\
+\hline
+Processador & 6 núcleos / 12 threads, até 4,5 GHz \\
+\hline
+Memória RAM & 16 GB DDR4 \\
+\hline
+Armazenamento & SSD NVMe 512 GB \\
+\hline
+Sistema Operativo & Linux Mint 22.3 Cinnamon \\
+\hline
+Ambiente de Execução & Node.js + Docker \\
+\hline
+Orquestração & n8n \\
+\hline
+Embeddings & Cohere \\
+\hline
+Processamento LLM & API externa \\
+\hline
+\end{tabular}
+\caption[Quadro 4.6: Especificações do Ambiente de Testes.]{Quadro 4.6: Especificações do Ambiente de Testes. Fonte: Elaboração própria.}
+\end{quadro}
 
 ##### A. Testes de Eficiência Temporal
 
@@ -611,7 +703,7 @@ Os resultados demonstram que, mesmo com a latência de rede associada à invoca�
 
 Para atestar a eficácia do isolamento multi-tenant e das restrições de visibilidade por departamento e cargo, foi executado um conjunto de simulações com perfis de utilizadores fictícios pertencentes a organizações distintas. O critério de sucesso consistia em verificar se a resposta gerada pelo LLM era qualitativamente correcta, se citava a fonte devida e se respeitava o perímetro de segurança.
 
-O Quadro 4.6 apresenta uma selecção das avaliações qualitativas registadas durante as sessões de teste.
+O Quadro 4.7 apresenta uma selecção das avaliações qualitativas registadas durante as sessões de teste.
 
 A avaliação qualitativa seguiu uma rubrica padronizada: 'Excelente' (o sistema forneceu uma resposta factualmente correcta, suportada pelo contexto e com citação exacta da fonte), 'Parcial' (a resposta é coerente mas omite detalhes do contexto), e 'Nula' (o sistema bloqueia o acesso à informação por restrições de segurança ou o LLM recusa-se a responder por falta de contexto autorizado).
 
@@ -631,10 +723,16 @@ A avaliação qualitativa seguiu uma rubrica padronizada: 'Excelente' (o sistema
 \textbf{QA-04} & Operador / Produção / Empresa B & "Como iniciar a máquina X?" & Acede à página Wiki \texttt{Proc\_}\newline\texttt{Maquina\_X} (Produção). & \textbf{Permitido:} Pertence ao departamento do utilizador. & \textbf{Excelente:} Passos descritos de forma coerente. & Sim (\texttt{Proc\_}\newline\texttt{Maquina\_X}) \\
 \hline
 \end{tabular}
-\caption[Quadro 4.6: Matriz de Testes de Relevância Qualitativa e Segurança.]{Quadro 4.6: Matriz de Testes de Relevância Qualitativa e Segurança. Fonte: Elaboração própria.}
+\caption[Quadro 4.7: Matriz de Testes de Relevância Qualitativa e Segurança.]{Quadro 4.7: Matriz de Testes de Relevância Qualitativa e Segurança. Fonte: Elaboração própria.}
 \end{quadro}
 
-A análise qualitativa das simulações fornece evidências preliminares da eficácia das políticas implementadas: nos cenários avaliados, os mecanismos actuaram de forma a não permitir o envio de dados não autorizados para o LLM, nem permitiram o acesso a documentos de outro tenant nem a documentos fora do perímetro de autorização do utilizador, mitigando a possibilidade de fuga de informação inter-tenant e minimizando alucinações ao limitar o contexto apenas a dados autorizados.
+A análise qualitativa das simulações fornece evidências preliminares da eficácia das políticas implementadas: nos cenários avaliados, os mecanismos actuaram de forma a não permitir o envio de dados não autorizados para o LLM, nem permitiram o acesso a documentos de outro *tenant* nem a documentos fora do perímetro de autorização do utilizador, mitigando a possibilidade de fuga de informação inter-tenant e minimizando alucinações ao limitar o contexto apenas a dados autorizados.
+
+##### C. Avaliação Comportamental de Agentes de Extracção
+
+De forma a validar a fiabilidade da autonomia cognitiva dos agentes na gestão de conhecimento, foi concebido um cenário de teste focado na ingestão a partir de canais de comunicação corporativa simulados. O agente de extracção foi exposto a um *corpus* de 15 mensagens simuladas (5 relevantes para a organização, 5 contendo ruído e conversação informal, e 5 com informação propositadamente contraditória face aos dados existentes).
+
+Os resultados demonstraram que o agente conseguiu identificar e descartar correctamente 100\% das mensagens irrelevantes, garantindo que o ruído informal não poluía o repositório documental (0 falsos positivos). Nas 5 mensagens de cariz relevante, o agente estruturou rigorosamente a informação, categorizando os tópicos e extraindo os dados para formatação e submissão vectorial. O teste de maior complexidade verificou-se perante as mensagens contraditórias: nestes casos, o agente de validação consultou activamente a base de dados histórica, detectou a divergência crítica e, em vez de sobrescrever dados consolidados, atribuiu o estado de revisão pendente (\texttt{needs\_review}) a 4 das 5 mensagens, demonstrando capacidade primária de raciocínio preventivo.
 
 #### 4.1.5.6. Protótipo dos Ecrãs
 

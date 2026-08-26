@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     }
 
     const systemInstruction = `Você é o Redator-Chefe de Inteligência Artificial para a Wiki Corporativa de uma grande organização.
-Seu objetivo é criar um artigo técnico, estruturado, polido e denso (Wiki corporativa) para sanar dúvidas comuns no assunto: "${topic}" pertencente ao departamento de "${department}".
+Seu objectivo é criar um artigo técnico, estruturado, polido e denso (Wiki corporativa) para sanar dúvidas comuns no assunto: "${topic}" pertencente ao departamento de "${department}".
 
 REGRAS DO ARTIGO:
 1. O artigo deve conter títulos limpos no padrão Markdown (ex: ### 1. Introdução, ### 2. Melhores Práticas, ### 3. Fluxo de Trabalho).

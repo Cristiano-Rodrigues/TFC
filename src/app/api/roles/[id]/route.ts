@@ -45,8 +45,8 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
       .eq('company_id', user.company_id);
 
     if (roleError) {
-      console.error("Erro atualizar role:", roleError);
-      return NextResponse.json({ error: 'Erro ao atualizar cargo' }, { status: 500 });
+      console.error("Erro actualizar role:", roleError);
+      return NextResponse.json({ error: 'Erro ao actualizar cargo' }, { status: 500 });
     }
 
     // Connect permissions

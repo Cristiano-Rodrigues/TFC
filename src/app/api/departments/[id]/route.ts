@@ -45,8 +45,8 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
       .eq('company_id', user.company_id);
 
     if (deptError) {
-      console.error("Erro atualizar dept:", deptError);
-      return NextResponse.json({ error: 'Erro ao atualizar departamento' }, { status: 500 });
+      console.error("Erro actualizar dept:", deptError);
+      return NextResponse.json({ error: 'Erro ao actualizar departamento' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });

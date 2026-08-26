@@ -32,10 +32,10 @@ export const UploadView: React.FC = () => {
   const [dragActive, setDragActive] = useState(false);
   const [queuedFiles, setQueuedFiles] = useState<QueuedFile[]>([]);
   const [uploadHistory, setUploadHistory] = useState<UploadHistoryItem[]>([]);
-  
-  const [departments, setDepartments] = useState<{id: string, name: string}[]>([]);
-  const [roles, setRoles] = useState<{id: string, name: string}[]>([]);
-  
+
+  const [departments, setDepartments] = useState<{ id: string, name: string }[]>([]);
+  const [roles, setRoles] = useState<{ id: string, name: string }[]>([]);
+
   const [selectedDepts, setSelectedDepts] = useState<string[]>([]);
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
   const [accessLogic, setAccessLogic] = useState<'AND' | 'OR'>('AND');
@@ -64,7 +64,7 @@ export const UploadView: React.FC = () => {
         </div>
         <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Acesso Restrito - Upload de Documentos</h2>
         <p className="text-xs text-slate-500 leading-relaxed font-sans">
-          A sua conta atual <strong>({profile?.fullName || "Colaborador"})</strong> licenciada sob o cargo <strong>(role: {profile?.role})</strong> não possui outorga explícita para registrar regulamentos na base central. Entre em contacto com a equipa de TI para elevar o seu perfil.
+          A sua conta actual <strong>({profile?.fullName || "Colaborador"})</strong> licenciada sob o cargo <strong>(role: {profile?.role})</strong> não possui outorga explícita para registrar regulamentos na base central. Entre em contacto com a equipa de TI para elevar o seu perfil.
         </p>
       </div>
     );
@@ -101,9 +101,9 @@ export const UploadView: React.FC = () => {
       alert("Por favor, selecione pelo menos um departamento.");
       return;
     }
-    
+
     const deptNames = departments.filter(d => selectedDepts.includes(d.id)).map(d => d.name).join(', ') || 'Desconhecido';
-    
+
     const arr: QueuedFile[] = [];
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
@@ -129,13 +129,13 @@ export const UploadView: React.FC = () => {
   };
 
   const toggleRole = (roleId: string) => {
-    setSelectedRoles(prev => 
+    setSelectedRoles(prev =>
       prev.includes(roleId) ? prev.filter(r => r !== roleId) : [...prev, roleId]
     );
   };
 
   const toggleDept = (deptId: string) => {
-    setSelectedDepts(prev => 
+    setSelectedDepts(prev =>
       prev.includes(deptId) ? prev.filter(r => r !== deptId) : [...prev, deptId]
     );
   };
@@ -211,14 +211,14 @@ export const UploadView: React.FC = () => {
       <div className="pb-4 border-b border-slate-200">
         <h1 id="upload-title" className="text-2xl font-semibold text-slate-900 tracking-tight">Ingestão de Documentos</h1>
         <p className="text-sm text-slate-500 mt-1">
-          Faça upload de novos materiais para que a IA processe a segmentação em pedaços (chunking) e crie os vetores semânticos no RAG.
+          Faça upload de novos materiais para que a IA processe a segmentação em pedaços (chunking) e crie os vectores semânticos no RAG.
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white p-5 border border-slate-200 rounded-xl space-y-4 shadow-2xs">
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4 border-b border-slate-200">
               <div className="space-y-1.5 md:col-span-2">
                 <span className="text-xs font-semibold text-slate-800 uppercase tracking-wider block">1. Departamentos Destino</span>
@@ -226,9 +226,9 @@ export const UploadView: React.FC = () => {
                   {departments.length === 0 && <span className="text-[10px] text-slate-400 p-1">A carregar...</span>}
                   {departments.map(d => (
                     <label key={d.id} className="flex items-center gap-1.5 cursor-pointer bg-white px-2.5 py-1.5 border border-slate-200 rounded-md shadow-2xs hover:border-slate-300 transition-colors">
-                      <input 
-                        type="checkbox" 
-                        checked={selectedDepts.includes(d.id)} 
+                      <input
+                        type="checkbox"
+                        checked={selectedDepts.includes(d.id)}
                         onChange={() => toggleDept(d.id)}
                         className="rounded text-slate-900 focus:ring-0"
                       />
@@ -237,7 +237,7 @@ export const UploadView: React.FC = () => {
                   ))}
                 </div>
               </div>
-              
+
               <div className="space-y-1.5">
                 <span className="text-xs font-semibold text-slate-800 uppercase tracking-wider block">2. Lógica de Acesso Restrito</span>
                 <select
@@ -253,14 +253,14 @@ export const UploadView: React.FC = () => {
               <div className="md:col-span-2 space-y-1.5">
                 <span className="text-xs font-semibold text-slate-800 uppercase tracking-wider flex justify-between">
                   <span>3. Restringir a Cargos (Opcional)</span>
-                  <span className="text-slate-400 font-normal">Se não selecionar nenhum, qualquer membro do departamento tem acesso.</span>
+                  <span className="text-slate-400 font-normal">Se não seleccionar nenhum, qualquer membro do departamento tem acesso.</span>
                 </span>
                 <div className="flex flex-wrap gap-2 p-3 border border-slate-200 rounded-md bg-[#f3f3f5]">
                   {roles.map(r => (
                     <label key={r.id} className="flex items-center gap-1.5 cursor-pointer bg-white px-2.5 py-1.5 border border-slate-200 rounded-md shadow-2xs hover:border-slate-300 transition-colors">
-                      <input 
-                        type="checkbox" 
-                        checked={selectedRoles.includes(r.id)} 
+                      <input
+                        type="checkbox"
+                        checked={selectedRoles.includes(r.id)}
                         onChange={() => toggleRole(r.id)}
                         className="rounded text-slate-900 focus:ring-0"
                       />
@@ -308,7 +308,7 @@ export const UploadView: React.FC = () => {
 
           {queuedFiles.length > 0 && (
             <div className="bg-white border border-slate-200 rounded-lg p-5 space-y-4">
-              <h3 className="text-xs font-bold text-[#1e293b] uppercase tracking-wider">Fila de Registro de IA</h3>
+              <h3 className="text-xs font-bold text-[#1e293b] uppercase tracking-wider">Fila de registo de IA</h3>
 
               <div className="divide-y divide-slate-100">
                 {queuedFiles.map((file) => (
@@ -351,7 +351,7 @@ export const UploadView: React.FC = () => {
                       {file.status === 'Processando IA' && (
                         <div className="text-right flex items-center gap-1.5 text-[10px] text-indigo-600 font-bold bg-indigo-50 border border-indigo-100 px-2.5 py-1 rounded">
                           <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                          Vetorizando Chunks...
+                          vectorizando Chunks...
                         </div>
                       )}
 

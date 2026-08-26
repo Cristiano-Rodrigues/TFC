@@ -17,11 +17,11 @@ export const RolesPanel: React.FC = () => {
   const [roles, setRoles] = useState<Role[]>([]);
   const [allPermissions, setAllPermissions] = useState<Permission[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentId, setCurrentId] = useState('');
-  
+
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [selectedPerms, setSelectedPerms] = useState<string[]>([]);
@@ -36,7 +36,7 @@ export const RolesPanel: React.FC = () => {
       ]);
       const dataRoles = await resRoles.json();
       const dataPerms = await resPerms.json();
-      
+
       if (resRoles.ok && dataRoles.roles) setRoles(dataRoles.roles);
       if (resPerms.ok && dataPerms.permissions) setAllPermissions(dataPerms.permissions);
     } catch (e) {
@@ -54,17 +54,17 @@ export const RolesPanel: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    
+
     try {
       const url = isEditing ? `/api/roles/${currentId}` : '/api/roles';
       const method = isEditing ? 'PUT' : 'POST';
-      
+
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, description, permission_ids: selectedPerms })
       });
-      
+
       if (res.ok) {
         await fetchData();
         handleCloseModal();
@@ -78,7 +78,7 @@ export const RolesPanel: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Tem a certeza que deseja eliminar esta role?')) return;
-    
+
     try {
       const res = await fetch(`/api/roles/${id}`, { method: 'DELETE' });
       if (res.ok) {
@@ -143,7 +143,7 @@ export const RolesPanel: React.FC = () => {
             <tr>
               <th className="px-5 py-3">Cargo</th>
               <th className="px-5 py-3">Permissões Associadas</th>
-              <th className="px-5 py-3 text-right">Ação</th>
+              <th className="px-5 py-3 text-right">Acção</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 font-medium">
@@ -194,7 +194,7 @@ export const RolesPanel: React.FC = () => {
               <h3 className="text-sm font-bold uppercase tracking-wider">{isEditing ? 'Editar Cargo' : 'Novo Cargo'}</h3>
               <button onClick={handleCloseModal} className="text-slate-400 hover:text-white cursor-pointer"><X className="h-4 w-4" /></button>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="flex flex-col overflow-hidden">
               <div className="p-5 space-y-4 overflow-y-auto">
                 <div className="grid grid-cols-2 gap-4">
@@ -207,17 +207,17 @@ export const RolesPanel: React.FC = () => {
                     <input value={description} onChange={e => setDescription(e.target.value)} className="w-full text-xs px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 bg-[#f3f3f5] text-slate-900" />
                   </div>
                 </div>
-                
+
                 <div className="pt-2">
                   <label className="text-xs font-semibold text-slate-700 mb-2 block">Permissões de Sistema</label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 border border-slate-200 p-3 rounded-md bg-[#f3f3f5]">
                     {allPermissions.map(p => (
                       <label key={p.id} className="flex items-center gap-2 cursor-pointer p-1.5 hover:bg-white rounded border border-transparent hover:border-slate-200 transition-colors">
-                        <input 
-                          type="checkbox" 
-                          checked={selectedPerms.includes(p.id)} 
+                        <input
+                          type="checkbox"
+                          checked={selectedPerms.includes(p.id)}
                           onChange={() => togglePermission(p.id)}
-                          className="rounded text-slate-900 focus:ring-0" 
+                          className="rounded text-slate-900 focus:ring-0"
                         />
                         <span className="text-[10px] font-bold text-slate-700 uppercase">{p.code}</span>
                       </label>

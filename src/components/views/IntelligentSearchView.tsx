@@ -167,7 +167,7 @@ export const IntelligentSearchView: React.FC<IntelligentSearchViewProps> = ({ se
     } catch (err) {
       console.error("RAG Error:", err);
       const errorContent = "Lamento, ocorreu um erro de comunicação com o servidor de Inteligência Artificial de retaguarda. Por favor, tente novamente de seguida.";
-      
+
       if (currentSessionId) {
         await fetch('/api/chat/messages', {
           method: 'POST',
@@ -200,7 +200,7 @@ export const IntelligentSearchView: React.FC<IntelligentSearchViewProps> = ({ se
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-4 h-[calc(100vh-140px)] border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm">
-      
+
       <div className="xl:col-span-3 flex flex-col h-full bg-[#f8fafc] border-r border-slate-200 relative overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 bg-white/80 backdrop-blur-md border-b border-slate-200 shrink-0 z-10">
           <div className="flex items-center gap-3">
@@ -221,11 +221,10 @@ export const IntelligentSearchView: React.FC<IntelligentSearchViewProps> = ({ se
                 key={message.id}
                 className={`flex gap-4 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                <div className={`p-4 max-w-[85%] relative group shadow-sm transition-all ${
-                  message.role === 'user'
+                <div className={`p-4 max-w-[85%] relative group shadow-sm transition-all ${message.role === 'user'
                     ? 'bg-[#030213] text-white rounded-2xl rounded-br-sm'
                     : 'bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-bl-sm'
-                }`}>
+                  }`}>
                   <div className={`flex items-center gap-2 mb-2 text-[10px] font-bold tracking-wider uppercase ${message.role === 'user' ? 'text-slate-400' : 'text-slate-400'}`}>
                     {message.role === 'user' ? "Você" : "Knowledge Core"}
                     <span>•</span>
@@ -299,7 +298,7 @@ export const IntelligentSearchView: React.FC<IntelligentSearchViewProps> = ({ se
             </div>
           </form>
           <div className="text-center mt-2">
-             <span className="text-[10px] text-slate-400 font-medium">As respostas são geradas por IA com base em documentos da empresa e podem conter imprecisões.</span>
+            <span className="text-[10px] text-slate-400 font-medium">As respostas são geradas por IA com base em documentos da empresa e podem conter imprecisões.</span>
           </div>
         </div>
       </div>
@@ -335,10 +334,10 @@ export const IntelligentSearchView: React.FC<IntelligentSearchViewProps> = ({ se
               <div className="flex items-start gap-2 p-3 bg-blue-50/50 rounded-lg border border-blue-100">
                 <Info className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" />
                 <div className="text-[10px] text-slate-600 font-medium leading-relaxed">
-                  Este conteúdo foi vetorizado e considerado o mais relevante pelo modelo de IA para fundamentar a resposta atual.
+                  Este conteúdo foi vectorizado e considerado o mais relevante pelo modelo de IA para fundamentar a resposta actual.
                 </div>
               </div>
-              
+
               <button
                 onClick={() => setSelectedSource(null)}
                 className="w-full flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-700 text-xs py-2.5 rounded-xl border border-slate-200 transition-colors cursor-pointer font-bold shadow-2xs"

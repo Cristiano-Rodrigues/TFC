@@ -45,7 +45,7 @@ export const DashboardView: React.FC = () => {
     },
     {
       id: "stat-users",
-      title: "Utilizadores Ativos",
+      title: "Utilizadores Activos",
       value: loading ? "..." : statsData.activeUsers.toString(),
       change: "Sincronizado",
       trend: "up",

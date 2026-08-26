@@ -84,7 +84,7 @@ Com base no modelo de referência (`Modelo_TFC_IGF.pdf`), a estrutura final dese
    4.1. Apresentação e análise dos resultados
      4.1.1. Metodologia do desenvolvimento
      4.1.2. Requisitos (Funcionais e Não Funcionais)
-     4.1.3. Modelagem do Sistema
+     4.1.3. Modelação do Sistema
        - Diagrama de Contexto
        - Diagrama de Casos de Usos
        - Especificação dos casos de usos
@@ -97,7 +97,7 @@ Com base no modelo de referência (`Modelo_TFC_IGF.pdf`), a estrutura final dese
        - Arquitectura Física e Lógica
        - Ferramentas e Tecnologias Utilizadas
        - Testes Realizados
-       - Protótipo das Telas
+       - Protótipo dos Ecrãs
        - Codificação
        - Segurança aplicada no sistema
 
@@ -213,7 +213,7 @@ O schema da base de dados inclui:
 - **`permissions`** — Permissões globais do sistema (ex: `doc:view`, `doc:upload`, `users:manage`).
 - **`role_permissions`** — Associação N:N entre cargos e permissões.
 - **`users`** — Utilizadores, cada um associado a uma empresa, um cargo e um departamento.
-- **`documents`** — Registo de documentos uploaded (metadados, estado n8n, referência ao storage).
+- **`documents`** — registo de documentos uploaded (metadados, estado n8n, referência ao storage).
 - **`document_departments`** — Controlo de acesso por departamento.
 - **`document_permissions`** — Controlo de acesso por cargo.
 - **`chunks`** — Trechos de texto extraídos dos documentos com os seus embeddings vectoriais.
@@ -238,7 +238,7 @@ integrations:manage, users:manage
 
 | Módulo | Ficheiro Principal | Descrição |
 |--------|-------------------|-----------|
-| **Login/Registo** | `Login.tsx` | Autenticação com registo de empresa (tenant) |
+| **Login/registo** | `Login.tsx` | Autenticação com registo de empresa (tenant) |
 | **Dashboard** | `DashboardView.tsx` | Visão geral com estatísticas |
 | **Documentos** | `DocumentsView.tsx` | Listagem e gestão de documentos |
 | **Upload** | `UploadView.tsx` | Upload de ficheiros com controlo de acesso multi-departamental |
@@ -286,7 +286,7 @@ O pipeline `minimal_ai_ingestion_pipeline.json` implementa dois fluxos:
 
 ---
 
-## 7. Infraestrutura do Repositório
+## 7. Infra-estrutura do Repositório
 
 ```
 TFC/
@@ -372,7 +372,7 @@ As referências bibliográficas da investigação encontram-se integralmente cen
 
 **Técnicas de recolha:**
 - Revisão bibliográfica
-- Modelagem de requisitos
+- Modelação de requisitos
 - Testes funcionais e de desempenho
 - Simulação com dados estruturados
 
@@ -395,6 +395,6 @@ As referências bibliográficas da investigação encontram-se integralmente cen
 O desenvolvimento do protótipo e a redação da monografia encontram-se **concluídos**. O sistema foi totalmente implementado, testado e documentado com rigor académico. O código-fonte está versionado e o protótipo encontra-se funcional e acessível num ambiente de produção (Vercel).
 
 ### Passos Finais
-- Leitura final de revisão para detetar pequenos erros tipográficos no PDF final (`dist/output.pdf`).
+- Leitura final de revisão para detectar pequenos erros tipográficos no PDF final (`dist/output.pdf`).
 - Impressão e submissão formal do Trabalho Final de Curso (TFC) ao ISAF.
 - Preparação da apresentação de Defesa da Tese (criação de diapositivos resumindo o problema de pesquisa, a arquitectura metodológica/técnica construída e as conclusões).

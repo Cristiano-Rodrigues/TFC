@@ -184,7 +184,7 @@ export const IntegrationsView: React.FC = () => {
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 uppercase bg-[#f3f3f5] px-2 py-0.5 rounded border border-slate-200">
-                      Inativo
+                      Inactivo
                     </span>
                   )}
                 </div>

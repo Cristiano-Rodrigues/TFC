@@ -37,7 +37,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(true);
       const res = await fetch('/api/auth/me');
       const data = await res.json();
-      
+
       if (res.ok && data.user) {
         const activeRole = data.user.role as 'admin' | 'manager' | 'user' || 'user';
         const dynamicPermissions = Array.isArray(data.user.permissions) ? data.user.permissions : [];
@@ -55,7 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           role_id: data.user.role_id,
           department_id: data.user.department_id
         };
-        
+
         setUser(data.user);
         setProfile(loadedProfile);
       } else {
@@ -83,15 +83,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         body: JSON.stringify({ email, password })
       });
       const data = await res.json();
-      
+
       if (!res.ok) {
-        return { error: data.error || "Email ou palavra-passe incorretos" };
+        return { error: data.error || "Email ou palavra-passe incorrectos" };
       }
 
       await refreshSession();
       return { error: null };
     } catch (err: any) {
-      return { error: err.message || "Email ou palavra-passe incorretos" };
+      return { error: err.message || "Email ou palavra-passe incorrectos" };
     }
   };
 
@@ -99,7 +99,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
-    } catch (e) {}
+    } catch (e) { }
     setUser(null);
     setProfile(null);
     setLoading(false);

@@ -11,11 +11,11 @@ interface Department {
 export const DepartmentsPanel: React.FC = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentId, setCurrentId] = useState('');
-  
+
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -43,17 +43,17 @@ export const DepartmentsPanel: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    
+
     try {
       const url = isEditing ? `/api/departments/${currentId}` : '/api/departments';
       const method = isEditing ? 'PUT' : 'POST';
-      
+
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, description })
       });
-      
+
       if (res.ok) {
         await fetchDepartments();
         handleCloseModal();
@@ -67,7 +67,7 @@ export const DepartmentsPanel: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Tem a certeza que deseja eliminar este departamento?')) return;
-    
+
     try {
       const res = await fetch(`/api/departments/${id}`, { method: 'DELETE' });
       if (res.ok) {
@@ -122,7 +122,7 @@ export const DepartmentsPanel: React.FC = () => {
             <tr>
               <th className="px-5 py-3">Nome</th>
               <th className="px-5 py-3">Descrição</th>
-              <th className="px-5 py-3 text-right">Ação</th>
+              <th className="px-5 py-3 text-right">Acção</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 font-medium">

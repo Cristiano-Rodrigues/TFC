@@ -319,7 +319,7 @@
           <text variable="volume"/>
         </group>
         <choose>
-          <!--Se houver localizador inserido diretamente na citação (on the fly)-->
+          <!--Se houver localizador inserido directamente na citação (on the fly)-->
           <if variable="locator" match="any">
             <choose>
               <!-- se não for um número de página, exibe a paginação-->
@@ -331,7 +331,7 @@
               </if>
             </choose>
           </if>
-          <!--Se não houver localizador inserido diretamente na citação (on the fly), exibe a paginação-->
+          <!--Se não houver localizador inserido directamente na citação (on the fly), exibe a paginação-->
           <else>
             <group>
               <text term="page" form="short" prefix=", " suffix="&#160;"/>
@@ -395,7 +395,7 @@
       </if>
     </choose>
   </macro>
-  <!--localizadores inseridos diretamente na citação (on the fly)-->
+  <!--localizadores inseridos directamente na citação (on the fly)-->
   <macro name="locators">
     <group>
       <label variable="locator" form="short" text-case="lowercase" suffix="&#160;"/>
@@ -431,13 +431,13 @@
           </choose>
           <!-- imprenta-->
           <text macro="imprenta-locators" prefix=", "/>
-          <!-- localizadores inseridos diretamente na citação (on the fly)-->
+          <!-- localizadores inseridos directamente na citação (on the fly)-->
           <text macro="locators" prefix=", "/>
         </if>
         <!-- se a citação for igual à anterior-->
         <else-if position="ibid-with-locator" match="any">
           <text term="ibid" text-case="capitalize-first" font-style="italic" suffix="."/>
-          <!-- localizadores inseridos diretamente na citação (on the fly)-->
+          <!-- localizadores inseridos directamente na citação (on the fly)-->
           <text macro="locators" prefix=", "/>
         </else-if>
         <!-- se a citação for igual à anterior, com os mesmo localizadores ou se a anterior não tem localizadores-->
@@ -448,7 +448,7 @@
         <else>
           <text macro="producers-short" suffix=", "/>
           <text macro="title-short"/>
-          <!-- localizadores inseridos diretamente na citação (on the fly)-->
+          <!-- localizadores inseridos directamente na citação (on the fly)-->
           <text macro="locators" prefix=", "/>
         </else>
       </choose>

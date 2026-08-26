@@ -72,15 +72,15 @@ Os Requisitos Não Funcionais (RNF) especificam critérios que qualificam o func
 \hline
 \textbf{RNF-04} & Usabilidade (Interface) & A interface deve apresentar-se responsiva, fluida e incluir transições e animações visuais curtas para guiar a navegação do utilizador (\textit{Framer Motion}). \\
 \hline
-\textbf{RNF-05} & Disponibilidade e Extensibilidade & A lógica de ingestão documental e recuperação RAG deve correr numa infraestrutura modular externa (n8n), facilitando a adição de novos conectores sem necessidade de recompilar o frontend Next.js. \\
+\textbf{RNF-05} & Disponibilidade e Extensibilidade & A lógica de ingestão documental e recuperação RAG deve correr numa infra-estrutura modular externa (n8n), facilitando a adição de novos conectores sem necessidade de recompilar o frontend Next.js. \\
 \hline
 \end{tabular}
 \caption{Quadro 4.2: Requisitos Não Funcionais do Sistema. Fonte: Elaboração própria.}
 \end{quadro}
 
-### 4.1.3. Modelagem do Sistema
+### 4.1.3. Modelação do Sistema
 
-A modelagem gráfica do sistema foi elaborada recorrendo à linguagem UML (*Unified Modeling Language*), mapeando a estrutura lógica de interacção e o comportamento dos componentes do software.
+A modelação gráfica do sistema foi elaborada recorrendo à linguagem UML (*Unified Modeling Language*), mapeando a estrutura lógica de interacção e o comportamento dos componentes do software.
 
 #### 4.1.3.1. Diagrama de Contexto
 
@@ -138,7 +138,7 @@ actor "Utilizador" as Utilizador
 actor "Administrador da Empresa" as Admin
 
 rectangle "Sistema RAG Multi-Tenant" {
-    usecase "Efectuar Login e Registo" as UC1
+    usecase "Efectuar Login e registo" as UC1
     usecase "Fazer Upload de Documento / Criar Wiki" as UC2
     usecase "Consultar Base de Conhecimento Chat" as UC3
     usecase "Configurar Acessos do Documento RBAC/Dept" as UC4
@@ -326,9 +326,9 @@ Document "*" o-- "*" Role : restrito por DocumentPermission >
 
 #### 4.1.3.5. Diagrama Entidade-Relacional
 
-O Diagrama Entidade-Relacional (DER) detalha a modelagem lógica e física da base de dados PostgreSQL alojada no Supabase. O modelo implementa uma **Abstração Unificada** para as fontes de conhecimento, na qual as páginas Wiki, uploads de PDF ou integrações de terceiros são todos armazenados de forma unificada na tabela `documents` e diferenciados pelo atributo `source_type`. Esta abordagem garante que toda e qualquer fonte de dados possa ser fatiada em `chunks` e submetida a pesquisas vectoriais utilizando a mesma infraestrutura, respeitando as regras relacionais de segurança.
+O Diagrama Entidade-Relacional (DER) detalha a modelação lógica e física da base de dados PostgreSQL alojada no Supabase. O modelo implementa uma **Abstracção Unificada** para as fontes de conhecimento, na qual as páginas Wiki, uploads de PDF ou integrações de terceiros são todos armazenados de forma unificada na tabela `documents` e diferenciados pelo atributo `source_type`. Esta abordagem garante que toda e qualquer fonte de dados possa ser fatiada em `chunks` e submetida a pesquisas vectoriais utilizando a mesma infra-estrutura, respeitando as regras relacionais de segurança.
 
-A modelagem inclui adicionalmente a chave estrangeira `company_id` na tabela `documents` para impor um isolamento estrito de múltiplos inquilinos (*multi-tenancy*) ao nível relacional, mitigando o risco de vazamento de dados exposto em fases anteriores de teste.
+A modelação inclui adicionalmente a chave estrangeira `company_id` na tabela `documents` para impor um isolamento estrito de múltiplos inquilinos (*multi-tenancy*) ao nível relacional, mitigando o risco de vazamento de dados exposto em fases anteriores de teste.
 
 ```plantuml
 @startuml
@@ -464,7 +464,7 @@ Para assegurar que o protótipo cumpre os padrões mínimos de qualidade aceitá
 3. **Usabilidade:** A interface Next.js utiliza componentes React responsivos e animações curtas com Framer Motion. Isto assegura que utilizadores com pouca literacia em sistemas baseados em inteligência artificial compreendam visualmente o estado das suas operações e as fontes das respostas.
 4. **Segurança:** O acesso é estritamente controlado através do fluxo abaixo:
     *   Autenticação por JSON Web Tokens (JWT) gerados no backend Next.js.
-    *   Uso de encriptação unidireccional de palavras-passe com a biblioteca `bcrypt` no registo.
+    *   Uso de *hashing* de palavras-passe com a biblioteca `bcrypt` no registo.
     *   Isolamento de dados por inquilino (*multi-tenant*) ao nível relacional nas tabelas através do `company_id`.
     *   Controlo de acesso departamental e por cargo (RBAC) validado tanto no carregamento de ecrãs do Next.js como nas consultas à base de dados PostgreSQL na busca vectorial.
 
@@ -476,18 +476,18 @@ O escopo do protótipo desenvolvido delimita as fronteiras da prova de conceito,
 
 *   **Administração Geral:** Gestão de uma única instância multi-tenant onde é simulado o isolamento de dados entre empresas distintas, com criação autónoma de utilizadores, departamentos e cargos.
 *   **Mecanismo de Ingestão:** Upload de ficheiros em formato de texto estruturado ou PDF. O processamento realiza o fatiamento (*chunking*) em blocos lógicos de 500 caracteres e gera \textit{embeddings} com suporte multilíngue.
-*   **Controlo de Acesso:** Implementação de políticas de acesso ao nível do documento ou página Wiki. As restrições de visibilidade podem ser departamentais (ex: restrito ao departamento de Recursos Humanos) ou hierárquicas por cargo (ex: apenas visível por Directores).
+*   **Controlo de Acesso:** Implementação de políticas de acesso ao nível do documento ou página Wiki. As restrições de visibilidade podem ser departamentais (ex: restrito ao departamento de Recursos Humanos) ou hierárquicas por cargo (ex: apenas visível por directores).
 *   **Recuperação e Síntese de Informação:** Canal de chat interactivo que recebe a consulta do utilizador, filtra os fragmentos de documentos usando o perfil do utilizador (empresa, departamento e cargo) e sintetiza a resposta final recorrendo a um LLM.
 
 #### 4.1.5.2. Descrição dos Módulos
 
 O protótipo divide-se em oito módulos funcionais interligados:
 
-1.  **Módulo de Login e Registo:** Responsável pela autenticação e criação de novos tenants. Garante que cada utilizador é associado de forma unívoca à empresa criada, gerando o contexto relacional do utilizador na sessão.
-2.  **Módulo de Dashboard:** Apresenta indicadores consolidados da organização, tais como volume de documentos processados, quantidade de utilizadores ativos por departamento e estatísticas básicas de utilização do chat.
+1.  **Módulo de Login e registo:** Responsável pela autenticação e criação de novos tenants. Garante que cada utilizador é associado de forma unívoca à empresa criada, gerando o contexto relacional do utilizador na sessão.
+2.  **Módulo de Dashboard:** Apresenta indicadores consolidados da organização, tais como volume de documentos processados, quantidade de utilizadores activos por departamento e estatísticas básicas de utilização do chat.
 3.  **Módulo de Documentos:** Permite a visualização dos ficheiros armazenados no sistema em formato de listagem, exibindo o metadado do ficheiro, o autor do upload, o estado do processamento n8n (`pending`, `success` ou `error`) e o tipo de fonte (`source_type`).
-4.  **Módulo de Upload:** Interface dedicada ao carregamento de novos conteúdos. Permite selecionar ficheiros locais ou criar novas páginas de conhecimento (Wiki). Inclui caixas de seleção multiseleção para associar permissões de acesso por departamentos e cargos.
-5.  **Módulo de Chat IA:** Interface de conversação em linguagem natural. Mostra o histórico de mensagens da sessão e as referências clicáveis para os documentos fontes originais que suportaram a resposta gerada. Importa clarificar que a etapa de optimização de busca (*reranking*) não ocorre dentro da função SQL da base de dados, mas sim fora desta, dentro do workflow n8n, entre a recuperação de fragmentos e a construção do *prompt* enviado ao LLM.
+4.  **Módulo de Upload:** Interface dedicada ao carregamento de novos conteúdos. Permite seleccionar ficheiros locais ou criar novas páginas de conhecimento (Wiki). Inclui caixas de multiselecção para associar permissões de acesso por departamentos e cargos.
+5.  **Módulo de Chat IA:** Interface de conversação em linguagem natural. Mostra o histórico de mensagens da sessão e as referências clicáveis para os documentos originais que suportaram a resposta gerada. Importa clarificar que a etapa de optimização de busca (*reranking*) não ocorre dentro da função SQL da base de dados, mas sim fora desta, dentro do workflow n8n, entre a recuperação de fragmentos e a construção do *prompt* enviado ao LLM.
 6.  **Módulo de Wiki (Base de Conhecimento):** Permite aos utilizadores criarem páginas de documentação textual interna directamente no browser. O texto introduzido é guardado na tabela `documents` com a flag `source_type = 'wiki'`, integrando de imediato o pipeline de indexação vectorial.
 7.  **Módulo de Cargos e Permissões:** Permite ao utilizador administrador criar perfis internos de permissões e atribuir cargos aos colaboradores, assegurando a flexibilidade de papéis do RBAC.
 8.  **Módulo de Departamentos:** CRUD de departamentos internos para agrupar logicamente utilizadores e delimitar os ecrãs e documentos que podem ser consultados por equipa.
@@ -496,7 +496,7 @@ Para garantir que o agente de inteligência artificial produza respostas formata
 
 #### 4.1.5.3. Arquitectura Física e Lógica do Sistema
 
-A arquitetura do sistema segue um modelo de camadas descentralizado, separando a interface do utilizador, a lógica da aplicação, a base de dados relacional e vectorial, e a orquestração assíncrona dos pipelines de Inteligência Artificial.
+A arquitectura do sistema segue um modelo de camadas descentralizado, separando a interface do utilizador, a lógica da aplicação, a base de dados relacional e vectorial, e a orquestração assíncrona dos pipelines de Inteligência Artificial.
 
 ```plantuml
 @startuml
@@ -548,7 +548,7 @@ A stack tecnológica seleccionada para a implementação do protótipo baseia-se
 \hline
 \textbf{Camada} & \textbf{Tecnologia / Serviço} & \textbf{Papel e Justificação da Escolha} \\
 \hline
-\textbf{Frontend} & Next.js 15 (React 19) & Framework para construção da interface de utilizador interactiva e navegação nativa, tirando partido do \textit{App Router} (arquitetura multi-rota) e rotas de API integradas. \\
+\textbf{Frontend} & Next.js 15 (React 19) & Framework para construção da interface de utilizador interactiva e navegação nativa, tirando partido do \textit{App Router} (arquitectura multi-rota) e rotas de API integradas. \\
 \hline
 \textbf{Styling} & TailwindCSS & Permite desenhar uma interface moderna, limpa e responsiva sem sobrecarregar a largura de banda de ligação à rede do cliente. \\
 \hline
@@ -556,7 +556,7 @@ A stack tecnológica seleccionada para a implementação do protótipo baseia-se
 \hline
 \textbf{Base de Dados} & Supabase (PostgreSQL) & Fornece uma base de dados relacional robusta com suporte nativo a políticas de segurança RLS (\textit{Row Level Security}) por inquilino. \\
 \hline
-\textbf{Vector Store} & Extensão \texttt{pgvector} & Armazena e indexa vectores de \textit{embeddings} na base de dados PostgreSQL existente, dispensando a contratação e manutenção de um serviço de banco de dados vectorial autónomo. \\
+\textbf{Vector Store} & Extensão \texttt{pgvector} & Armazena e indexa vectores de \textit{embeddings} na base de dados PostgreSQL existente, dispensando a contratação e manutenção de um serviço de base de dados vectorial autónomo. \\
 \hline
 \textbf{Armazenamento} & Supabase Storage Bucket & Repositório físico seguro para guardar os documentos originais em formato PDF ou texto carregados pelos utilizadores. \\
 \hline
@@ -564,7 +564,7 @@ A stack tecnológica seleccionada para a implementação do protótipo baseia-se
 \hline
 \textbf{Modelo de \textit{Embeddings}} & Cohere API (\texttt{embed\-multilingual\-v3.0}) & Modelo vectorial multilíngue com optimização específica e excelente suporte para o idioma português, crucial para processar os documentos organizacionais angolanos. \\
 \hline
-\textbf{Otimização de Busca (Re-Ranking)} & Cohere Rerank API (modelo \texttt{rerank\-multilingual\-v3.0}) & Avalia e reordena os fragmentos devolvidos pelo PostgreSQL pela sua relevância semântica real face à pergunta do utilizador, antes do envio ao LLM, materializando o paradigma de RAG Avançado. \\
+\textbf{Optimização de Busca (Re-Ranking)} & Cohere Rerank API (modelo \texttt{rerank\-multilingual\-v3.0}) & Avalia e reordena os fragmentos devolvidos pelo PostgreSQL pela sua relevância semântica real face à pergunta do utilizador, antes do envio ao LLM, materializando o paradigma de RAG Avançado. \\
 \hline
 \textbf{Síntese LLM} & Cohere Chat (\texttt{command\-r\-plus\-08\-2024}) & Modelo de linguagem optimizado para tarefas RAG com forte capacidade de raciocínio, formatação estruturada e citação transparente de fontes do contexto. \\
 \hline
@@ -629,19 +629,19 @@ A avaliação qualitativa seguiu uma rubrica padronizada: 'Excelente' (o sistema
 \caption{Quadro 4.6: Matriz de Testes de Relevância Qualitativa e Segurança. Fonte: Elaboração própria.}
 \end{quadro}
 
-A análise qualitativa das simulações fornece evidências preliminares da eficácia das políticas implementadas: nos cenários avaliados, os mecanismos actuaram de forma a não permitir o envio de dados não-autorizados para o LLM, nem permitiram o acesso a documentos de outro tenant nem a documentos fora do perímetro de autorização do utilizador, mitigando a possibilidade de fuga de informação inter-tenant e minimizando alucinações ao limitar o contexto apenas a dados autorizados.
+A análise qualitativa das simulações fornece evidências preliminares da eficácia das políticas implementadas: nos cenários avaliados, os mecanismos actuaram de forma a não permitir o envio de dados não autorizados para o LLM, nem permitiram o acesso a documentos de outro tenant nem a documentos fora do perímetro de autorização do utilizador, mitigando a possibilidade de fuga de informação inter-tenant e minimizando alucinações ao limitar o contexto apenas a dados autorizados.
 
-#### 4.1.5.6. Protótipo das Telas
+#### 4.1.5.6. Protótipo dos Ecrãs
 
-As interfaces desenvolvidas em Next.js priorizaram a simplicidade de utilização, a fluidez das transições e o fornecimento de feedback claro acerca do processamento assíncrono efetuado na infraestrutura. A apresentação gráfica das principais telas da aplicação demonstra a concretização prática dos requisitos do protótipo:
+As interfaces desenvolvidas em Next.js priorizaram a simplicidade de utilização, a fluidez das transições e o fornecimento de feedback claro acerca do processamento assíncrono efectuado na infra-estrutura. A apresentação gráfica dos principais ecrãs da aplicação demonstra a concretização prática dos requisitos do protótipo:
 
-##### a) Ecrã de Autenticação e Registo Multi-tenant
+##### a) Ecrã de Autenticação e registo Multi-tenant
 
-Apresenta um formulário unificado e responsivo com divisão visual (imagem concetual e marca à esquerda, e formulário de acesso/registo de alta fidelidade à direita). Permite a uma nova organização registar o seu perfil autónomo na base de dados PostgreSQL e criar a conta do utilizador administrador inicial de forma simples.
+Apresenta um formulário unificado e responsivo com divisão visual (imagem conceptual e marca à esquerda, e formulário de acesso/registo de alta fidelidade à direita). Permite a uma nova organização registar o seu perfil autónomo na base de dados PostgreSQL e criar a conta do utilizador administrador inicial de forma simples.
 
 \begin{figure}[htbp]
   \makebox[\textwidth][c]{\includegraphics[width=1.2\textwidth]{docs/images/login.png}}
-  \caption{Ecrã de Autenticação e Registo Multi-tenant. Fonte: Elaboração própria.}
+  \caption{Ecrã de Autenticação e registo Multi-tenant. Fonte: Elaboração própria.}
 \end{figure}
 
 ##### b) Painel Administrativo (RBAC e Departamentos)
@@ -664,7 +664,7 @@ O módulo de documentos subdivide-se no ecossistema de carregamento e na tabela 
   \caption{Módulo de Carregamento de Documentos (\textit{Drag-and-Drop}). Fonte: Elaboração própria.}
 \end{figure}
 
-*   **Tabela de Base Documental:** Exibe o repositório centralizado de ficheiros da organização, listando metadados como tamanho, departamento associado, data de criação e o estado de conversão e vetorização em tempo real (`pending`, `processed`, `error`).
+*   **Tabela de Base Documental:** Exibe o repositório centralizado de ficheiros da organização, listando metadados como tamanho, departamento associado, data de criação e o estado de conversão e vectorização em tempo real (`pending`, `processed`, `error`).
 
 \begin{figure}[htbp]
   \makebox[\textwidth][c]{\includegraphics[width=1.2\textwidth]{docs/images/base-documental.png}}
@@ -673,7 +673,7 @@ O módulo de documentos subdivide-se no ecossistema de carregamento e na tabela 
 
 ##### d) Módulo de Wiki Corporativa
 
-Consiste num editor de texto incorporado diretamente na plataforma. Permite aos colaboradores elaborar e publicar políticas internas, manuais de procedimentos e notas operacionais de forma ágil, convertendo instantaneamente o conteúdo criado em blocos textuais (*chunks*) vetorizados sem a necessidade de upload de documentos externos.
+Consiste num editor de texto incorporado directamente na plataforma. Permite aos colaboradores elaborar e publicar políticas internas, manuais de procedimentos e notas operacionais de forma ágil, convertendo instantaneamente o conteúdo criado em blocos textuais (*chunks*) vectorizados sem a necessidade de upload de documentos externos.
 
 \begin{figure}[htbp]
   \makebox[\textwidth][c]{\includegraphics[width=1.2\textwidth]{docs/images/wiki.png}}
@@ -682,7 +682,7 @@ Consiste num editor de texto incorporado diretamente na plataforma. Permite aos 
 
 ##### e) Interface de Chat IA (Pesquisa Inteligente)
 
-Representa a interface principal de interação do utilizador com o agente de inteligência artificial. Possui um layout moderno, histórico lateral de conversas persistentes, suporte a múltiplas sessões e caixas de diálogo estilizados. Cada resposta gerada apresenta botões interativos com as fontes bibliográficas consultadas; ao clicar em qualquer citação, um painel lateral de inspeção exibe o trecho exato do documento vetorizado utilizado pelo modelo para fundamentar a sua resposta. É aplicado um filtro inteligente na API (*backend*) que assegura a apresentação exclusiva das fontes efetivamente referenciadas pelo modelo de IA na resposta, eliminando assim o ruído visual de documentos contextuais que não foram julgados relevantes para a síntese final.
+Representa a interface principal de interacção do utilizador com o agente de inteligência artificial. Possui um layout moderno, histórico lateral de conversas persistentes, suporte a múltiplas sessões e caixas de diálogo estilizados. Cada resposta gerada apresenta botões interativos com as fontes bibliográficas consultadas; ao clicar em qualquer citação, um painel lateral de inspeção exibe o trecho exacto do documento vectorizado utilizado pelo modelo para fundamentar a sua resposta. É aplicado um filtro inteligente na API (*backend*) que assegura a apresentação exclusiva das fontes efetivamente referenciadas pelo modelo de IA na resposta, eliminando assim o ruído visual de documentos contextuais que não foram julgados relevantes para a síntese final.
 
 \begin{figure}[htbp]
   \makebox[\textwidth][c]{\includegraphics[width=1.2\textwidth]{docs/images/chat-ia.png}}
@@ -693,7 +693,7 @@ Representa a interface principal de interação do utilizador com o agente de in
 
 A componente mais complexa e inovadora do sistema de software reside na lógica de busca semântica integrada com o controlo de acesso relacional. Abaixo apresenta-se a codificação em PL/pgSQL da função `match_chunks()`, responsável por receber a pergunta convertida em vector e filtrar os blocos textuais correspondentes à empresa e permissões de departamento/cargo do utilizador.
 
-A codificação integral em PL/pgSQL da função `match_chunks()`, responsável por realizar esta filtragem diretamente na base de dados, encontra-se documentada no **Anexo I.1**.
+A codificação integral em PL/pgSQL da função `match_chunks()`, responsável por realizar esta filtragem directamente na base de dados, encontra-se documentada no **Anexo I.1**.
 
 No backend Next.js, as permissões são validadas de forma síncrona antes do reencaminhamento ao n8n. O excerto de código abaixo exemplifica como a API do Next.js lê o perfil de segurança do utilizador a partir da sessão e injecta o identificador do tenant, departamento e cargo no payload enviado ao pipeline do n8n:
 
@@ -701,11 +701,11 @@ O excerto de código detalhando o *endpoint* Next.js que valida as sessões e co
 
 #### 4.1.5.8. Segurança Aplicada no Sistema
 
-A arquitetura de segurança do protótipo baseia-se numa abordagem de defesa em profundidade, combinando diferentes mecanismos técnicos:
+A arquitectura de segurança do protótipo baseia-se numa abordagem de defesa em profundidade, combinando diferentes mecanismos técnicos:
 
-1.  **Autenticação por JSON Web Tokens (JWT):** Garante a integridade e expiração automática das sessões no frontend Next.js. O token contém dados cifrados e assinados pelo servidor, impedindo a falsificação de identidade do utilizador.
+1.  **Autenticação por JSON Web Tokens (JWT):** Garante a integridade e expiração automática das sessões no frontend Next.js. O token contém dados assinados pelo servidor, impedindo a falsificação de identidade do utilizador.
 2.  **Isolamento Físico de Ficheiros:** Os uploads no Supabase Storage são organizados em estruturas de directórios virtuais segmentados pelo identificador do tenant (`/storage/rag_documents/{company_id}/{document_id}`).
 3.  **Políticas RLS na Base de Dados:** Configuração de regras Row Level Security no PostgreSQL para garantir que operações simples de leitura e escrita (SELECT, UPDATE, DELETE) em tabelas administrativas (ex: listar utilizadores ou listar departamentos) estão logicamente bloqueadas apenas a registos que possuam o mesmo `company_id` do utilizador autenticado.
-4.  **Lógica Híbrida RBAC + ABAC:** Conforme descrito na secção 2.6.2, o modelo de autorização implementado combina o controlo baseado no papel do utilizador com atributos organizacionais contextuais (tenant e departamento). Na prática, esta lógica é executada diretamente na base de dados PostgreSQL pela função `match_chunks()`, que filtra os fragmentos de texto antes de qualquer envio ao modelo LLM externo, assegurando que o modelo nunca recebe contexto não-autorizado para o perfil do utilizador solicitante.
-5.  **Revisão via *Prompts*:** A arquitetura RAG utiliza *prompts* de sistema dedicadas que instruem o modelo LLM a mascarar e mitigar a exposição de Dados Pessoais Sensíveis (PII) na fase de geração da resposta, com o objectivo de mitigar a exposição indevida destes dados no texto final, antes de apresentar qualquer resultado ao utilizador final.
+4.  **Lógica Híbrida RBAC + ABAC:** Conforme descrito na secção 2.6.2, o modelo de autorização implementado combina o controlo baseado no papel do utilizador com atributos organizacionais contextuais (tenant e departamento). Na prática, esta lógica é executada directamente na base de dados PostgreSQL pela função `match_chunks()`, que filtra os fragmentos de texto antes de qualquer envio ao modelo LLM externo, assegurando que o modelo nunca recebe contexto não autorizado para o perfil do utilizador solicitante.
+5.  **Revisão via *Prompts*:** A arquitectura RAG utiliza *prompts* de sistema dedicadas que instruem o modelo LLM a mascarar e mitigar a exposição de Dados Pessoais Sensíveis (PII) na fase de geração da resposta, com o objectivo de mitigar a exposição indevida destes dados no texto final, antes de apresentar qualquer resultado ao utilizador final.
 

@@ -7,7 +7,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('auth_token')?.value;
-    
+
     if (!token) return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     const payload = verifyToken(token);
     if (!payload || !payload.sub) return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
@@ -48,7 +48,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       .eq('id', id);
 
     if (updateError) {
-      return NextResponse.json({ error: 'Erro ao atualizar utilizador' }, { status: 500 });
+      return NextResponse.json({ error: 'Erro ao actualizar utilizador' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
@@ -61,7 +61,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('auth_token')?.value;
-    
+
     if (!token) return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     const payload = verifyToken(token);
     if (!payload || !payload.sub) return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });

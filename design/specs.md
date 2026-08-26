@@ -34,7 +34,7 @@ A aplicação utiliza **Tailwind CSS v4** com um tema neutro, denso e corporativ
   --muted: #ececf0;
   --muted-foreground: #717182; /* slate-500 */
   
-  /* Interações & Accents */
+  /* interacções & Accents */
   --accent: #e9ebef;
   --accent-foreground: #030213;
   --destructive: #d4183d;
@@ -141,8 +141,8 @@ A aplicação utiliza **Tailwind CSS v4** com um tema neutro, denso e corporativ
 1.  **Cabeçalho da Página:** Título `text-xl font-bold text-slate-900` com descrição concisa em `text-xs text-slate-500`.
 2.  **Linha Superior (KPI Cards):** Grelha de 4 cartões com totais de documentos, pesquisas IA, departamentos e utilizadores activos.
 3.  **Área Principal (2 Colunas):**
-    *   **Coluna Esquerda (2/3):** Atividade recente / documentos carregados recentemente numa tabela limpa ou lista compacta com badges.
-    *   **Coluna Direita (1/3):** Ações rápidas (Upload, Nova Pesquisa IA, Gerar Wiki) e Estado do Sistema RAG.
+    *   **Coluna Esquerda (2/3):** Actividade recente / documentos carregados recentemente numa tabela limpa ou lista compacta com badges.
+    *   **Coluna Direita (1/3):** Acções rápidas (Upload, Nova Pesquisa IA, Gerar Wiki) e Estado do Sistema RAG.
 
 ### 4.2 Pesquisa Inteligente RAG (`IntelligentSearchView.tsx`)
 1.  **Layout de Conversa:**
@@ -159,7 +159,7 @@ A aplicação utiliza **Tailwind CSS v4** com um tema neutro, denso e corporativ
 1.  **Barra de Ferramentas / Filtros:**
     *   Input de pesquisa rápida à esquerda (`w-72 relative`), selector de departamento e botão de carregamento à direita.
 2.  **Tabela da Base Documental:**
-    *   Colunas: Nome do Ficheiro (com ícone por extensão PDF/DOCX/TXT), Tamanho, Departamento, Permissões RBAC, Estado de Ingestão n8n, Ações.
+    *   Colunas: Nome do Ficheiro (com ícone por extensão PDF/DOCX/TXT), Tamanho, Departamento, Permissões RBAC, Estado de Ingestão n8n, Acções.
 3.  **Modal de Permissões de Documento:**
     *   Design limpo em `max-w-md bg-white p-6 rounded-xl border border-slate-200 shadow-xl`.
 
@@ -191,5 +191,5 @@ A aplicação utiliza **Tailwind CSS v4** com um tema neutro, denso e corporativ
 1.  **Não usar cores primárias aleatórias** (ex: azuis vibrantes e sem padrão). Usar primariamente o tom escuro obsidian `#030213` para botões/destaques e neutros de `slate-50` a `slate-900` para superfícies e textos.
 2.  **Espaçamento Uniforme:** Usar múltiplos de 4px (Tailwind `p-1`, `p-2`, `p-3`, `p-4`, `p-6`).
 3.  **Tamanhos de Ícone:** Padrão inline `h-4 w-4`, cabeçalhos `h-5 w-5`, destaques/hero `h-8 w-8`.
-4.  **Bordas Suaves:** Todas as superfícies interativas e contentores devem utilizar a borda padrão `border border-slate-200`.
+4.  **Bordas Suaves:** Todas as superfícies interactivas e contentores devem utilizar a borda padrão `border border-slate-200`.
 5.  **Responsividade:** Garantir que sidebars se transformam em drawer no mobile (`lg:hidden`) e as grelhas adaptam-se de `grid-cols-1` para `md:grid-cols-2`/`lg:grid-cols-3` ou `lg:grid-cols-4`.

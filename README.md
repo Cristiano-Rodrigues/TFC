@@ -1,6 +1,6 @@
 # Guia de Configuração (TFC)
 
-Este guia explica passo a passo como  colocar este projeto em funcionamento, incluindo o frontend em React/Next.js, a base de dados no Supabase e o pipeline de RAG no n8n.
+Este guia explica passo a passo como  colocar este projecto em funcionamento, incluindo o frontend em React/Next.js, a base de dados no Supabase e o pipeline de RAG no n8n.
 
 ---
 
@@ -12,34 +12,34 @@ No repositório, foram criadas duas pastas principais que contêm as definiçõe
 
 ---
 
-## Descrição do Projeto
+## Descrição do Projecto
 
-Este projeto é um sistema **SaaS Multi-Tenant** focado na gestão inteligente de documentos e partilha de conhecimento interno, com integração avançada de Inteligência Artificial. O sistema permite que diferentes empresas criem o seu próprio espaço (tenant), efetuem a gestão da sua equipa e centralizem a sua base de conhecimento com controlos de acesso rigorosos.
+Este projecto é um sistema **SaaS Multi-Tenant** focado na gestão inteligente de documentos e partilha de conhecimento interno, com integração avançada de Inteligência Artificial. O sistema permite que diferentes empresas criem o seu próprio espaço (tenant), efetuem a gestão da sua equipa e centralizem a sua base de conhecimento com controlos de acesso rigorosos.
 
 ### Funcionalidades Implementadas (Features)
-- **Autenticação e Multi-Tenancy:** Registo de novas empresas e gestão de sessões, garantindo que os dados de cada empresa permanecem isolados.
+- **Autenticação e Multi-Tenancy:** registo de novas empresas e gestão de sessões, garantindo que os dados de cada empresa permanecem isolados.
 - **Gestão de Acessos (RBAC):** Painel administrativo completo para gestão de Utilizadores, Criação de Departamentos Organizacionais e definição de Cargos (Roles) com permissões granulares.
 - **Base Documental e Controlo de Permissões Multi-Departamentais:** Upload e gestão de documentos com a capacidade de restringir ou partilhar o acesso a ficheiros utilizando cruzamentos lógicos complexos (`AND`/`OR`) entre múltiplos departamentos e cargos.
 - **Inteligência Artificial & RAG (Retrieval-Augmented Generation):** Chat inteligente integrado com o n8n e Cohere. A IA analisa os documentos submetidos, extrai o contexto relevante (respeitando rigorosamente o nível de acesso e o departamento de quem pergunta) e fornece respostas com base exclusiva na base de conhecimento da empresa, prevenindo alucinações.
-- **Visualização de Atividade:** Possibilidade de consultar o histórico completo de interações de IA (chats passados) de cada utilizador.
+- **Visualização de Actividade:** Possibilidade de consultar o histórico completo de interacções de IA (chats passados) de cada utilizador.
 
 ---
 
 ## Passo 1: Configuração do Supabase (Base de Dados)
 
-A pessoa que vai testar o projeto deve seguir estes passos:
+A pessoa que vai testar o projecto deve seguir estes passos:
 
-1. Criar um projeto gratuito no [Supabase](https://supabase.com/).
-2. No painel do projeto Supabase, aceder ao **SQL Editor**.
+1. Criar um projecto gratuito no [Supabase](https://supabase.com/).
+2. No painel do projecto Supabase, aceder ao **SQL Editor**.
 3. Criar uma nova query, colar todo o conteúdo do ficheiro `supabase/schema.sql` e clicar em **Run**.
-   * *Isto ativará a extensão `vector`, criará todas as tabelas necessárias para o modelo SaaS Multi-Tenant e inserirá as permissões por defeito.*
+   * *Isto activará a extensão `vector`, criará todas as tabelas necessárias para o modelo SaaS Multi-Tenant e inserirá as permissões por defeito.*
 4. Aceder a **Project Settings > API** e recolher o **Project URL**, a **anon public / publishable key** e a **service_role secret**. Esta última é vital para que o backend consiga fazer upload de ficheiros para a cloud contornando as restrições normais de segurança (RLS).
 5. Aceder ao menu **Storage**, e criar um novo bucket chamado `rag_documents` (pode deixá-lo público ou privado, conforme a necessidade). Sem isto os uploads de documentos irão falhar.
 
 > [!WARNING]
 > **Nota de Segurança sobre RLS (Row Level Security):**
-> Por predefinição, as tabelas criadas no Supabase não têm as políticas de RLS ativas para facilitar o desenvolvimento local. Para um ambiente de produção ou testes públicos seguros, deves ativar o RLS e configurar políticas específicas.
-> Podes ativar o RLS correndo:
+> Por predefinição, as tabelas criadas no Supabase não têm as políticas de RLS activas para facilitar o desenvolvimento local. Para um ambiente de produção ou testes públicos seguros, deves activar o RLS e configurar políticas específicas.
+> Podes activar o RLS correndo:
 > ```sql
 > ALTER TABLE public.documents ENABLE ROW LEVEL SECURITY;
 > ALTER TABLE public.chunks ENABLE ROW LEVEL SECURITY;
@@ -50,19 +50,19 @@ A pessoa que vai testar o projeto deve seguir estes passos:
 
 ## Passo 2: Configuração do n8n
 
-O n8n é o motor que processa os uploads de ficheiros, gera os embeddings com a Cohere e armazena os vetores no Supabase.
+O n8n é o motor que processa os uploads de ficheiros, gera os embeddings com a Cohere e armazena os vectores no Supabase.
 
 1. Abrir a instância do n8n.
-2. Criar um novo fluxo (workflow) e, no canto superior direito, clicar nos três pontos (`...`) e selecionar **Import from File**. Escolher o ficheiro `n8n/minimal_ai_ingestion_pipeline.json`.
+2. Criar um novo fluxo (workflow) e, no canto superior direito, clicar nos três pontos (`...`) e seleccionar **Import from File**. Escolher o ficheiro `n8n/minimal_ai_ingestion_pipeline.json`.
 3. Configurar as credenciais nos nós correspondentes:
    * **Nós do Cohere (Embeddings e Chat)**:
      * Substituir o placeholder `YOUR_COHERE_API_KEY` pela chave de API da Cohere nos cabeçalhos `Authorization` (ex: `Bearer <chave>`).
    * **Nó Supabase Vector Store**:
      * Clicar no nó e associar uma conta do Supabase (introduzindo o URL e a chave de serviço/anon).
    * **Nó Supabase_RPC_Search_Manual**:
-     * Alterar o URL para apontar para o novo projeto: `https://<NOVO_PROJECT_REF>.supabase.co/rest/v1/rpc/match_chunks`.
+     * Alterar o URL para apontar para o novo projecto: `https://<NOVO_PROJECT_REF>.supabase.co/rest/v1/rpc/match_chunks`.
      * Alterar as variáveis nos cabeçalhos `apikey` e `Authorization` para a nova chave anónima do Supabase.
-4. Clicar em **Active** (ou guardar e ativar) para colocar o webhook em funcionamento.
+4. Clicar em **Active** (ou guardar e activar) para colocar o webhook em funcionamento.
 5. Registar os URLs de Webhook gerados pelos nós de Trigger:
    * O URL terminado em `/upload` (produção ou teste).
    * O URL terminado em `/query` (produção ou teste).
@@ -98,7 +98,7 @@ O n8n é o motor que processa os uploads de ficheiros, gera os embeddings com a 
 
 ## Passo 4: Como Testar a Integração
 
-1. **Registo de Empresa (SaaS)**: Aceder à aplicação Next.js e criar uma **Empresa**. Isto irá registar o primeiro administrador e inicializar automaticamente os cargos (roles) e departamentos da empresa.
+1. **registo de Empresa (SaaS)**: Aceder à aplicação Next.js e criar uma **Empresa**. Isto irá registar o primeiro administrador e inicializar automaticamente os cargos (roles) e departamentos da empresa.
 2. **Criação de Utilizadores**: Aceder ao painel de administração (apenas para o admin da empresa) para criar outros utilizadores (não é necessário que eles se registem por si próprios). Eles farão o login com as credenciais provisórias e poderão alterá-las futuramente.
 2. **Upload de Documentos**: Fazer o upload de um ficheiro (ex: um documento de texto ou PDF) no menu correspondente. A aplicação enviará o ficheiro para o n8n (`/upload`), que fará a extração de texto, chunking, geração de embeddings na Cohere e gravação na tabela `chunks` do Supabase.
 3. **Chat Inteligente**: Enviar uma pergunta no Chat. A aplicação chamará a rota do Next.js que envia o pedido ao n8n (`/query`). O n8n gerará o embedding da pergunta, procurará os trechos mais semelhantes no Supabase através do RPC `match_chunks` e enviará a resposta final produzida pela Cohere.

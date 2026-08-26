@@ -91,7 +91,7 @@ export const AdminView: React.FC = () => {
         </div>
         <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Acesso Negado</h2>
         <p className="text-xs text-slate-500 leading-relaxed font-sans">
-          A sua credencial atual diz respeito a um perfil de <strong>{profile?.role || "standard"}</strong>. Esta secção administrativa permite o controlo e atribuição de permissões da equipa, estando restrita apenas a quem possui os privilégios corretos.
+          A sua credencial actual diz respeito a um perfil de <strong>{profile?.role || "standard"}</strong>. Esta secção administrativa permite o controlo e atribuição de permissões da equipa, estando restrita apenas a quem possui os privilégios correctos.
         </p>
       </div>
     );
@@ -316,7 +316,7 @@ export const AdminView: React.FC = () => {
                   <th scope="col" className="px-5 py-3">Departamento Organizacional</th>
                   <th scope="col" className="px-5 py-3">Nível de Acesso (Role)</th>
                   <th scope="col" className="px-5 py-3">Situação Cadastral</th>
-                  <th scope="col" className="px-5 py-3 text-right">Ação</th>
+                  <th scope="col" className="px-5 py-3 text-right">Acção</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-medium">
@@ -334,10 +334,10 @@ export const AdminView: React.FC = () => {
 
                       <td className="px-5 py-3.5">
                         <span className={`inline-block text-[9px] font-bold tracking-wider px-2 py-0.5 rounded uppercase ${u.role === 'admin'
-                            ? 'bg-red-50 text-red-700 border border-red-100'
-                            : u.role === 'manager'
-                              ? 'bg-blue-50 text-blue-700 border border-blue-100'
-                              : 'bg-slate-100 text-slate-600'
+                          ? 'bg-red-50 text-red-700 border border-red-100'
+                          : u.role === 'manager'
+                            ? 'bg-blue-50 text-blue-700 border border-blue-100'
+                            : 'bg-slate-100 text-slate-600'
                           }`}>
                           {u.role}
                         </span>
@@ -347,12 +347,12 @@ export const AdminView: React.FC = () => {
                         <span
                           onClick={() => handleToggleActiveState(u)}
                           className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide cursor-pointer select-none ${u.active
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
-                              : 'bg-red-50 text-red-700 border border-red-100'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+                            : 'bg-red-50 text-red-700 border border-red-100'
                             }`}
                         >
                           <span className={`w-1 h-1 rounded-full ${u.active ? 'bg-emerald-500' : 'bg-red-500'}`} />
-                          {u.active ? 'Ativo' : 'Desativado'}
+                          {u.active ? 'Activo' : 'Desactivado'}
                         </span>
                       </td>
 
@@ -550,11 +550,11 @@ export const AdminView: React.FC = () => {
                   onChange={(e) => setEditingUser({ ...editingUser, active: e.target.checked })}
                   className="rounded text-blue-600 focus:ring-0 h-4 w-4 cursor-pointer"
                 />
-                <label htmlFor="edit-user-active-checkbox" className="text-xs font-bold text-slate-700 uppercase tracking-wider cursor-pointer">Definir como Utilizador Ativo</label>
+                <label htmlFor="edit-user-active-checkbox" className="text-xs font-bold text-slate-700 uppercase tracking-wider cursor-pointer">Definir como Utilizador Activo</label>
               </div>
 
               <div className="p-3 bg-slate-50 rounded border border-slate-200 space-y-1">
-                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">Privilégios da Role Selecionada:</span>
+                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">Privilégios da Role Seleccionada:</span>
                 <p className="text-[10px] text-slate-500 leading-normal">
                   Permissões atribuídas a este perfil na base de dados.
                 </p>

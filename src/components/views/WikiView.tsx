@@ -105,7 +105,7 @@ export const WikiView: React.FC = () => {
       setGenTopic('');
     } catch (err: any) {
       console.error("Wiki creation error:", err);
-      setGenError("Incapaz de estruturar Wiki de forma automática. Verifique se o backend está ativo.");
+      setGenError("Incapaz de estruturar Wiki de forma automática. Verifique se o backend está activo.");
     } finally {
       setIsGenerating(false);
     }

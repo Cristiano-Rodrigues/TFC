@@ -8,9 +8,9 @@ interface DocBase {
   id: string;
   name: string;
   type: 'PDF' | 'DOCX' | 'TXT' | 'XLSX';
-  departments: {id: string, name: string}[];
+  departments: { id: string, name: string }[];
   accessLogic: 'AND' | 'OR';
-  allowedRolesData: {id: string, name: string}[];
+  allowedRolesData: { id: string, name: string }[];
   updatedAt: string;
   indexingState: 'Indexado' | 'Em Processamento' | 'Não Indexado';
   allowedRoles: string[];
@@ -25,8 +25,8 @@ export const DocumentsView: React.FC = () => {
   const [documents, setDocuments] = useState<DocBase[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDoc, setSelectedDoc] = useState<DocBase | null>(null);
-  const [departmentsList, setDepartmentsList] = useState<{id: string, name: string}[]>([]);
-  const [rolesList, setRolesList] = useState<{id: string, name: string}[]>([]);
+  const [departmentsList, setDepartmentsList] = useState<{ id: string, name: string }[]>([]);
+  const [rolesList, setRolesList] = useState<{ id: string, name: string }[]>([]);
 
   useEffect(() => {
     const fetchDocuments = async () => {
@@ -37,7 +37,7 @@ export const DocumentsView: React.FC = () => {
           fetch('/api/departments'),
           fetch('/api/roles')
         ]);
-        
+
         if (deptRes.ok) {
           const { departments } = await deptRes.json();
           if (departments) setDepartmentsList(departments);
@@ -55,9 +55,9 @@ export const DocumentsView: React.FC = () => {
           const type = (['PDF', 'DOCX', 'TXT', 'XLSX'].includes(ext) ? ext : 'TXT') as DocBase['type'];
           const indexState: DocBase['indexingState'] =
             d.n8n_status === 'done' ? 'Indexado'
-            : d.n8n_status === 'processing' ? 'Em Processamento'
-            : 'Não Indexado';
-            
+              : d.n8n_status === 'processing' ? 'Em Processamento'
+                : 'Não Indexado';
+
           const depts = d.document_departments ? d.document_departments.map((dd: any) => dd.departments).filter(Boolean) : [];
           const roles = d.document_permissions ? d.document_permissions.map((dp: any) => dp.roles).filter(Boolean) : [];
 
@@ -87,11 +87,11 @@ export const DocumentsView: React.FC = () => {
 
     fetchDocuments();
   }, []);
-  
+
   const [permissionsModalDoc, setPermissionsModalDoc] = useState<DocBase | null>(null);
   const [updatingPermsRole, setUpdatingPermsRole] = useState<string[]>([]);
   const [updatingPermsDept, setUpdatingPermsDept] = useState<string[]>([]);
-  const [updatingAccessLogic, setUpdatingAccessLogic] = useState<'AND'|'OR'>('AND');
+  const [updatingAccessLogic, setUpdatingAccessLogic] = useState<'AND' | 'OR'>('AND');
   const [isSavingPerms, setIsSavingPerms] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -106,7 +106,7 @@ export const DocumentsView: React.FC = () => {
     const userRole = profile?.role || 'user';
     const userDeptId = profile?.department_id;
     const userRoleId = profile?.role_id;
-    
+
     let isAllowed = false;
 
     if (userRole === 'admin') {
@@ -116,20 +116,20 @@ export const DocumentsView: React.FC = () => {
     } else {
       const hasDept = doc.departments.some(d => d.id === userDeptId);
       const hasRole = doc.allowedRolesData.some(r => r.id === userRoleId);
-      
+
       if (doc.accessLogic === 'OR') {
-         isAllowed = hasDept || hasRole;
+        isAllowed = hasDept || hasRole;
       } else {
-         const deptCheck = doc.departments.length === 0 || hasDept;
-         const roleCheck = doc.allowedRoles.length === 0 || hasRole;
-         isAllowed = deptCheck && roleCheck;
+        const deptCheck = doc.departments.length === 0 || hasDept;
+        const roleCheck = doc.allowedRoles.length === 0 || hasRole;
+        isAllowed = deptCheck && roleCheck;
       }
     }
 
     if (!isAllowed) return false;
 
     const matchesSearch = doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          doc.content.toLowerCase().includes(searchTerm.toLowerCase());
+      doc.content.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = typeFilter === 'Todos' || doc.type === typeFilter;
     const matchesDept = deptFilter === 'Todos' || doc.departments.some(d => d.id === deptFilter) || (doc.departments.length === 0 && deptFilter === 'Geral');
     const matchesSource = sourceFilter === 'Todos' || doc.source === sourceFilter;
@@ -139,7 +139,7 @@ export const DocumentsView: React.FC = () => {
 
   const handleDeleteDoc = async (id: string, name: string) => {
     if (!window.confirm(`Confirma a exclusão irrevogável do documento "${name}" de toda a base de inteligência?`)) return;
-    
+
     try {
       const res = await fetch(`/api/documents/${id}`, { method: 'DELETE' });
       if (res.ok) {
@@ -182,7 +182,7 @@ export const DocumentsView: React.FC = () => {
   const handleSavePermissions = async () => {
     if (!permissionsModalDoc) return;
     setIsSavingPerms(true);
-    
+
     try {
       const res = await fetch(`/api/documents/${permissionsModalDoc.id}`, {
         method: 'PUT',
@@ -193,14 +193,14 @@ export const DocumentsView: React.FC = () => {
           access_logic: updatingAccessLogic
         })
       });
-      
+
       if (res.ok) {
         setDocuments(prev => prev.map(d => {
           if (d.id === permissionsModalDoc.id) {
             const newDepts = departmentsList.filter(dept => updatingPermsDept.includes(dept.id));
             const newRolesData = rolesList.filter(role => updatingPermsRole.includes(role.id));
-            return { 
-              ...d, 
+            return {
+              ...d,
               departments: newDepts,
               allowedRolesData: newRolesData,
               allowedRoles: newRolesData.map(r => r.name),
@@ -211,31 +211,31 @@ export const DocumentsView: React.FC = () => {
         }));
         setPermissionsModalDoc(null);
       } else {
-        alert("Erro ao atualizar as permissões.");
+        alert("Erro ao actualizar as permissões.");
       }
     } catch (e) {
       console.error(e);
-      alert("Erro ao atualizar permissões.");
+      alert("Erro ao actualizar permissões.");
     } finally {
       setIsSavingPerms(false);
     }
   };
 
   const toggleRoleInModal = (roleId: string) => {
-    setUpdatingPermsRole(prev => 
+    setUpdatingPermsRole(prev =>
       prev.includes(roleId) ? prev.filter(r => r !== roleId) : [...prev, roleId]
     );
   };
 
   const toggleDeptInModal = (deptId: string) => {
-    setUpdatingPermsDept(prev => 
+    setUpdatingPermsDept(prev =>
       prev.includes(deptId) ? prev.filter(r => r !== deptId) : [...prev, deptId]
     );
   };
 
   return (
     <div className="space-y-6 relative">
-      
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between pb-4 border-b border-slate-200">
         <div>
@@ -248,10 +248,10 @@ export const DocumentsView: React.FC = () => {
 
       {/* Primary Split View (Table + PDF Viewer Column) */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        
+
         {/* Table list */}
         <div className="xl:col-span-2 space-y-4">
-          
+
           {/* Advanced Filter Panel */}
           <div className="bg-white p-4 border border-slate-200 rounded-xl grid grid-cols-1 sm:grid-cols-4 gap-3 items-end shadow-2xs">
             <div className="sm:col-span-1 space-y-1">
@@ -320,7 +320,7 @@ export const DocumentsView: React.FC = () => {
                   <th scope="col" className="px-4 py-3">Área / Origem</th>
                   <th scope="col" className="px-4 py-3">Indexação IA</th>
                   <th scope="col" className="px-4 py-3">Acessibilidade RBAC</th>
-                  <th scope="col" className="px-4 py-3 text-right">Ações</th>
+                  <th scope="col" className="px-4 py-3 text-right">Acções</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-medium">
@@ -457,7 +457,7 @@ export const DocumentsView: React.FC = () => {
           {selectedDoc ? (
             /* --- Actual Document Viewer UI --- */
             <div id="document-viewer-container" className="bg-white border border-slate-200 rounded-lg overflow-hidden flex flex-col h-full shadow-xs animate-in slide-in-from-right duration-150">
-              
+
               {/* Header */}
               <div className="bg-white px-4 py-3 border-b border-slate-200 text-slate-800 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-2 truncate">
@@ -475,7 +475,7 @@ export const DocumentsView: React.FC = () => {
               {/* PDF style sheet */}
               <div className="p-5 flex-1 bg-slate-50 min-h-[300px] border-b border-slate-200">
                 <div className="bg-white border border-slate-200 rounded p-5 shadow-2xs space-y-4">
-                  
+
                   {/* Internal file Header */}
                   <div className="flex items-center justify-between border-b pb-3 text-[10px] text-slate-400 font-semibold font-mono">
                     <span>MANUAL INTERNO</span>
@@ -557,9 +557,9 @@ export const DocumentsView: React.FC = () => {
                   <div className="flex flex-wrap gap-2 p-2.5 border border-slate-150 rounded bg-slate-50 max-h-32 overflow-y-auto">
                     {departmentsList.map(d => (
                       <label key={d.id} className="flex items-center gap-1.5 cursor-pointer bg-white px-2 py-1 border border-slate-200 rounded hover:border-blue-400 transition-colors">
-                        <input 
-                          type="checkbox" 
-                          checked={updatingPermsDept.includes(d.id)} 
+                        <input
+                          type="checkbox"
+                          checked={updatingPermsDept.includes(d.id)}
                           onChange={() => toggleDeptInModal(d.id)}
                           className="rounded text-blue-600 focus:ring-0 h-3.5 w-3.5"
                         />
@@ -568,7 +568,7 @@ export const DocumentsView: React.FC = () => {
                     ))}
                   </div>
                   <span className="text-[10px] text-slate-400 block mt-1 leading-tight">
-                    Se nenhum departamento for selecionado, o documento é considerado global para toda a empresa.
+                    Se nenhum departamento for seleccionado, o documento é considerado global para toda a empresa.
                   </span>
                 </div>
 
@@ -579,8 +579,8 @@ export const DocumentsView: React.FC = () => {
                     onChange={(e) => setUpdatingAccessLogic(e.target.value as 'AND' | 'OR')}
                     className="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded focus:outline-none bg-slate-50"
                   >
-                    <option value="AND">E (AND) - Tem de ter o departamento E o cargo selecionado</option>
-                    <option value="OR">OU (OR) - Basta ter o departamento OU o cargo selecionado</option>
+                    <option value="AND">E (AND) - Tem de ter o departamento E o cargo seleccionado</option>
+                    <option value="OR">OU (OR) - Basta ter o departamento OU o cargo seleccionado</option>
                   </select>
                 </div>
 
@@ -599,7 +599,7 @@ export const DocumentsView: React.FC = () => {
                           <input
                             type="checkbox"
                             checked={updatingPermsRole.includes(role.id)}
-                            onChange={() => {}}
+                            onChange={() => { }}
                             className="rounded text-blue-600 focus:ring-0 h-3.5 w-3.5 cursor-pointer shrink-0"
                           />
                         </div>

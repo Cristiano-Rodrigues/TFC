@@ -1,3 +1,5 @@
+\newpage
+
 # Anexos
 
 ## Anexo I - Código Fonte Principal

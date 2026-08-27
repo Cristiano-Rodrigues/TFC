@@ -5,4 +5,4 @@ description: Enforces the use of docs/context.md as the primary source of truth 
 
 # Source of Truth
 
-Always use `docs/context.md` (or the absolute path `/home/cristiano/Desktop/TFC/docs/context.md`) as the source of truth for this project. You can also use `README.md` for other details
+Always use `docs/context.md` as the source of truth for this project. You can also use `README.md` for other details

@@ -8,7 +8,7 @@ Este guia explica passo a passo como  colocar este projecto em funcionamento, in
 
 No repositório, foram criadas duas pastas principais que contêm as definições necessárias:
 1. **`supabase/schema.sql`**: Contém todo o esquema de tabelas para o modelo SaaS Multi-Tenant com suporte a empresas, cargos dinâmicos, permissões globais e funções (como `match_chunks`).
-2. **`n8n/minimal_ai_ingestion_pipeline.json`**: Contém o fluxo completo do pipeline RAG pronto a ser importado para o n8n (com placeholders para as chaves secretas).
+2. **`n8n/minimal_ai_ingestion_pipeline.json`**: Contém o fluxo completo de orquestração multiagente e pipeline RAG pronto a ser importado para o n8n (com placeholders para as chaves secretas).
 
 ---
 
@@ -20,7 +20,7 @@ Este projecto é um sistema **SaaS Multi-Tenant** focado na gestão inteligente 
 - **Autenticação e Multi-Tenancy:** registo de novas empresas e gestão de sessões, garantindo que os dados de cada empresa permanecem isolados.
 - **Gestão de Acessos (RBAC):** Painel administrativo completo para gestão de Utilizadores, Criação de Departamentos Organizacionais e definição de Cargos (Roles) com permissões granulares.
 - **Base Documental e Controlo de Permissões Multi-Departamentais:** Upload e gestão de documentos com a capacidade de restringir ou partilhar o acesso a ficheiros utilizando cruzamentos lógicos complexos (`AND`/`OR`) entre múltiplos departamentos e cargos.
-- **Inteligência Artificial & RAG (Retrieval-Augmented Generation):** Chat inteligente integrado com o n8n e Cohere. A IA analisa os documentos submetidos, extrai o contexto relevante (respeitando rigorosamente o nível de acesso e o departamento de quem pergunta) e fornece respostas com base exclusiva na base de conhecimento da empresa, prevenindo alucinações.
+- **Sistema Multiagentes & RAG:** Plataforma orquestrada pelo n8n, onde agentes de IA especializados (Extracção, Validação, Resposta) colaboram. O sistema analisa documentos ou mensagens, extrai conhecimento estruturado, e no chat (respeitando rigorosamente permissões RBAC) fornece respostas com base exclusiva na base de conhecimento da empresa, prevenindo alucinações.
 - **Visualização de Actividade:** Possibilidade de consultar o histórico completo de interacções de IA (chats passados) de cada utilizador.
 
 ---

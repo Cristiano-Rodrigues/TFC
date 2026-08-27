@@ -25,7 +25,7 @@ O projecto demonstra como organizações angolanas podem centralizar, classifica
 
 ## 2. Problema de Investigação
 
-**Pergunta central:** Como avaliar a viabilidade técnica de um protótipo de sistema de gestão da informação organizacional, baseado em orquestração de inteligência artificial, capaz de centralizar, classificar e facilitar a recuperação de dados em ambientes empresariais angolanos?
+**Pergunta central:** Como avaliar a viabilidade técnica de um protótipo de sistema de gestão da informação organizacional, baseado em agentes de inteligência artificial, capaz de centralizar, classificar e facilitar a recuperação de dados em ambientes empresariais angolanos?
 
 ### Contexto do Problema
 - Nas organizações angolanas, a informação encontra-se dispersa em silos (documentos, emails, plataformas isoladas).
@@ -126,9 +126,9 @@ BIBLIOGRAFIA
      2.3.3. Busca semântica vs busca por palavras-chave
      2.3.4. Vantagens do RAG sobre abordagens tradicionais
    2.4. Sistemas Multiagentes (SMA)
-     2.4.1. Definição de agentes de software
-     2.4.2. Arquitecturas multiagentes
-     2.4.3. Aplicações em gestão de informação
+     2.4.1. Definição e Tipos de Agentes de Software
+     2.4.2. Arquitecturas Multiagentes
+     2.4.3. Agentes Autónomos Baseados em LLMs
    2.5. Tecnologias de Desenvolvimento Web
      2.5.1. Arquitectura SaaS Multi-Tenant
      2.5.2. Frameworks e ferramentas modernas (React, Next.js)
@@ -155,7 +155,8 @@ BIBLIOGRAFIA
 | **Base de Dados** | Supabase (PostgreSQL) | Dados relacionais, metadados, autenticação |
 | **Vector Store** | pgvector (extensão PostgreSQL) | Armazenamento de embeddings para busca semântica |
 | **Storage** | Supabase Storage (bucket `rag_documents`) | Ficheiros originais uploaded |
-| **Pipeline IA** | n8n (workflow automation) | Orquestração do pipeline RAG |
+| **Orquestração** | n8n (workflow automation) | Coordenação dos fluxos e agentes de IA |
+| **Agentes IA** | LLMs + Tool Use | Análise, validação e extracção autónoma de conhecimento |
 | **Embeddings** | Cohere (API) | Geração de embeddings vectoriais (1024 dimensões) |
 | **LLM** | Cohere (Chat) | Geração de respostas baseadas em contexto |
 | **Animações** | Framer Motion | Micro-animações e transições da UI |
@@ -266,22 +267,22 @@ integrations:manage, users:manage
 | `/api/wiki/*` | Geração de conteúdos Wiki |
 | `/api/debug-rag/*` | Debugging do pipeline RAG |
 
-### 6.3. Pipeline RAG (n8n)
+### 6.3. Orquestração e Agentes IA (n8n)
 
-O pipeline `minimal_ai_ingestion_pipeline.json` implementa dois fluxos:
+O pipeline `minimal_ai_ingestion_pipeline.json` orquestra a colaboração entre agentes de IA através de fluxos de processamento:
 
-**Fluxo de Upload (`/upload`):**
-1. Recebe ficheiro via webhook
-2. Extrai texto do documento
-3. Divide em chunks
-4. Gera embeddings com Cohere (modelo embed-multilingual-v3.0, 1024 dimensões)
+**Fluxo de Ingestão e Estruturação (`/upload` ou Canais):**
+1. Recebe ficheiro ou mensagem via webhook
+2. Agente de Extracção analisa e estrutura o conteúdo
+3. Agente de Validação verifica a consistência face ao conhecimento existente
+4. Processo divide o texto em chunks e gera embeddings (Cohere embed-multilingual-v3.0, 1024 dimensões)
 5. Armazena chunks + embeddings na tabela `chunks` via Supabase
 
 **Fluxo de Query (`/query`):**
 1. Recebe pergunta via webhook
 2. Gera embedding da pergunta com Cohere
 3. Executa `match_chunks()` via RPC do Supabase (com filtros RBAC)
-4. Envia contexto + pergunta ao LLM (Cohere Chat)
+4. Agente de Resposta recebe o contexto e a pergunta para gerar uma síntese fundamentada
 5. Retorna resposta com referências aos documentos fonte
 
 ---
@@ -387,14 +388,3 @@ As referências bibliográficas da investigação encontram-se integralmente cen
 - **RBAC refinado:** Sistema de permissões com lógica AND/OR entre departamentos e cargos para máxima flexibilidade.
 - **Multi-Tenant:** Isolamento de dados por `company_id` em todas as tabelas.
 - **Pandoc para monografia:** Permite escrever em Markdown com citações BibTeX e gerar PDF formatado.
-
----
-
-## 12. Próximos Passos
-
-O desenvolvimento do protótipo e a redação da monografia encontram-se **concluídos**. O sistema foi totalmente implementado, testado e documentado com rigor académico. O código-fonte está versionado e o protótipo encontra-se funcional e acessível num ambiente de produção (Vercel).
-
-### Passos Finais
-- Leitura final de revisão para detectar pequenos erros tipográficos no PDF final (`dist/output.pdf`).
-- Impressão e submissão formal do Trabalho Final de Curso (TFC) ao ISAF.
-- Preparação da apresentação de Defesa da Tese (criação de diapositivos resumindo o problema de pesquisa, a arquitectura metodológica/técnica construída e as conclusões).

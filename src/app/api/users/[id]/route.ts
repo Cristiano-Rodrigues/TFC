@@ -1,43 +1,29 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { verifyToken } from '@/lib/jwt';
-import { supabase } from '@/lib/supabase';
+import { requireAuth, requirePermission, requireTenantResource, unauthenticatedResponse, unauthorizedResponse } from '@/lib/auth-helpers';
+import { getAuthenticatedSupabase } from '@/lib/supabase';
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('auth_token')?.value;
+    const session = await requireAuth();
+    if (!session) return unauthenticatedResponse();
 
-    if (!token) return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
-    const payload = verifyToken(token);
-    if (!payload || !payload.sub) return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
-
-    const { data: userRecord } = await supabase
-      .from('users')
-      .select('role, roles(role_permissions(permissions(code)))')
-      .eq('id', payload.sub)
-      .single();
-
-    const hasPermission = userRecord?.role === 'admin' || (userRecord as any)?.roles?.role_permissions?.some(
-      (rp: any) => rp.permissions?.code === 'users:manage'
-    );
-
-    if (!hasPermission) return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
+    const hasPermission = await requirePermission(session, 'users:manage');
+    if (!hasPermission) return unauthorizedResponse();
 
     const { id } = await params;
     const body = await req.json();
 
-    const { data: userToUpdate, error: fetchError } = await supabase
+    const { data: userToUpdate, error: fetchError } = await getAuthenticatedSupabase(session.token)
       .from('users')
       .select('company_id')
       .eq('id', id)
       .single();
 
-    if (fetchError || !userToUpdate || userToUpdate.company_id !== payload.company_id) {
+    if (fetchError || !userToUpdate || !requireTenantResource(session, userToUpdate.company_id)) {
       return NextResponse.json({ error: 'Utilizador não encontrado ou sem permissão' }, { status: 404 });
     }
 
-    const { error: updateError } = await supabase
+    const { error: updateError } = await getAuthenticatedSupabase(session.token)
       .from('users')
       .update({
         full_name: body.fullName,
@@ -59,38 +45,25 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('auth_token')?.value;
+    const session = await requireAuth();
+    if (!session) return unauthenticatedResponse();
 
-    if (!token) return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
-    const payload = verifyToken(token);
-    if (!payload || !payload.sub) return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
-
-    const { data: userRecord } = await supabase
-      .from('users')
-      .select('role, roles(role_permissions(permissions(code)))')
-      .eq('id', payload.sub)
-      .single();
-
-    const hasPermission = userRecord?.role === 'admin' || (userRecord as any)?.roles?.role_permissions?.some(
-      (rp: any) => rp.permissions?.code === 'users:manage'
-    );
-
-    if (!hasPermission) return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
+    const hasPermission = await requirePermission(session, 'users:manage');
+    if (!hasPermission) return unauthorizedResponse();
 
     const { id } = await params;
 
-    const { data: userToDelete, error: fetchError } = await supabase
+    const { data: userToDelete, error: fetchError } = await getAuthenticatedSupabase(session.token)
       .from('users')
       .select('company_id')
       .eq('id', id)
       .single();
 
-    if (fetchError || !userToDelete || userToDelete.company_id !== payload.company_id) {
+    if (fetchError || !userToDelete || !requireTenantResource(session, userToDelete.company_id)) {
       return NextResponse.json({ error: 'Utilizador não encontrado ou sem permissão' }, { status: 404 });
     }
 
-    const { error: deleteError } = await supabase
+    const { error: deleteError } = await getAuthenticatedSupabase(session.token)
       .from('users')
       .delete()
       .eq('id', id);

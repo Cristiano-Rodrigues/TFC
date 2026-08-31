@@ -1,26 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { verifyToken } from '@/lib/jwt';
-import { supabase } from '@/lib/supabase';
+import { requireAuth } from '@/lib/auth-helpers';
+import { getAuthenticatedSupabase } from '@/lib/supabase';
 
 export async function GET() {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('auth_token')?.value;
+    const session = await requireAuth();
 
-    if (!token) {
-      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
+    if (!session) {
+      return NextResponse.json({ error: 'Não autenticado ou sessão inválida' }, { status: 401 });
     }
 
-    const payload = verifyToken(token);
-    if (!payload || !payload.sub) {
-      return NextResponse.json({ error: 'Sessão inválida' }, { status: 401 });
-    }
-
-    const { data, error } = await supabase
+    const { data, error } = await getAuthenticatedSupabase(session.token)
       .from('ai_chat_sessions')
       .select('id, title, created_at, updated_at')
-      .eq('user_id', payload.sub)
+      .eq('user_id', session.sub)
       .order('updated_at', { ascending: false });
 
     if (error) {
@@ -35,24 +28,18 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('auth_token')?.value;
+    const session = await requireAuth();
 
-    if (!token) {
-      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
-    }
-
-    const payload = verifyToken(token);
-    if (!payload || !payload.sub) {
-      return NextResponse.json({ error: 'Sessão inválida' }, { status: 401 });
+    if (!session) {
+      return NextResponse.json({ error: 'Não autenticado ou sessão inválida' }, { status: 401 });
     }
 
     const { title } = await req.json();
 
-    const { data, error } = await supabase
+    const { data, error } = await getAuthenticatedSupabase(session.token)
       .from('ai_chat_sessions')
       .insert({
-        user_id: payload.sub,
+        user_id: session.sub,
         title: title || 'Nova Conversa',
       })
       .select('id, title, created_at, updated_at')

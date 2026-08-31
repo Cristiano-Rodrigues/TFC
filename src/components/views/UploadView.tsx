@@ -40,7 +40,7 @@ export const UploadView: React.FC = () => {
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
   const [accessLogic, setAccessLogic] = useState<'AND' | 'OR'>('AND');
 
-  const canUpload = profile?.permissions.includes('doc:upload') || profile?.role === 'admin' || profile?.role === 'manager';
+  const canUpload = profile?.permissions.includes('documents:create') || profile?.role === 'admin' || profile?.role === 'manager';
 
   useEffect(() => {
     if (canUpload) {

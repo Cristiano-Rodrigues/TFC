@@ -1,30 +1,16 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { verifyToken } from '@/lib/jwt';
-import { supabase } from '@/lib/supabase';
 import { hashPassword } from '@/lib/hash';
 import crypto from 'crypto';
+import { requireAuth, requirePermission, unauthenticatedResponse, unauthorizedResponse } from '@/lib/auth-helpers';
+import { supabaseAdmin } from '@/lib/supabase';
 
 export async function POST(req: Request) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('auth_token')?.value;
-    
-    if (!token) return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
-    const payload = verifyToken(token);
-    if (!payload || !payload.sub) return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
+    const session = await requireAuth();
+    if (!session) return unauthenticatedResponse();
 
-    const { data: userRecord } = await supabase
-      .from('users')
-      .select('role, roles(role_permissions(permissions(code)))')
-      .eq('id', payload.sub)
-      .single();
-
-    const hasPermission = userRecord?.role === 'admin' || (userRecord as any)?.roles?.role_permissions?.some(
-      (rp: any) => rp.permissions?.code === 'users:manage'
-    );
-
-    if (!hasPermission) return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
+    const hasPermission = await requirePermission(session, 'users:manage');
+    if (!hasPermission) return unauthorizedResponse();
 
     const { email, fullName, role_id, department_id, password } = await req.json();
 
@@ -34,7 +20,7 @@ export async function POST(req: Request) {
 
     const passwordHash = hashPassword(password);
 
-    const { data: newUser, error } = await supabase
+    const { data: newUser, error } = await supabaseAdmin
       .from('users')
       .insert({
         id: crypto.randomUUID(),
@@ -43,7 +29,7 @@ export async function POST(req: Request) {
         role_id,
         department_id,
         password_hash: passwordHash,
-        company_id: payload.company_id,
+        company_id: session.company_id,
         active: true
       })
       .select('id, email, full_name, active, role_id, department_id')
@@ -61,39 +47,26 @@ export async function POST(req: Request) {
 
 export async function GET() {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('auth_token')?.value;
-    
-    if (!token) return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
-    const payload = verifyToken(token);
-    if (!payload || !payload.sub) return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
+    const session = await requireAuth();
+    if (!session) return unauthenticatedResponse();
 
-    const { data: userRecord } = await supabase
-      .from('users')
-      .select('role, roles(role_permissions(permissions(code)))')
-      .eq('id', payload.sub)
-      .single();
+    const hasPermission = await requirePermission(session, 'users:manage');
+    if (!hasPermission) return unauthorizedResponse();
 
-    const hasPermission = userRecord?.role === 'admin' || (userRecord as any)?.roles?.role_permissions?.some(
-      (rp: any) => rp.permissions?.code === 'users:manage'
-    );
-
-    if (!hasPermission) return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
-
-    const { data: usersData, error: usersError } = await supabase
+    const { data: usersData, error: usersError } = await supabaseAdmin
       .from('users')
       .select('id, email, full_name, active, roles(id, name), departments(id, name)')
-      .eq('company_id', payload.company_id);
+      .eq('company_id', session.company_id);
 
-    const { data: rolesData, error: rolesError } = await supabase
+    const { data: rolesData, error: rolesError } = await supabaseAdmin
       .from('roles')
       .select('id, name')
-      .eq('company_id', payload.company_id);
+      .eq('company_id', session.company_id);
 
-    const { data: deptsData, error: deptsError } = await supabase
+    const { data: deptsData, error: deptsError } = await supabaseAdmin
       .from('departments')
       .select('id, name')
-      .eq('company_id', payload.company_id);
+      .eq('company_id', session.company_id);
 
     if (usersError || rolesError || deptsError) {
       return NextResponse.json({ error: 'Erro ao listar dados' }, { status: 500 });

@@ -99,8 +99,8 @@ export const DocumentsView: React.FC = () => {
   const [deptFilter, setDeptFilter] = useState('Todos');
   const [sourceFilter, setSourceFilter] = useState('Todos');
 
-  const canDelete = profile?.permissions.includes('doc:delete') || profile?.role === 'admin';
-  const canManagePerms = profile?.permissions.includes('doc:manage_perms') || profile?.role === 'admin';
+  const canDelete = profile?.permissions.includes('documents:delete') || profile?.role === 'admin';
+  const canManagePerms = profile?.permissions.includes('documents:manage_permissions') || profile?.role === 'admin';
 
   const filteredDocs = documents.filter(doc => {
     const userRole = profile?.role || 'user';

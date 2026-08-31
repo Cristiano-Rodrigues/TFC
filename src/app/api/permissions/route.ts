@@ -1,40 +1,16 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { verifyToken } from '@/lib/jwt';
-import { supabaseAdmin } from '@/lib/supabase';
+import { requireAuth, requirePermission, unauthenticatedResponse, unauthorizedResponse } from '@/lib/auth-helpers';
+import { getAuthenticatedSupabase } from '@/lib/supabase';
 
 export async function GET() {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('auth_token')?.value;
+    const session = await requireAuth();
+    if (!session) return unauthenticatedResponse();
 
-    if (!token) return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
-    const payload = verifyToken(token);
-    if (!payload || !payload.sub) return NextResponse.json({ error: 'Sessão inválida' }, { status: 401 });
+    const hasPermission = await requirePermission(session, 'roles:manage');
+    if (!hasPermission) return unauthorizedResponse();
 
-    const { data: user, error: userErr } = await supabaseAdmin
-      .from('users')
-      .select(`
-        company_id, 
-        role,
-        roles (
-          role_permissions (
-            permissions ( code )
-          )
-        )
-      `)
-      .eq('id', payload.sub)
-      .single();
-
-    const hasPermission = (user as any)?.roles?.role_permissions?.some(
-      (rp: any) => rp.permissions?.code === 'roles:manage'
-    );
-
-    if (userErr || !user || !hasPermission) {
-      return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
-    }
-
-    const { data: permissions, error } = await supabaseAdmin
+    const { data: permissions, error } = await getAuthenticatedSupabase(session.token)
       .from('permissions')
       .select('*')
       .order('code', { ascending: true });

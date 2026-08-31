@@ -186,12 +186,18 @@ $function$;
 
 -- 4. Semear as permissões globais do sistema
 INSERT INTO public.permissions (code, description) VALUES 
-('doc:view', 'Visualizar documentos'),
-('doc:upload', 'Fazer upload de documentos'),
-('doc:delete', 'Eliminar documentos'),
-('doc:manage_perms', 'Gerir acessos a documentos'),
-('wiki:view', 'Visualizar base de conhecimento (Wiki)'),
-('wiki:generate', 'Gerar conteúdos na Wiki'),
-('integrations:manage', 'Gerir integrações'),
-('users:manage', 'Gerir utilizadores da empresa')
+('documents:view', 'Visualizar documentos permitidos'),
+('documents:create', 'Fazer upload de novos documentos'),
+('documents:delete', 'Eliminar documentos'),
+('documents:manage_permissions', 'Gerir acessos/RBAC de documentos'),
+('documents:view_all', 'Acesso global a todos os documentos (bypass RBAC)'),
+('wiki:view', 'Ler conteúdos da Wiki'),
+('wiki:view_all', 'Acesso global a todos os conteúdos da Wiki (bypass RBAC)'),
+('wiki:create', 'Criar novos conteúdos na Wiki'),
+('wiki:edit', 'Editar conteúdos da Wiki'),
+('wiki:delete', 'Eliminar conteúdos da Wiki'),
+('integrations:manage', 'Gerir ligações e chaves API (n8n, etc)'),
+('users:manage', 'Gerir utilizadores da empresa'),
+('departments:manage', 'Gerir departamentos da empresa'),
+('roles:manage', 'Gerir cargos e permissões da empresa')
 ON CONFLICT (code) DO UPDATE SET description = EXCLUDED.description;

@@ -1,22 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from 'next/headers';
-import { verifyToken } from '@/lib/jwt';
-import { supabaseAdmin } from '@/lib/supabase';
+import { requireAuth, requireTenantResource, unauthenticatedResponse } from '@/lib/auth-helpers';
+import { getAuthenticatedSupabase } from '@/lib/supabase';
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const cookieStore = await cookies();
-    const token = cookieStore.get('auth_token')?.value;
-
-    if (!token) {
-      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
-    }
-
-    const payload = verifyToken(token);
-    if (!payload || !payload.sub) {
-      return NextResponse.json({ error: 'Sessão inválida' }, { status: 401 });
-    }
+    const session = await requireAuth();
+    if (!session) return unauthenticatedResponse();
 
     const { department_ids, role_ids, access_logic } = await req.json();
 
@@ -24,7 +14,17 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: "Parâmetros inválidos" }, { status: 400 });
     }
 
-    const { error: updateError } = await supabaseAdmin
+    const { data: docToUpdate, error: fetchError } = await getAuthenticatedSupabase(session.token)
+      .from('documents')
+      .select('company_id')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !docToUpdate || !requireTenantResource(session, docToUpdate.company_id)) {
+      return NextResponse.json({ error: 'Documento não encontrado ou acesso negado' }, { status: 404 });
+    }
+
+    const { error: updateError } = await getAuthenticatedSupabase(session.token)
       .from('documents')
       .update({ metadata: { access_logic } })
       .eq('id', id);
@@ -33,15 +33,15 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: updateError.message }, { status: 500 });
     }
 
-    await supabaseAdmin.from('document_departments').delete().eq('document_id', id);
-    await supabaseAdmin.from('document_permissions').delete().eq('document_id', id);
+    await getAuthenticatedSupabase(session.token).from('document_departments').delete().eq('document_id', id);
+    await getAuthenticatedSupabase(session.token).from('document_permissions').delete().eq('document_id', id);
 
     if (department_ids.length > 0) {
       const deptsToInsert = department_ids.map((dId: string) => ({
         document_id: id,
         department_id: dId
       }));
-      await supabaseAdmin.from('document_departments').insert(deptsToInsert);
+      await getAuthenticatedSupabase(session.token).from('document_departments').insert(deptsToInsert);
     }
 
     if (role_ids.length > 0) {
@@ -49,7 +49,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         document_id: id,
         role_id: rId
       }));
-      await supabaseAdmin.from('document_permissions').insert(permsToInsert);
+      await getAuthenticatedSupabase(session.token).from('document_permissions').insert(permsToInsert);
     }
 
     return NextResponse.json({ success: true });
@@ -61,29 +61,20 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const cookieStore = await cookies();
-    const token = cookieStore.get('auth_token')?.value;
+    const session = await requireAuth();
+    if (!session) return unauthenticatedResponse();
 
-    if (!token) {
-      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
-    }
-
-    const payload = verifyToken(token);
-    if (!payload || !payload.sub) {
-      return NextResponse.json({ error: 'Sessão inválida' }, { status: 401 });
-    }
-
-    const { data: docData, error: fetchError } = await supabaseAdmin
+    const { data: docData, error: fetchError } = await getAuthenticatedSupabase(session.token)
       .from('documents')
-      .select('storage_path')
+      .select('storage_path, company_id')
       .eq('id', id)
       .single();
 
-    if (fetchError) {
-      return NextResponse.json({ error: fetchError.message }, { status: 500 });
+    if (fetchError || !docData || !requireTenantResource(session, docData.company_id)) {
+      return NextResponse.json({ error: 'Documento não encontrado ou acesso negado' }, { status: 404 });
     }
 
-    const { error: dbError } = await supabaseAdmin
+    const { error: dbError } = await getAuthenticatedSupabase(session.token)
       .from('documents')
       .delete()
       .eq('id', id);
@@ -93,7 +84,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     }
 
     if (docData?.storage_path) {
-      await supabaseAdmin.storage.from('rag_documents').remove([docData.storage_path]);
+      await getAuthenticatedSupabase(session.token).storage.from('rag_documents').remove([docData.storage_path]);
     }
 
     return NextResponse.json({ success: true });

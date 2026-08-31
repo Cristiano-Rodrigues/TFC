@@ -16,3 +16,13 @@ export const supabaseAdmin = supabaseServiceKey
     auth: { autoRefreshToken: false, persistSession: false },
   })
   : supabase;
+
+export function getAuthenticatedSupabase(token: string) {
+  return createClient(supabaseUrl!, supabaseAnonKey!, {
+    global: {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  });
+}

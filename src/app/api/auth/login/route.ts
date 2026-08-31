@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
 import { verifyPassword } from '@/lib/hash';
 import { signToken } from '@/lib/jwt';
 import { cookies } from 'next/headers';
@@ -12,7 +12,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Credenciais incompletas' }, { status: 400 });
     }
 
-    const { data: user, error } = await supabase
+    const { data: user, error } = await supabaseAdmin
       .from('users')
       .select('*, roles(name)')
       .eq('email', email)
@@ -38,11 +38,12 @@ export async function POST(req: Request) {
     const tokenPayload = {
       sub: user.id,
       email: user.email,
-      role: user.roles?.name || 'user',
+      role: 'authenticated',
+      user_role: user.roles?.name || 'user',
       company_id: user.company_id
     };
 
-    const token = signToken(tokenPayload);
+    const token = await signToken(tokenPayload);
 
     const cookieStore = await cookies();
     cookieStore.set('auth_token', token, {

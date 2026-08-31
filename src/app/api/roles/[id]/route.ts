@@ -1,48 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { verifyToken } from '@/lib/jwt';
-import { supabaseAdmin } from '@/lib/supabase';
+import { requireAuth, requirePermission, unauthenticatedResponse, unauthorizedResponse } from '@/lib/auth-helpers';
+import { getAuthenticatedSupabase } from '@/lib/supabase';
 
 export async function PUT(req: NextRequest, props: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await props.params;
-    const cookieStore = await cookies();
-    const token = cookieStore.get('auth_token')?.value;
+    const session = await requireAuth();
+    if (!session) return unauthenticatedResponse();
 
-    if (!token) return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
-    const payload = verifyToken(token);
-    if (!payload || !payload.sub) return NextResponse.json({ error: 'Sessão inválida' }, { status: 401 });
-
-    const { data: user, error: userErr } = await supabaseAdmin
-      .from('users')
-      .select(`
-        company_id, 
-        role,
-        roles (
-          role_permissions (
-            permissions ( code )
-          )
-        )
-      `)
-      .eq('id', payload.sub)
-      .single();
-
-    const hasPermission = (user as any)?.roles?.role_permissions?.some(
-      (rp: any) => rp.permissions?.code === 'roles:manage'
-    );
-
-    if (userErr || !user || !hasPermission) {
-      return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
-    }
+    const hasPermission = await requirePermission(session, 'roles:manage');
+    if (!hasPermission) return unauthorizedResponse();
 
     const body = await req.json();
     const { name, description, permission_ids } = body;
 
-    const { error: roleError } = await supabaseAdmin
+    const { error: roleError } = await getAuthenticatedSupabase(session.token)
       .from('roles')
       .update({ name, description })
       .eq('id', id)
-      .eq('company_id', user.company_id);
+      .eq('company_id', session.company_id);
 
     if (roleError) {
       console.error("Erro actualizar role:", roleError);
@@ -51,7 +27,7 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
 
     // Connect permissions
     if (permission_ids !== undefined) {
-      await supabaseAdmin
+      await getAuthenticatedSupabase(session.token)
         .from('role_permissions')
         .delete()
         .eq('role_id', id);
@@ -62,7 +38,7 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
           permission_id: pId
         }));
 
-        const { error: permError } = await supabaseAdmin
+        const { error: permError } = await getAuthenticatedSupabase(session.token)
           .from('role_permissions')
           .insert(permsToInsert);
 
@@ -81,40 +57,17 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
 export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await props.params;
-    const cookieStore = await cookies();
-    const token = cookieStore.get('auth_token')?.value;
+    const session = await requireAuth();
+    if (!session) return unauthenticatedResponse();
 
-    if (!token) return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
-    const payload = verifyToken(token);
-    if (!payload || !payload.sub) return NextResponse.json({ error: 'Sessão inválida' }, { status: 401 });
+    const hasPermission = await requirePermission(session, 'roles:manage');
+    if (!hasPermission) return unauthorizedResponse();
 
-    const { data: user, error: userErr } = await supabaseAdmin
-      .from('users')
-      .select(`
-        company_id, 
-        role,
-        roles (
-          role_permissions (
-            permissions ( code )
-          )
-        )
-      `)
-      .eq('id', payload.sub)
-      .single();
-
-    const hasPermission = (user as any)?.roles?.role_permissions?.some(
-      (rp: any) => rp.permissions?.code === 'roles:manage'
-    );
-
-    if (userErr || !user || !hasPermission) {
-      return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
-    }
-
-    const { error } = await supabaseAdmin
+    const { error } = await getAuthenticatedSupabase(session.token)
       .from('roles')
       .delete()
       .eq('id', id)
-      .eq('company_id', user.company_id);
+      .eq('company_id', session.company_id);
 
     if (error) {
       console.error("Erro eliminar role:", error);

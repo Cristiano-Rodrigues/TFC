@@ -1,32 +1,27 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { verifyToken } from '@/lib/jwt';
-import { supabaseAdmin } from '@/lib/supabase';
+import { requireAuth } from '@/lib/auth-helpers';
+import { getAuthenticatedSupabase } from '@/lib/supabase';
 
 export async function GET() {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('auth_token')?.value;
+    const session = await requireAuth();
 
-    if (!token) {
-      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
+    if (!session) {
+      return NextResponse.json({ error: 'Não autenticado ou sessão inválida' }, { status: 401 });
     }
 
-    const payload = verifyToken(token);
-    if (!payload || !payload.sub) {
-      return NextResponse.json({ error: 'Sessão inválida' }, { status: 401 });
-    }
-
-    const { count: totalDocs } = await supabaseAdmin
+    const { count: totalDocs } = await getAuthenticatedSupabase(session.token)
       .from('documents')
-      .select('*', { count: 'exact', head: true });
+      .select('*', { count: 'exact', head: true })
+      .eq('company_id', session.company_id);
 
-    const { count: activeUsers } = await supabaseAdmin
+    const { count: activeUsers } = await getAuthenticatedSupabase(session.token)
       .from('users')
       .select('*', { count: 'exact', head: true })
-      .eq('active', true);
+      .eq('active', true)
+      .eq('company_id', session.company_id);
       
-    const { count: totalSearches } = await supabaseAdmin
+    const { count: totalSearches } = await getAuthenticatedSupabase(session.token)
       .from('ai_chat_messages')
       .select('*', { count: 'exact', head: true })
       .eq('role', 'user');

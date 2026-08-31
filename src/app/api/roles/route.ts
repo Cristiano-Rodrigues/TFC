@@ -1,28 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { verifyToken } from '@/lib/jwt';
-import { supabaseAdmin } from '@/lib/supabase';
+import { requireAuth, requirePermission, unauthenticatedResponse, unauthorizedResponse } from '@/lib/auth-helpers';
+import { getAuthenticatedSupabase } from '@/lib/supabase';
 
 export async function GET() {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('auth_token')?.value;
+    const session = await requireAuth();
+    if (!session) return unauthenticatedResponse();
 
-    if (!token) return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
-    const payload = verifyToken(token);
-    if (!payload || !payload.sub) return NextResponse.json({ error: 'Sessão inválida' }, { status: 401 });
-
-    const { data: user, error: userErr } = await supabaseAdmin
-      .from('users')
-      .select('company_id, role')
-      .eq('id', payload.sub)
-      .single();
-
-    if (userErr || !user) {
-      return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
-    }
-
-    const { data: roles, error } = await supabaseAdmin
+    const { data: roles, error } = await getAuthenticatedSupabase(session.token)
       .from('roles')
       .select(`
         id,
@@ -36,7 +21,7 @@ export async function GET() {
           )
         )
       `)
-      .eq('company_id', user.company_id)
+      .eq('company_id', session.company_id)
       .order('created_at', { ascending: true });
 
     if (error) {
@@ -52,50 +37,23 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('auth_token')?.value;
+    const session = await requireAuth();
+    if (!session) return unauthenticatedResponse();
 
-    if (!token) return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
-    const payload = verifyToken(token);
-    if (!payload || !payload.sub) return NextResponse.json({ error: 'Sessão inválida' }, { status: 401 });
-
-    const { data: user, error: userErr } = await supabaseAdmin
-      .from('users')
-      .select(`
-        company_id, 
-        role,
-        roles (
-          role_permissions (
-            permissions ( code )
-          )
-        )
-      `)
-      .eq('id', payload.sub)
-      .single();
-
-    if (userErr || !user) {
-      return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
-    }
-
-    const hasPermission = user.role === 'admin' || (user as any)?.roles?.role_permissions?.some(
-      (rp: any) => rp.permissions?.code === 'roles:manage'
-    );
-
-    if (!hasPermission) {
-      return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
-    }
+    const hasPermission = await requirePermission(session, 'roles:manage');
+    if (!hasPermission) return unauthorizedResponse();
 
     const body = await req.json();
     const { name, description, permission_ids } = body;
 
     if (!name) return NextResponse.json({ error: 'Nome é obrigatório' }, { status: 400 });
 
-    const { data: newRole, error: roleError } = await supabaseAdmin
+    const { data: newRole, error: roleError } = await getAuthenticatedSupabase(session.token)
       .from('roles')
       .insert({
         name,
         description,
-        company_id: user.company_id
+        company_id: session.company_id
       })
       .select('id')
       .single();
@@ -112,7 +70,7 @@ export async function POST(req: NextRequest) {
         permission_id: pId
       }));
 
-      const { error: permError } = await supabaseAdmin
+      const { error: permError } = await getAuthenticatedSupabase(session.token)
         .from('role_permissions')
         .insert(permsToInsert);
 

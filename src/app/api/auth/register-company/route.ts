@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
 import { hashPassword } from '@/lib/hash';
 import crypto from 'crypto';
 
@@ -11,7 +11,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const { data: existingCompany } = await supabase
+    const { data: existingCompany } = await supabaseAdmin
       .from('companies')
       .select('id')
       .ilike('name', companyName)
@@ -21,7 +21,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Já existe uma empresa registada com este nome' }, { status: 400 });
     }
 
-    const { data: company, error: companyError } = await supabase
+    const { data: company, error: companyError } = await supabaseAdmin
       .from('companies')
       .insert({
         name: companyName,
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Failed to create company' }, { status: 500 });
     }
 
-    const { data: depts, error: deptsError } = await supabase
+    const { data: depts, error: deptsError } = await supabaseAdmin
       .from('departments')
       .insert([
         { id: crypto.randomUUID(), name: 'Administração', company_id: company.id },
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
     }
     const adminDept = depts.find(d => d.name === 'Administração');
 
-    const { data: roles, error: rolesError } = await supabase
+    const { data: roles, error: rolesError } = await supabaseAdmin
       .from('roles')
       .insert([
         { id: crypto.randomUUID(), name: 'admin', description: 'Administrador do Sistema', company_id: company.id },
@@ -68,14 +68,14 @@ export async function POST(req: Request) {
     const managerRole = roles.find(r => r.name === 'manager');
     const userRole = roles.find(r => r.name === 'user');
 
-    const { data: permissions } = await supabase.from('permissions').select('id, code');
+    const { data: permissions } = await supabaseAdmin.from('permissions').select('id, code');
     
     if (permissions && permissions.length > 0) {
       const rolePermissionsToInsert: { role_id: string, permission_id: string }[] = [];
       
-      const adminPerms = ["doc:view", "doc:upload", "doc:delete", "doc:manage_perms", "wiki:view", "wiki:generate", "integrations:manage", "users:manage", "departments:manage", "roles:manage"];
-      const managerPerms = ["doc:view", "doc:upload", "wiki:view", "wiki:generate", "integrations:manage"];
-      const userPerms = ["doc:view", "wiki:view"];
+      const adminPerms = ["documents:view", "documents:create", "documents:delete", "documents:manage_permissions", "documents:view_all", "wiki:view", "wiki:view_all", "wiki:create", "wiki:edit", "wiki:delete", "integrations:manage", "users:manage", "departments:manage", "roles:manage"];
+      const managerPerms = ["documents:view", "documents:create", "wiki:view", "wiki:create", "wiki:edit", "integrations:manage"];
+      const userPerms = ["documents:view", "wiki:view"];
 
       for (const p of permissions) {
         if (adminRole && adminPerms.includes(p.code)) rolePermissionsToInsert.push({ role_id: adminRole.id, permission_id: p.id });
@@ -84,13 +84,13 @@ export async function POST(req: Request) {
       }
 
       if (rolePermissionsToInsert.length > 0) {
-        await supabase.from('role_permissions').insert(rolePermissionsToInsert);
+        await supabaseAdmin.from('role_permissions').insert(rolePermissionsToInsert);
       }
     }
 
     const passwordHash = hashPassword(adminPassword);
 
-    const { error: userError } = await supabase
+    const { error: userError } = await supabaseAdmin
       .from('users')
       .insert({
         id: crypto.randomUUID(),
@@ -105,7 +105,6 @@ export async function POST(req: Request) {
       });
 
     if (userError) {
-      console.error('User creation failed:', userError);
       return NextResponse.json({ error: 'Failed to create admin user' }, { status: 500 });
     }
 

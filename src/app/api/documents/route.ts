@@ -1,25 +1,16 @@
 import { NextResponse } from "next/server";
-import { cookies } from 'next/headers';
-import { verifyToken } from '@/lib/jwt';
-import { supabaseAdmin } from '@/lib/supabase';
+import { requireAuth, unauthenticatedResponse } from '@/lib/auth-helpers';
+import { getAuthenticatedSupabase } from '@/lib/supabase';
 
 export async function GET() {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('auth_token')?.value;
+    const session = await requireAuth();
+    if (!session) return unauthenticatedResponse();
 
-    if (!token) {
-      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
-    }
-
-    const payload = verifyToken(token);
-    if (!payload || !payload.sub) {
-      return NextResponse.json({ error: 'Sessão inválida' }, { status: 401 });
-    }
-
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getAuthenticatedSupabase(session.token)
       .from('documents')
       .select('id, filename, storage_path, file_size, mime_type, n8n_status, metadata, created_at, uploaded_by, document_permissions(roles(id, name)), document_departments(departments(id, name))')
+      .eq('company_id', session.company_id)
       .order('created_at', { ascending: false });
 
     if (error) {

@@ -1,23 +1,16 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { verifyToken } from '@/lib/jwt';
-import { supabase } from '@/lib/supabase';
+import { requireAuth } from '@/lib/auth-helpers';
+import { getAuthenticatedSupabase } from '@/lib/supabase';
 
 export async function GET() {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('auth_token')?.value;
+    const session = await requireAuth();
 
-    if (!token) {
-      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
+    if (!session) {
+      return NextResponse.json({ error: 'Não autenticado ou sessão inválida' }, { status: 401 });
     }
 
-    const payload = verifyToken(token);
-    if (!payload || !payload.sub) {
-      return NextResponse.json({ error: 'Sessão inválida' }, { status: 401 });
-    }
-
-    const { data, error } = await supabase
+    const { data, error } = await getAuthenticatedSupabase(session.token)
       .from('users')
       .select(`
         id, 
@@ -42,7 +35,7 @@ export async function GET() {
           name
         )
       `)
-      .eq('id', payload.sub)
+      .eq('id', session.sub)
       .single();
 
     const userRecord = data as any;

@@ -1,27 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from 'next/headers';
-import { verifyToken } from '@/lib/jwt';
-import { supabaseAdmin } from '@/lib/supabase';
+import { requireAuth, unauthenticatedResponse } from '@/lib/auth-helpers';
+import { getAuthenticatedSupabase } from '@/lib/supabase';
 
 export async function POST(req: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('auth_token')?.value;
-
-    if (!token) {
-      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
-    }
-
-    const payload = verifyToken(token);
-    if (!payload || !payload.sub) {
-      return NextResponse.json({ error: 'Sessão inválida' }, { status: 401 });
-    }
-
-    const { data: user } = await supabaseAdmin
-      .from('users')
-      .select('company_id')
-      .eq('id', payload.sub)
-      .single();
+    const session = await requireAuth();
+    if (!session) return unauthenticatedResponse();
 
     const formData = await req.formData();
     const file = formData.get('file') as File;
@@ -53,10 +37,11 @@ export async function POST(req: NextRequest) {
       fileExt = '';
     }
 
-    const fileName = fileExt ? `${crypto.randomUUID()}.${fileExt}` : crypto.randomUUID();
-    const storagePath = `${payload.sub}/${fileName}`;
+    const documentId = crypto.randomUUID();
+    const fileName = fileExt ? `document.${fileExt}` : 'document';
+    const storagePath = `${session.company_id}/${documentId}/${fileName}`;
 
-    const { error: storageError } = await supabaseAdmin
+    const { error: storageError } = await getAuthenticatedSupabase(session.token)
       .storage
       .from('rag_documents')
       .upload(storagePath, file);
@@ -69,15 +54,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { data: docData, error: dbError } = await supabaseAdmin
+    const { data: docData, error: dbError } = await getAuthenticatedSupabase(session.token)
       .from('documents')
       .insert({
+        id: documentId,
         filename: file.name,
         storage_path: storagePath,
         file_size: file.size,
         mime_type: file.type,
-        uploaded_by: payload.sub,
-        company_id: user?.company_id,
+        uploaded_by: session.sub,
+        company_id: session.company_id,
         n8n_status: 'pending',
         metadata: { access_logic }
       })
@@ -97,7 +83,7 @@ export async function POST(req: NextRequest) {
         document_id: docData.id,
         role_id: rId
       }));
-      const { error: permError } = await supabaseAdmin
+      const { error: permError } = await getAuthenticatedSupabase(session.token)
         .from('document_permissions')
         .insert(permsToInsert);
       if (permError) {
@@ -110,7 +96,7 @@ export async function POST(req: NextRequest) {
         document_id: docData.id,
         department_id: dId
       }));
-      const { error: deptError } = await supabaseAdmin
+      const { error: deptError } = await getAuthenticatedSupabase(session.token)
         .from('document_departments')
         .insert(deptsToInsert);
       if (deptError) {
@@ -126,7 +112,7 @@ export async function POST(req: NextRequest) {
       const n8nFormData = new FormData();
       n8nFormData.append('data', file);
       n8nFormData.append('document_id', docData.id);
-      n8nFormData.append('user_id', payload.sub);
+      n8nFormData.append('user_id', session.sub);
       if (department_ids.length > 0) {
         n8nFormData.append('department_ids', JSON.stringify(department_ids));
       }
@@ -139,7 +125,7 @@ export async function POST(req: NextRequest) {
 
       if (n8nResponse.ok) {
         n8nTriggered = true;
-        await supabaseAdmin
+        await getAuthenticatedSupabase(session.token)
           .from('documents')
           .update({ n8n_status: 'processing' })
           .eq('id', docData.id);

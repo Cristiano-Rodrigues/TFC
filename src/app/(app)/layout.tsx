@@ -84,8 +84,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { id: "dashboard", label: "Painel de Controlo", icon: LayoutDashboard, permissions: [], badge: null },
     { id: "search", label: "Pesquisa Inteligente", icon: Search, permissions: [], badge: "IA" },
     { id: "wiki", label: "Wiki Corporativa", icon: BookOpen, permissions: ["wiki:view"], badge: "Auto" },
-    { id: "documents", label: "Base Documental", icon: FileText, permissions: ["doc:view"], badge: null },
-    { id: "upload", label: "Carregar Arquivos", icon: UploadCloud, permissions: ["doc:upload"], badge: null },
+    { id: "documents", label: "Base Documental", icon: FileText, permissions: ["documents:view"], badge: null },
+    { id: "upload", label: "Carregar Arquivos", icon: UploadCloud, permissions: ["documents:create"], badge: null },
     { id: "integrations", label: "Sincronizadores", icon: Network, permissions: ["integrations:manage"], badge: null },
     { id: "admin", label: "Administração", icon: Users, permissions: ["roles:manage", "users:manage", "departments:manage"], badge: null },
     { id: "profile", label: "O Meu Perfil", icon: UserCircle, permissions: [], badge: null }

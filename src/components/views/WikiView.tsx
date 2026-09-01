@@ -1,7 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { BookOpen, Search, Compass, Plus, Sparkles, Clock, Calendar, CheckCircle2, Bookmark, ArrowRight, ExternalLink, X, RefreshCw } from 'lucide-react';
+import { BookOpen, Search, Compass, Sparkles, Clock, Calendar, CheckCircle2, Bookmark, X, RefreshCw, Save, Edit3, Shield, Trash2 } from 'lucide-react';
+import { useAuth } from '@/lib/auth-context';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface WikiArticle {
   id: string;
@@ -9,58 +12,96 @@ interface WikiArticle {
   category: string;
   summary: string;
   content: string;
-  sources: string[];
   updatedAt: string;
   isAiGenerated: boolean;
-  isGrounded: boolean;
+  status: string;
   popularity: number;
+  sources?: string[];
+  accessLogic?: string;
+  departments?: string[];
+  roles?: string[];
 }
 
-const INITIAL_ARTICLES: WikiArticle[] = [];
-
 export const WikiView: React.FC = () => {
-  const [articles, setArticles] = useState<WikiArticle[]>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('company_wiki_articles');
-      if (saved) {
-        try {
-          return JSON.parse(saved);
-        } catch (e) {
-          return INITIAL_ARTICLES;
-        }
-      }
-    }
-    return INITIAL_ARTICLES;
-  });
+  const { profile } = useAuth();
+  const [articles, setArticles] = useState<WikiArticle[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todas');
   const [activeArticle, setActiveArticle] = useState<WikiArticle | null>(null);
   
-  // AIS Generator Modal
+  const [departments, setDepartments] = useState<any[]>([]);
+  const [roles, setRoles] = useState<any[]>([]);
+
   const [showGenModal, setShowGenModal] = useState(false);
   const [genTopic, setGenTopic] = useState('');
-  const [genDept, setGenDept] = useState('Recursos Humanos');
   const [isGenerating, setIsGenerating] = useState(false);
   const [genError, setGenError] = useState('');
 
-  const saveArticles = (newArticles: WikiArticle[]) => {
-    setArticles(newArticles);
-    localStorage.setItem('company_wiki_articles', JSON.stringify(newArticles));
+  const [draftArticle, setDraftArticle] = useState<any>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const [wikiRes, deptsRes, rolesRes] = await Promise.all([
+        fetch('/api/wiki'),
+        fetch('/api/departments'),
+        fetch('/api/roles')
+      ]);
+
+      if (deptsRes.ok) {
+        const d = await deptsRes.json();
+        setDepartments(d.departments || []);
+      }
+      if (rolesRes.ok) {
+        const r = await rolesRes.json();
+        setRoles(r.roles || []);
+      }
+      if (wikiRes.ok) {
+        const w = await wikiRes.json();
+        const formatted = (w.articles || []).map((doc: any) => ({
+          id: doc.id,
+          title: doc.filename,
+          category: doc.document_departments?.[0]?.departments?.name || 'Geral',
+          summary: doc.metadata?.summary || '',
+          content: doc.metadata?.content || '',
+          updatedAt: new Date(doc.created_at).toISOString().split('T')[0],
+          isAiGenerated: doc.metadata?.is_ai_generated || false,
+          status: doc.metadata?.status || 'published',
+          popularity: doc.metadata?.popularity || 1,
+          sources: doc.metadata?.sources || [],
+          accessLogic: doc.metadata?.access_logic || 'AND',
+          departments: doc.document_departments?.map((d: any) => d.departments?.id).filter(Boolean) || [],
+          roles: doc.document_permissions?.map((p: any) => p.roles?.id).filter(Boolean) || []
+        }));
+        setArticles(formatted);
+      }
+    } catch (error) {
+      console.error("Error fetching wiki data:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const categories = ["Todas", "Recursos Humanos", "Tecnologia e Segurança", "Financeiro", "Compliance", "Suporte e Operações"];
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchData();
+  }, []);
+
+  const categories = ["Todas", ...departments.map(d => d.name), "Geral"];
 
   const filteredArticles = articles.filter(art => {
+    if (art.status !== 'published' && !profile?.permissions?.includes('wiki:edit')) return false;
     const matchesSearch = art.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          art.summary.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          art.content.toLowerCase().includes(searchTerm.toLowerCase());
+                          art.summary.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCat = selectedCategory === 'Todas' || art.category === selectedCategory;
     return matchesSearch && matchesCat;
   });
 
-  // Sort articles by popularity for popular section, filtered by most up-to-date
-  const popularArticles = [...articles].sort((a, b) => b.popularity - a.popularity).slice(0, 3);
-  const recentArticles = [...articles].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()).slice(0, 3);
+  const popularArticles = [...articles].filter(a => a.status === 'published').sort((a, b) => b.popularity - a.popularity).slice(0, 3);
+  const recentArticles = [...articles].filter(a => a.status === 'published').sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()).slice(0, 3);
 
   const handleGenerateWiki = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,90 +115,301 @@ export const WikiView: React.FC = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          topic: genTopic,
-          department: genDept
+          topic: genTopic
         })
       });
 
       if (!response.ok) {
-        throw new Error("Erro na rede de geração de artigos");
+        throw new Error("Erro na geração");
       }
 
       const data = await response.json();
-
-      const newArticle: WikiArticle = {
-        id: `wiki-${Date.now()}`,
+      
+      setDraftArticle({
         title: data.title || genTopic,
-        category: data.category || genDept,
-        summary: data.summary || `Coletânea automatizada de diretrizes para o tema ${genTopic}`,
-        content: data.content || "Sem conteúdo gerado.",
-        sources: data.sources || ["Documentação Geral"],
-        updatedAt: new Date().toISOString().split('T')[0],
-        isAiGenerated: true,
-        isGrounded: true,
-        popularity: 1
-      };
-
-      const updatedList = [newArticle, ...articles];
-      saveArticles(updatedList);
-      setActiveArticle(newArticle); // Focus on fresh guide
+        summary: data.summary || '',
+        content: data.content || '',
+        sources: data.sources || [],
+        department_ids: [],
+        role_ids: [],
+        access_logic: 'AND'
+      });
+      
       setShowGenModal(false);
       setGenTopic('');
     } catch (err: any) {
       console.error("Wiki creation error:", err);
-      setGenError("Incapaz de estruturar Wiki de forma automática. Verifique se o backend está activo.");
+      setGenError("Incapaz de estruturar Wiki de forma automática.");
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const incrementPopularity = (art: WikiArticle) => {
-    const updated = articles.map(a => {
-      if (a.id === art.id) {
-        return { ...a, popularity: a.popularity + 1 };
-      }
-      return a;
-    });
-    saveArticles(updated);
-    setActiveArticle({ ...art, popularity: art.popularity + 1 });
+  const handlePublishWiki = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try {
+      const payload = {
+        ...draftArticle,
+        status: 'published',
+        is_ai_generated: true
+      };
+
+      const res = await fetch('/api/wiki', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error("Falha ao publicar");
+
+      await fetchData();
+      setDraftArticle(null);
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao publicar a Wiki.");
+    } finally {
+      setIsSaving(false);
+    }
   };
+
+  const incrementPopularity = async (art: WikiArticle) => {
+    setActiveArticle(art);
+  };
+
+  const handleDeleteWiki = async (id: string) => {
+    if (!window.confirm('Tem a certeza que deseja apagar permanentemente este artigo da Wiki?')) return;
+    try {
+      const res = await fetch(`/api/wiki/${id}`, {
+        method: 'DELETE'
+      });
+      if (!res.ok) throw new Error('Falha ao apagar');
+      setActiveArticle(null);
+      await fetchData();
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao apagar artigo da Wiki.');
+    }
+  };
+
+  const handleEditWiki = () => {
+    if (!activeArticle) return;
+    setDraftArticle({
+      id: activeArticle.id,
+      title: activeArticle.title,
+      summary: activeArticle.summary,
+      content: activeArticle.content,
+      access_logic: activeArticle.accessLogic || 'AND',
+      department_ids: activeArticle.departments || [],
+      role_ids: activeArticle.roles || [],
+      is_ai_generated: activeArticle.isAiGenerated,
+      sources: activeArticle.sources || []
+    });
+  };
+
+  if (isLoading) {
+    return <div className="p-12 text-center text-slate-500">A carregar Wiki Corporativa...</div>;
+  }
 
   return (
     <div className="space-y-6 relative">
       
-      {/* Wiki Header */}
+      {draftArticle && (
+        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 lg:p-10 overflow-y-auto">
+          <div className="bg-white rounded-xl border border-slate-200 w-full max-w-5xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="px-6 py-4 bg-[#030213] flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2">
+                <Edit3 className="h-5 w-5 text-indigo-400" />
+                <h3 className="text-base font-bold text-white tracking-wide">Modo Fact-Check (Rascunho de IA)</h3>
+              </div>
+              <button onClick={() => setDraftArticle(null)} className="text-slate-400 hover:text-white transition-colors cursor-pointer">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto flex-1 grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 block">Título do Artigo</label>
+                  <input 
+                    type="text" 
+                    value={draftArticle.title} 
+                    onChange={e => setDraftArticle({...draftArticle, title: e.target.value})}
+                    className="w-full text-lg font-bold px-3 py-2 border-b-2 border-slate-200 focus:border-indigo-500 focus:outline-none bg-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 block">Resumo Curto</label>
+                  <textarea 
+                    value={draftArticle.summary} 
+                    onChange={e => setDraftArticle({...draftArticle, summary: e.target.value})}
+                    className="w-full text-sm p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 focus:outline-none"
+                    rows={2}
+                  />
+                </div>
+                <div className="flex-1 flex flex-col">
+                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 block">Corpo (Markdown)</label>
+                  <textarea 
+                    value={draftArticle.content} 
+                    onChange={e => setDraftArticle({...draftArticle, content: e.target.value})}
+                    className="w-full h-[400px] text-sm p-4 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 focus:outline-none font-mono"
+                  />
+                </div>
+                {draftArticle.sources && draftArticle.sources.length > 0 && (
+                  <div className="bg-blue-50 border border-blue-100 p-4 rounded-lg mt-4">
+                    <label className="text-xs font-bold text-blue-800 uppercase tracking-wider mb-2 flex items-center gap-1.5"><Bookmark className="h-3.5 w-3.5" /> Fontes Detetadas pela IA</label>
+                    <ul className="list-disc pl-5 space-y-1">
+                      {draftArticle.sources.map((src: string, idx: number) => (
+                        <li key={idx} className="text-xs font-medium text-blue-700">{src}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <Shield className="h-4 w-4 text-indigo-600" />
+                  <h4 className="font-bold text-slate-800">Controlo de Acesso</h4>
+                </div>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Define quem pode pesquisar e consultar este artigo. A Inteligência Artificial respeitará estas regras (RLS).
+                </p>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 mb-2 block">Lógica de Acesso Departamental</label>
+                  <div className="flex bg-white border border-slate-200 rounded p-1 mb-4">
+                    <button 
+                      className={`flex-1 text-[10px] font-bold py-1.5 rounded transition-colors ${draftArticle.access_logic === 'AND' ? 'bg-[#030213] text-white shadow-2xs' : 'text-slate-500 hover:bg-slate-50'}`}
+                      onClick={() => setDraftArticle({...draftArticle, access_logic: 'AND'})}
+                    >
+                      Exigir TODOS (AND)
+                    </button>
+                    <button 
+                      className={`flex-1 text-[10px] font-bold py-1.5 rounded transition-colors ${draftArticle.access_logic === 'OR' ? 'bg-[#030213] text-white shadow-2xs' : 'text-slate-500 hover:bg-slate-50'}`}
+                      onClick={() => setDraftArticle({...draftArticle, access_logic: 'OR'})}
+                    >
+                      Permitir QUALQUER (OR)
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 mb-2 block">Departamentos Permitidos</label>
+                  <div className="space-y-1.5 max-h-40 overflow-y-auto border border-slate-200 bg-white p-2 rounded">
+                    {departments.map(dept => (
+                      <label key={dept.id} className="flex items-center gap-2 text-xs">
+                        <input 
+                          type="checkbox" 
+                          checked={draftArticle.department_ids.includes(dept.id)}
+                          onChange={(e) => {
+                            const newIds = e.target.checked 
+                              ? [...draftArticle.department_ids, dept.id]
+                              : draftArticle.department_ids.filter((id: string) => id !== dept.id);
+                            setDraftArticle({...draftArticle, department_ids: newIds});
+                          }}
+                        />
+                        {dept.name}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 mb-2 block">Cargos Permitidos (Roles)</label>
+                  <div className="space-y-1.5 max-h-40 overflow-y-auto border border-slate-200 bg-white p-2 rounded">
+                    {roles.map(role => (
+                      <label key={role.id} className="flex items-center gap-2 text-xs">
+                        <input 
+                          type="checkbox"
+                          checked={draftArticle.role_ids.includes(role.id)}
+                          onChange={(e) => {
+                            const newIds = e.target.checked 
+                              ? [...draftArticle.role_ids, role.id]
+                              : draftArticle.role_ids.filter((id: string) => id !== role.id);
+                            setDraftArticle({...draftArticle, role_ids: newIds});
+                          }}
+                        />
+                        {role.name}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 border-t border-slate-200 bg-slate-50 flex justify-end gap-3 shrink-0">
+              <button 
+                onClick={() => setDraftArticle(null)}
+                className="px-4 py-2 text-sm font-semibold text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 cursor-pointer"
+              >
+                Descartar Rascunho
+              </button>
+              <button 
+                onClick={handlePublishWiki}
+                disabled={isSaving}
+                className="px-5 py-2 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg flex items-center gap-2 cursor-pointer shadow-sm transition-colors disabled:opacity-50"
+              >
+                {isSaving ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                Publicar e Indexar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col md:flex-row md:items-center md:justify-between pb-4 border-b border-slate-200">
         <div>
-          <h1 id="wiki-title" className="text-2xl font-semibold text-slate-900 tracking-tight">Wiki Corporativa Autogerada</h1>
+          <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Wiki Corporativa Autogerada</h1>
           <p className="text-sm text-slate-500 mt-1">
-            Biblioteca de inteligência consolidada automaticamente com base em todos os canais e manuais validados.
+            Biblioteca de inteligência consolidada com base em documentos reais e curadoria humana.
           </p>
         </div>
         <div className="mt-4 md:mt-0">
-          <button
-            id="btn-trigger-wiki-gen"
-            onClick={() => setShowGenModal(true)}
-            className="inline-flex items-center gap-1.5 bg-[#030213] hover:bg-[#030213]/90 text-white text-xs font-semibold px-4 py-2 rounded-md shadow-2xs cursor-pointer transition-colors"
-          >
-            <Sparkles className="h-3.5 w-3.5" />
-            Compilar Novo Artigo (IA)
-          </button>
+          {profile?.permissions?.includes('wiki:create') && (
+            <button
+              onClick={() => setShowGenModal(true)}
+              className="inline-flex items-center gap-1.5 bg-[#030213] hover:bg-[#030213]/90 text-white text-xs font-semibold px-4 py-2 rounded-md shadow-2xs cursor-pointer transition-colors"
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              Compilar Novo Artigo (IA)
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Main split dashboard / reader */}
       {activeArticle ? (
-        /* --- Active Article Reader View --- */
-        <div id="wiki-reader-layout" className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <div className="lg:col-span-3 bg-white border border-slate-200 rounded-lg p-6 space-y-6">
-            <button
-              onClick={() => setActiveArticle(null)}
-              className="text-xs text-slate-500 hover:text-slate-800 flex items-center gap-1 cursor-pointer font-medium mb-2"
-            >
-              &larr; Voltar para a listagem principal
-            </button>
+            <div className="flex items-center justify-between mb-2">
+              <button
+                onClick={() => setActiveArticle(null)}
+                className="text-xs text-slate-500 hover:text-slate-800 flex items-center gap-1 cursor-pointer font-medium"
+              >
+                &larr; Voltar para a listagem principal
+              </button>
+              <div className="flex items-center gap-2">
+                {profile?.permissions?.includes('wiki:edit') && (
+                  <button
+                    onClick={handleEditWiki}
+                    className="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 cursor-pointer font-semibold transition-colors bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1.5 rounded border border-indigo-100"
+                  >
+                    <Edit3 className="h-3.5 w-3.5" />
+                    Editar
+                  </button>
+                )}
+                {profile?.permissions?.includes('wiki:delete') && (
+                  <button
+                    onClick={() => handleDeleteWiki(activeArticle.id)}
+                    className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1 cursor-pointer font-semibold transition-colors bg-red-50 hover:bg-red-100 px-2.5 py-1.5 rounded border border-red-100"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    Remover
+                  </button>
+                )}
+              </div>
+            </div>
 
-            {/* Badges and metadata */}
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 px-2.5 py-1 rounded">
                 {activeArticle.category}
@@ -168,15 +420,8 @@ export const WikiView: React.FC = () => {
                   Gerado por IA
                 </span>
               )}
-              {activeArticle.isGrounded && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-emerald-50 border border-emerald-150 text-emerald-700 px-2.5 py-1 rounded">
-                  <CheckCircle2 className="h-3 w-3 text-emerald-500" />
-                  Sustentado em Documentos Reais
-                </span>
-              )}
             </div>
 
-            {/* Title */}
             <div>
               <h2 className="text-2xl font-bold text-slate-900 tracking-tight">{activeArticle.title}</h2>
               <div className="flex items-center gap-4 text-xs text-slate-400 mt-2">
@@ -195,28 +440,26 @@ export const WikiView: React.FC = () => {
               &ldquo;{activeArticle.summary}&rdquo;
             </p>
 
-            {/* Structured Content Markdowns */}
-            <div className="prose prose-slate max-w-none text-sm text-slate-800 leading-relaxed whitespace-pre-line border-t border-slate-100 pt-5 space-y-4">
-              {activeArticle.content}
+            <div className="prose prose-slate max-w-none text-sm text-slate-800 leading-relaxed border-t border-slate-100 pt-5">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {activeArticle.content}
+              </ReactMarkdown>
             </div>
 
-            {/* Citation Sources Footnotes */}
             {activeArticle.sources && activeArticle.sources.length > 0 && (
-              <div className="pt-6 border-t border-slate-200 space-y-2">
-                <h4 className="text-xs font-extrabold text-slate-450 uppercase tracking-widest">Documentação de Base e Auditoria:</h4>
-                <ul className="space-y-1">
-                  {activeArticle.sources.map((src, i) => (
-                    <li key={i} className="text-xs text-slate-600 flex items-center gap-2">
-                      <Bookmark className="h-3.5 w-3.5 text-blue-500 shrink-0" />
-                      <span>{src}</span>
-                    </li>
+              <div className="mt-8 pt-5 border-t border-slate-100">
+                <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-3 flex items-center gap-1.5"><Bookmark className="h-4 w-4 text-indigo-500" /> Referências & Fontes</h3>
+                <div className="flex flex-wrap gap-2">
+                  {activeArticle.sources.map((src, idx) => (
+                    <span key={idx} className="inline-flex items-center text-[10px] font-semibold bg-slate-100 text-slate-600 px-2.5 py-1 rounded border border-slate-200 shadow-sm">
+                      {src}
+                    </span>
                   ))}
-                </ul>
+                </div>
               </div>
             )}
           </div>
 
-          {/* Collateral Reader side links */}
           <div className="space-y-4">
             <div className="bg-white border border-slate-200 rounded-lg p-4">
               <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-3">Navegadores Relacionados</h3>
@@ -235,10 +478,8 @@ export const WikiView: React.FC = () => {
           </div>
         </div>
       ) : (
-        /* --- General Directory Layout --- */
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
           <div className="xl:col-span-3 space-y-5">
-            {/* Search and category filters */}
             <div className="flex flex-col md:flex-row md:items-center gap-3 bg-white p-4 rounded-xl border border-slate-200">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
@@ -250,12 +491,12 @@ export const WikiView: React.FC = () => {
                   className="w-full text-xs pl-9 pr-4 py-2 border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 text-slate-900 bg-[#f3f3f5]"
                 />
               </div>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-1.5 overflow-x-auto pb-1 max-w-full md:max-w-md">
                 {categories.map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
-                    className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all border cursor-pointer ${
+                    className={`whitespace-nowrap shrink-0 px-3 py-1.5 rounded-md text-xs font-semibold transition-all border cursor-pointer ${
                       selectedCategory === cat
                         ? 'bg-[#030213] border-[#030213] text-white shadow-2xs'
                         : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
@@ -267,7 +508,6 @@ export const WikiView: React.FC = () => {
               </div>
             </div>
 
-            {/* List of Articles Grid */}
             {filteredArticles.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {filteredArticles.map((art) => (
@@ -285,6 +525,11 @@ export const WikiView: React.FC = () => {
                           <span className="inline-flex items-center gap-0.5 text-[9px] font-bold uppercase tracking-wider bg-indigo-50 border border-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded">
                             <Sparkles className="h-2.5 w-2.5" />
                             IA
+                          </span>
+                        )}
+                        {art.status === 'draft' && (
+                          <span className="inline-flex items-center gap-0.5 text-[9px] font-bold uppercase tracking-wider bg-amber-50 border border-amber-200 text-amber-700 px-1.5 py-0.5 rounded">
+                            Rascunho
                           </span>
                         )}
                       </div>
@@ -316,17 +561,14 @@ export const WikiView: React.FC = () => {
             )}
           </div>
 
-          {/* Right margin panel directories info */}
           <div className="space-y-4">
-            
-            {/* Popular Section */}
             <div className="bg-white border border-slate-200 rounded-lg p-4">
               <h3 className="text-xs font-bold text-[#1e293b] uppercase tracking-wider pb-2 border-b border-slate-100 mb-3 flex items-center gap-1.5">
                 <Clock className="h-4 w-4 text-slate-400" />
                 Artigos Populares
               </h3>
               <div className="space-y-3">
-                {popularArticles.map((art) => (
+                {popularArticles.length > 0 ? popularArticles.map((art) => (
                   <div key={art.id} className="text-xs">
                     <button
                       onClick={() => incrementPopularity(art)}
@@ -336,18 +578,17 @@ export const WikiView: React.FC = () => {
                     </button>
                     <span className="text-[10px] text-slate-400 mt-0.5 block">{art.popularity} acessos corporativos</span>
                   </div>
-                ))}
+                )) : <p className="text-xs text-slate-500">Sem dados.</p>}
               </div>
             </div>
 
-            {/* Recent Section */}
             <div className="bg-white border border-slate-200 rounded-lg p-4">
               <h3 className="text-xs font-bold text-[#1e293b] uppercase tracking-wider pb-2 border-b border-slate-100 mb-3 flex items-center gap-1.5">
                 <Calendar className="h-4 w-4 text-slate-400" />
                 Artigos Recentes
               </h3>
               <div className="space-y-3">
-                {recentArticles.map((art) => (
+                {recentArticles.length > 0 ? recentArticles.map((art) => (
                   <div key={art.id} className="text-xs">
                     <button
                       onClick={() => incrementPopularity(art)}
@@ -357,27 +598,22 @@ export const WikiView: React.FC = () => {
                     </button>
                     <span className="text-[10px] text-slate-400 mt-0.5 block">Sincronizado: {art.updatedAt}</span>
                   </div>
-                ))}
+                )) : <p className="text-xs text-slate-500">Sem dados.</p>}
               </div>
             </div>
-
           </div>
         </div>
       )}
 
-      {/* COMPILATION MODAL POPUP */}
       {showGenModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 transition-all">
-          <div id="wiki-creation-modal" className="bg-white rounded-xl border border-slate-200 w-full max-w-md shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-xl border border-slate-200 w-full max-w-md shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="px-5 py-4 bg-[#030213] flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Sparkles className="h-4.5 w-4.5 text-white" />
                 <h3 className="text-sm font-bold uppercase tracking-wider text-white">Compilação Inteligente</h3>
               </div>
-              <button
-                onClick={() => setShowGenModal(false)}
-                className="text-slate-400 hover:text-white cursor-pointer"
-              >
+              <button onClick={() => setShowGenModal(false)} className="text-slate-400 hover:text-white cursor-pointer">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -392,7 +628,6 @@ export const WikiView: React.FC = () => {
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-slate-700 block">Assunto / Perguntas de Interesse</label>
                 <input
-                  id="modal-gen-topic"
                   type="text"
                   required
                   value={genTopic}
@@ -403,23 +638,8 @@ export const WikiView: React.FC = () => {
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700 block">Departamento Organizacional</label>
-                <select
-                  id="modal-gen-dept"
-                  value={genDept}
-                  onChange={(e) => setGenDept(e.target.value)}
-                  className="w-full text-xs px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 text-slate-900 bg-[#f3f3f5]"
-                  disabled={isGenerating}
-                >
-                  {categories.filter(c => c !== 'Todas').map(c => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
-              </div>
-
               <p className="text-[10px] text-slate-400 leading-relaxed font-mono">
-                Sincronizando com a nossa base documental, o modelo analisará as diretrizes arquivadas de privacidade e TI para estruturar um guia autoral para a equipa em segundos.
+                Sincronizando com a nossa base documental, o modelo analisará as diretrizes para estruturar um guia autoral. O resultado abrirá em modo de Fact-Check antes de publicar.
               </p>
 
               <div className="pt-3 border-t border-slate-150 flex items-center justify-end gap-2">
@@ -432,7 +652,6 @@ export const WikiView: React.FC = () => {
                   Cancelar
                 </button>
                 <button
-                  id="btn-confirm-wiki-gen"
                   type="submit"
                   disabled={isGenerating || !genTopic.trim()}
                   className="px-4 py-2 text-xs font-semibold text-white bg-[#030213] hover:bg-[#030213]/90 disabled:bg-slate-200 disabled:text-slate-400 rounded-md shadow-2xs flex items-center gap-1.5 transition-colors cursor-pointer"

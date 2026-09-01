@@ -1,76 +1,78 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ai, GEMINI_MODEL } from "@/lib/gemini";
-import { Type } from "@google/genai";
+import { requireAuth, requirePermission, unauthenticatedResponse, unauthorizedResponse } from '@/lib/auth-helpers';
+import { getAuthenticatedSupabase } from '@/lib/supabase';
 
 export async function POST(req: NextRequest) {
   try {
-    const { topic, department } = await req.json();
+    const session = await requireAuth();
+    if (!session) return unauthenticatedResponse();
 
-    if (!topic || !department) {
-      return NextResponse.json({ error: "Tópico e departamento são obrigatórios" }, { status: 400 });
+    const hasPermission = await requirePermission(session, 'wiki:create');
+    if (!hasPermission) return unauthorizedResponse();
+
+    const { topic } = await req.json();
+
+    if (!topic) {
+      return NextResponse.json({ error: "O tópico é obrigatório" }, { status: 400 });
     }
 
-    if (!ai) {
-      // Graceful fallback article
-      const fallbackTitle = `Guia Geral sobre ${topic}`;
-      return NextResponse.json({
-        title: fallbackTitle,
-        category: department,
-        summary: `Resumo gerado automaticamente sobre ${topic} para o departamento de ${department}.`,
-        content: `### 1. Visão Geral\nEste artigo corporativo descreve as principais diretrizes sobre **${topic}** no âmbito do departamento de **${department}**.\n\n### 2. Procedimentos Recomendados\n* **Acompanhamento**: Manter registo detalhado de todas as operações associadas ao tópico.\n* **Conformidade**: Validar os dados internamente com as chefias de equipa da área de ${department}.\n* **Garantia de Qualidade**: Assegurar o reporte de quaisquer anomalias observadas de imediato.\n\n### 3. Conclusão e Recursos\nPara consultar mais dados práticos detalhados, use o nosso motor de Pesquisa Inteligente RAG na barra de ferramentas lateral do portal.`,
-        sources: ["Manual Organizacional Global"],
-        generatedAt: new Date().toISOString(),
-      });
+    const supabase = getAuthenticatedSupabase(session.token);
+    const { data: user } = await supabase
+      .from('users')
+      .select('id, department_id, role_id, company_id')
+      .eq('id', session.sub)
+      .single();
+
+    const n8nUrl = process.env.N8N_WEBHOOK_URL;
+    if (!n8nUrl) {
+      throw new Error("N8N_WEBHOOK_URL não está configurada");
     }
 
-    const systemInstruction = `Você é o Redator-Chefe de Inteligência Artificial para a Wiki Corporativa de uma grande organização.
-Seu objectivo é criar um artigo técnico, estruturado, polido e denso (Wiki corporativa) para sanar dúvidas comuns no assunto: "${topic}" pertencente ao departamento de "${department}".
-
-REGRAS DO ARTIGO:
-1. O artigo deve conter títulos limpos no padrão Markdown (ex: ### 1. Introdução, ### 2. Melhores Práticas, ### 3. Fluxo de Trabalho).
-2. Escreva num tom corporativo neutro e sério, livre de jargões de inteligência artificial ou saudações enérgicas.
-3. Crie tópicos bem construídos com resumos informativos.
-4. Inclua referências realistas a documentos internos de trabalho (ex: Manuais Operacionais, Normativos de Compliance, Matriz de Responsabilidades).
-
-Retorne obrigatoriamente um formato estruturado em JSON com os seguintes campos:
-- title: Título elegante do artigo para a Wiki.
-- summary: Um parágrafo de resumo em uma linha que introduza as diretrizes chave deste tópico.
-- content: Conteúdo completo formatado em Markdown com títulos com hashtags (###), negritos e listas por marcadores.
-- sources: Array contendo de 1 a 3 fontes simuladas que embasaram este compilado de conhecimento.`;
-
-    const promptText = `Por favor, elabore um artigo corporativo aprofundado para a nossa Wiki sobre o tema: "${topic}" pertencente ao departamento de "${department}".`;
-
-    const response = await ai.models.generateContent({
-      model: GEMINI_MODEL,
-      contents: promptText,
-      config: {
-        systemInstruction: systemInstruction,
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            title: { type: Type.STRING },
-            summary: { type: Type.STRING },
-            content: { type: Type.STRING },
-            sources: {
-              type: Type.ARRAY,
-              items: { type: Type.STRING },
-            },
-          },
-          required: ["title", "summary", "content", "sources"],
-        },
-      },
+    const n8nResponse = await fetch(`${n8nUrl}/query`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        query: topic, 
+        type: 'wiki',
+        company_id: user?.company_id, 
+        user_id: user?.id,
+        department_id: user?.department_id,
+        role_id: user?.role_id
+      }),
+      signal: AbortSignal.timeout(60000),
     });
 
-    const resultText = response.text ? response.text.trim() : "{}";
-    const parsedData = JSON.parse(resultText);
+    if (!n8nResponse.ok) {
+      throw new Error("Erro na comunicação com o n8n");
+    }
+
+    const data = await n8nResponse.json();
+    
+    let parsedData: any = {};
+    try {
+      let resultText = data.answer ? data.answer.trim() : "{}";
+      if (resultText.startsWith('```json')) {
+        resultText = resultText.replace(/```json\n?/, '').replace(/```$/, '').trim();
+      } else if (resultText.startsWith('```')) {
+        resultText = resultText.replace(/```\n?/, '').replace(/```$/, '').trim();
+      }
+      parsedData = JSON.parse(resultText);
+    } catch (parseError) {
+      console.error("Falha ao analisar a resposta JSON da AI:", parseError);
+      parsedData = {
+        title: `Artigo sobre ${topic}`,
+        summary: "Não foi possível estruturar o artigo corretamente.",
+        content: data.answer || "Conteúdo não disponível.",
+        sources: []
+      };
+    }
 
     return NextResponse.json({
-      title: parsedData.title,
-      category: department,
-      summary: parsedData.summary,
-      content: parsedData.content,
-      sources: parsedData.sources,
+      title: parsedData.title || `Guia sobre ${topic}`,
+      category: 'Geral',
+      summary: parsedData.summary || '',
+      content: parsedData.content || '',
+      sources: parsedData.sources || [],
       generatedAt: new Date().toISOString(),
     });
   } catch (error: any) {

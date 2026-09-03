@@ -28,7 +28,6 @@ export const WikiView: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('Todas');
   const [activeArticle, setActiveArticle] = useState<WikiArticle | null>(null);
   
   const [departments, setDepartments] = useState<any[]>([]);
@@ -90,14 +89,11 @@ export const WikiView: React.FC = () => {
     fetchData();
   }, []);
 
-  const categories = ["Todas", ...departments.map(d => d.name), "Geral"];
-
   const filteredArticles = articles.filter(art => {
     if ((art.status !== 'published' && art.status !== 'draft') && !profile?.permissions?.includes('wiki:edit')) return false;
     const matchesSearch = art.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           art.summary.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCat = selectedCategory === 'Todas' || art.category === selectedCategory;
-    return matchesSearch && matchesCat && art.status !== 'needs_review';
+    return matchesSearch && art.status !== 'needs_review';
   });
 
   const pendingReviewArticles = articles.filter(a => a.status === 'needs_review' && profile?.permissions?.includes('wiki:edit'));
@@ -210,7 +206,7 @@ export const WikiView: React.FC = () => {
   };
 
   if (isLoading) {
-    return <div className="p-12 text-center text-slate-500">A carregar Wiki Corporativa...</div>;
+    return <div className="p-12 text-center text-slate-500">A carregar página...</div>;
   }
 
   return (
@@ -477,7 +473,7 @@ export const WikiView: React.FC = () => {
               &ldquo;{activeArticle.summary}&rdquo;
             </p>
 
-            <div className="prose prose-slate max-w-none text-sm text-slate-800 leading-relaxed border-t border-slate-100 pt-5">
+            <div className="prose prose-slate max-w-none text-sm text-slate-800 text-justify leading-relaxed border-t border-slate-100 pt-5">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {activeArticle.content}
               </ReactMarkdown>
@@ -527,21 +523,6 @@ export const WikiView: React.FC = () => {
                   placeholder="Pesquisar"
                   className="w-full text-xs pl-9 pr-4 py-2 border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 text-slate-900 bg-[#f3f3f5]"
                 />
-              </div>
-              <div className="flex flex-wrap gap-1.5 overflow-x-auto pb-1 max-w-full md:max-w-md">
-                {categories.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`whitespace-nowrap shrink-0 px-3 py-1.5 rounded-md text-xs font-semibold transition-all border cursor-pointer ${
-                      selectedCategory === cat
-                        ? 'bg-[#030213] border-[#030213] text-white shadow-2xs'
-                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
               </div>
             </div>
 

@@ -3,7 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
+import { Toaster, toast } from 'sonner';
 
 import {
   LayoutDashboard,
@@ -18,7 +20,10 @@ import {
   Network,
   LogOut,
   Building,
-  Loader2
+  Loader2,
+  Edit2,
+  Trash2,
+  Check
 } from 'lucide-react';
 import { LoadingStage } from '@/components/ui/LoadingStage';
 
@@ -31,9 +36,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [chatSessions, setChatSessions] = useState<any[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const [isLoadingSessions, setIsLoadingSessions] = useState(false);
+  const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
+  const [editingTitle, setEditingTitle] = useState('');
 
   const fetchChatSessions = async () => {
     try {
+      setIsLoadingSessions(true);
       const res = await fetch('/api/chat/sessions');
       const data = await res.json();
       if (res.ok && data.sessions) {
@@ -41,7 +50,63 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       }
     } catch (err) {
       console.error("Erro ao carregar sessões de chat", err);
+    } finally {
+      setIsLoadingSessions(false);
     }
+  };
+
+  const handleRenameSession = async (id: string) => {
+    if (!editingTitle.trim()) {
+      setEditingSessionId(null);
+      return;
+    }
+    try {
+      const res = await fetch(`/api/chat/sessions/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: editingTitle }),
+      });
+      if (res.ok) {
+        setChatSessions(prev => prev.map(s => s.id === id ? { ...s, title: editingTitle } : s));
+      }
+    } catch (err) {
+      console.error("Erro ao renomear sessão", err);
+    }
+    setEditingSessionId(null);
+  };
+
+  const handleDeleteSession = async (id: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    toast('Apagar conversa', {
+      description: 'Tem a certeza que pretende apagar esta conversa?',
+      action: {
+        label: 'Apagar',
+        onClick: async () => {
+          try {
+            const res = await fetch(`/api/chat/sessions/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+              setChatSessions(prev => prev.filter(s => s.id !== id));
+              if (activeSessionId === id) {
+                router.push('/search');
+                setActiveSessionId(null);
+              }
+              toast.success('Conversa apagada com sucesso');
+            } else {
+              toast.error('Erro ao apagar conversa');
+            }
+          } catch (err) {
+            console.error("Erro ao apagar sessão", err);
+            toast.error('Erro de sistema ao apagar conversa');
+          }
+        }
+      },
+      cancel: {
+        label: 'Cancelar',
+        onClick: () => {}
+      }
+    });
   };
 
   const currentTab = pathname.split('/')[1] || 'dashboard';
@@ -106,7 +171,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <div id="master-shell" className="min-h-screen flex bg-[#f8fafc] text-slate-900 font-sans">
       <aside className="hidden lg:flex flex-col w-64 bg-[#fafafa] border-r border-slate-200 text-slate-800 h-screen sticky top-0 shrink-0">
         <div className="p-5 flex items-center gap-3 border-b border-slate-200/80 shrink-0">
-          <div className="w-7 h-7 bg-[#030213] text-white rounded-md flex items-center justify-center font-bold font-sans text-xs shadow-2xs">K</div>
+          <div className="w-8 h-8 rounded-md flex items-center justify-center shrink-0 shadow-2xs overflow-hidden">
+            <Image src="/logo.png" alt="Knowledge Core Logo" width={32} height={32} className="object-cover" />
+          </div>
           <div className="truncate">
             <h1 className="text-xs font-bold uppercase tracking-wider text-slate-900 font-sans">KNOWLEDGE CORE</h1>
             <span className="text-[10px] text-slate-400 font-medium block tracking-wider uppercase">Portal da empresa</span>
@@ -125,7 +192,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <div key={item.id} className="w-full">
                 {isSearch ? (
                   <div
-                    onClick={() => setIsSearchExpanded(!isSearchExpanded)}
+                    onClick={() => {
+                      setIsSearchExpanded(!isSearchExpanded);
+                      if (!isSearchExpanded) fetchChatSessions();
+                      router.push('/search');
+                    }}
                     className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium cursor-pointer transition-all ${isSelected
                         ? 'bg-[#030213] text-white font-semibold shadow-xs'
                         : 'hover:bg-slate-100 text-slate-600 hover:text-slate-900'
@@ -175,19 +246,58 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     >
                       + Nova Conversa
                     </Link>
+                    {isLoadingSessions && (
+                      <div className="flex items-center justify-center py-2 text-slate-400">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      </div>
+                    )}
                     {chatSessions.map((session) => (
-                      <Link
-                        key={session.id}
-                        href={`/search?sessionId=${session.id}`}
-                        onClick={() => setActiveSessionId(session.id)}
-                        className={`w-full text-left px-2 py-1.5 rounded-md text-[11px] truncate transition-colors block ${activeSessionId === session.id
-                            ? 'bg-slate-200/60 text-slate-900 font-semibold'
-                            : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
-                          }`}
-                        title={session.title}
-                      >
-                        {session.title || 'Conversa sem título'}
-                      </Link>
+                      <div key={session.id} className="group flex items-center justify-between relative w-full">
+                        {editingSessionId === session.id ? (
+                          <div className="flex items-center w-full bg-white border border-slate-300 rounded px-1">
+                            <input
+                              type="text"
+                              value={editingTitle}
+                              onChange={e => setEditingTitle(e.target.value)}
+                              onKeyDown={e => {
+                                if (e.key === 'Enter') handleRenameSession(session.id);
+                                if (e.key === 'Escape') setEditingSessionId(null);
+                              }}
+                              autoFocus
+                              className="w-full text-[11px] py-1 px-1 outline-none text-slate-700"
+                            />
+                            <button onClick={() => handleRenameSession(session.id)} className="p-1 text-emerald-600 cursor-pointer"><Check className="h-3 w-3" /></button>
+                          </div>
+                        ) : (
+                          <>
+                            <Link
+                              href={`/search?sessionId=${session.id}`}
+                              onClick={() => setActiveSessionId(session.id)}
+                              className={`flex-1 text-left px-2 py-1.5 rounded-md text-[11px] truncate transition-colors block pr-10 ${activeSessionId === session.id
+                                  ? 'bg-slate-200/60 text-slate-900 font-semibold'
+                                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
+                                }`}
+                              title={session.title}
+                            >
+                              {session.title || 'Conversa sem título'}
+                            </Link>
+                            <div className="absolute right-1 opacity-0 group-hover:opacity-100 flex items-center gap-1 bg-gradient-to-l from-slate-100 pl-2">
+                              <button
+                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setEditingSessionId(session.id); setEditingTitle(session.title || ''); }}
+                                className="p-1 text-slate-400 hover:text-blue-600 rounded cursor-pointer transition-colors"
+                              >
+                                <Edit2 className="h-3 w-3" />
+                              </button>
+                              <button
+                                onClick={(e) => handleDeleteSession(session.id, e)}
+                                className="p-1 text-slate-400 hover:text-red-500 rounded cursor-pointer transition-colors"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </div>
                     ))}
                   </div>
                 )}
@@ -226,7 +336,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <Menu className="h-5 w-5" />
             </button>
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-[#030213] text-white rounded flex items-center justify-center font-bold text-[10px]">K</div>
+              <div className="w-6 h-6 rounded flex items-center justify-center overflow-hidden shrink-0">
+                <Image src="/logo.png" alt="Logo" width={24} height={24} className="object-cover" />
+              </div>
               <span className="text-xs font-bold uppercase tracking-wider text-slate-900 font-sans">KNOWLEDGE CORE</span>
             </div>
           </div>
@@ -260,7 +372,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
             <div className="p-6 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 bg-[#030213] rounded flex items-center justify-center text-white font-semibold text-xs shrink-0">K</div>
+                <div className="w-7 h-7 rounded flex items-center justify-center overflow-hidden shrink-0">
+                  <Image src="/logo.png" alt="Logo" width={28} height={28} className="object-cover" />
+                </div>
                 <span className="text-xs font-bold uppercase text-slate-800 tracking-wider">KNOWLEDGE CORE</span>
               </div>
               <button
@@ -283,7 +397,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   <div key={item.id} className="w-full">
                     {isSearch ? (
                       <div
-                        onClick={() => setIsSearchExpanded(!isSearchExpanded)}
+                        onClick={() => {
+                          setIsSearchExpanded(!isSearchExpanded);
+                          if (!isSearchExpanded) fetchChatSessions();
+                          router.push('/search');
+                          setMobileMenuOpen(false);
+                        }}
                         className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-md text-xs font-medium cursor-pointer transition-all ${isSelected
                             ? 'bg-slate-100 text-[#030213] font-semibold'
                             : 'hover:bg-slate-50 text-slate-600 hover:text-slate-800'
@@ -322,18 +441,57 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                         >
                           + Nova Conversa
                         </Link>
+                        {isLoadingSessions && (
+                          <div className="flex items-center justify-center py-2 text-slate-400">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          </div>
+                        )}
                         {chatSessions.map((session) => (
-                          <Link
-                            key={session.id}
-                            href={`/search?sessionId=${session.id}`}
-                            onClick={() => { setActiveSessionId(session.id); setMobileMenuOpen(false); }}
-                            className={`w-full text-left px-2 py-1.5 rounded-md text-[11px] truncate transition-colors block ${activeSessionId === session.id
-                                ? 'bg-slate-100 text-[#030213] font-semibold'
-                                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
-                              }`}
-                          >
-                            {session.title || 'Conversa sem título'}
-                          </Link>
+                          <div key={session.id} className="group flex items-center justify-between relative w-full pr-1">
+                            {editingSessionId === session.id ? (
+                              <div className="flex items-center w-full bg-white border border-slate-300 rounded px-1">
+                                <input
+                                  type="text"
+                                  value={editingTitle}
+                                  onChange={e => setEditingTitle(e.target.value)}
+                                  onKeyDown={e => {
+                                    if (e.key === 'Enter') handleRenameSession(session.id);
+                                    if (e.key === 'Escape') setEditingSessionId(null);
+                                  }}
+                                  autoFocus
+                                  className="w-full text-[11px] py-1 px-1 outline-none text-slate-700 bg-transparent"
+                                />
+                                <button onClick={() => handleRenameSession(session.id)} className="p-1 text-emerald-600 cursor-pointer"><Check className="h-3 w-3" /></button>
+                              </div>
+                            ) : (
+                              <>
+                                <Link
+                                  href={`/search?sessionId=${session.id}`}
+                                  onClick={() => { setActiveSessionId(session.id); setMobileMenuOpen(false); }}
+                                  className={`flex-1 text-left px-2 py-1.5 rounded-md text-[11px] truncate transition-colors block pr-10 ${activeSessionId === session.id
+                                      ? 'bg-slate-100 text-[#030213] font-semibold'
+                                      : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+                                    }`}
+                                >
+                                  {session.title || 'Conversa sem título'}
+                                </Link>
+                                <div className="absolute right-1 opacity-0 group-hover:opacity-100 flex items-center gap-1 bg-gradient-to-l from-white pl-2">
+                                  <button
+                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setEditingSessionId(session.id); setEditingTitle(session.title || ''); }}
+                                    className="p-1 text-slate-400 hover:text-blue-600 rounded cursor-pointer transition-colors"
+                                  >
+                                    <Edit2 className="h-3 w-3" />
+                                  </button>
+                                  <button
+                                    onClick={(e) => handleDeleteSession(session.id, e)}
+                                    className="p-1 text-slate-400 hover:text-red-500 rounded cursor-pointer transition-colors"
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                  </button>
+                                </div>
+                              </>
+                            )}
+                          </div>
                         ))}
                       </div>
                     )}
@@ -364,6 +522,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
+      <Toaster position="top-center" richColors />
     </div>
   );
 }

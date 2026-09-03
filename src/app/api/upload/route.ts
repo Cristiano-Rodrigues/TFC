@@ -64,6 +64,7 @@ export async function POST(req: NextRequest) {
         mime_type: file.type,
         uploaded_by: session.sub,
         company_id: session.company_id,
+        source_type: 'document',
         n8n_status: 'pending',
         metadata: { access_logic }
       })
@@ -127,7 +128,7 @@ export async function POST(req: NextRequest) {
         n8nTriggered = true;
         await getAuthenticatedSupabase(session.token)
           .from('documents')
-          .update({ n8n_status: 'processing' })
+          .update({ n8n_status: 'done' })
           .eq('id', docData.id);
       } else {
         n8nError = `n8n respondeu com status ${n8nResponse.status}`;

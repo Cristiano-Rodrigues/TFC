@@ -11,6 +11,7 @@ export async function GET() {
       .from('documents')
       .select('id, filename, storage_path, file_size, mime_type, n8n_status, metadata, created_at, uploaded_by, document_permissions(roles(id, name)), document_departments(departments(id, name))')
       .eq('company_id', session.company_id)
+      .eq('source_type', 'document')
       .order('created_at', { ascending: false });
 
     if (error) {

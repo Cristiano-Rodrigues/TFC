@@ -2,15 +2,25 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { FileText, Users, Network, Search, ArrowUpRight, TrendingUp, RefreshCw, Layers } from 'lucide-react';
+import { FileText, Users, Network, Search, ArrowUpRight, TrendingUp } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 export const DashboardView: React.FC = () => {
   const router = useRouter();
-  const [statsData, setStatsData] = useState({
+  const [statsData, setStatsData] = useState<{
+    documents: number;
+    activeUsers: number;
+    searches: number;
+    departmentDistribution: { name: string, count: number }[];
+    recentDocs: { id: string, filename: string, created_at: string }[];
+    recentQueries: { id: string, content: string, created_at: string, is_error: boolean }[];
+  }>({
     documents: 0,
     activeUsers: 0,
-    searches: 0
+    searches: 0,
+    departmentDistribution: [],
+    recentDocs: [],
+    recentQueries: []
   });
   const [loading, setLoading] = useState(true);
 
@@ -19,8 +29,15 @@ export const DashboardView: React.FC = () => {
       try {
         const res = await fetch('/api/dashboard/stats');
         const data = await res.json();
-        if (res.ok && data.stats) {
-          setStatsData(data.stats);
+        if (res.ok) {
+          setStatsData({
+            documents: data.stats?.documents || 0,
+            activeUsers: data.stats?.activeUsers || 0,
+            searches: data.stats?.searches || 0,
+            departmentDistribution: data.departmentDistribution || [],
+            recentDocs: data.recentDocs || [],
+            recentQueries: data.recentQueries || []
+          });
         }
       } catch (error) {
         console.error("Erro ao carregar estatísticas:", error);
@@ -75,26 +92,6 @@ export const DashboardView: React.FC = () => {
     }
   ];
 
-  const departmentDistribution = [
-    { name: 'Engenharia', count: 120 },
-    { name: 'RH', count: 45 },
-    { name: 'Vendas', count: 68 },
-    { name: 'Marketing', count: 32 },
-    { name: 'Legal', count: 15 },
-  ];
-
-  const popDocs = [
-    { id: '1', name: 'Manual de Integração API', lastAccess: 'Hoje, 10:30', views: 342 },
-    { id: '2', name: 'Políticas de Férias 2026', lastAccess: 'Ontem, 16:45', views: 215 },
-    { id: '3', name: 'Relatório Trimestral Vendas', lastAccess: 'Hoje, 09:15', views: 189 },
-  ];
-
-  const recentQueries = [
-    { q: 'Como pedir reembolso de viagens?', resolved: true, user: 'João Silva', doc: 'Guia de Despesas' },
-    { q: 'Quais os endpoints para criar utilizador?', resolved: true, user: 'Maria Santos', doc: 'Manual API v2' },
-    { q: 'Template de contrato de prestação de serviços', resolved: false, user: 'Ana Sousa', doc: 'Modelos Legais' },
-  ];
-
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -139,68 +136,96 @@ export const DashboardView: React.FC = () => {
       {/* Main Insights Segment */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         
-        {/* Department Volume Graph & Analytics */}
-        <div id="chart-panel" className="bg-white border border-slate-200 rounded-xl p-5 xl:col-span-2 shadow-2xs">
-          <div className="flex items-center gap-2 pb-4 mb-4 border-b border-slate-100">
-            <Layers className="h-4.5 w-4.5 text-[#030213]" />
-            <h2 className="text-sm font-bold text-[#030213]">Documentação por Área</h2>
+        {/* Department Volume Graph */}
+        <div id="chart-panel" className="bg-white border border-slate-200 rounded-xl p-6 shadow-2xs xl:col-span-2">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-sm font-bold text-slate-900 tracking-tight">Distribuição de Conhecimento</h3>
+              <p className="text-xs text-slate-500 mt-1">Volume de documentos por departamento</p>
+            </div>
           </div>
-          <div className="h-[280px] w-full mt-4">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={departmentDistribution} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis 
-                  dataKey="name" 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fontSize: 11, fill: '#64748b', fontWeight: 500 }} 
-                  dy={10} 
-                />
-                <YAxis 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fontSize: 11, fill: '#64748b', fontWeight: 500 }} 
-                />
-                <Tooltip 
-                  cursor={{ fill: '#f8fafc' }}
-                  contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '12px', fontWeight: 600, color: '#0f172a' }}
-                />
-                <Bar dataKey="count" radius={[4, 4, 0, 0]} maxBarSize={50}>
-                  {departmentDistribution.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={index === 0 ? '#030213' : '#cbd5e1'} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+          <div className="h-[300px] w-full">
+            {statsData.departmentDistribution.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={statsData.departmentDistribution} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#64748b' }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#64748b' }} />
+                  <Tooltip 
+                    cursor={{ fill: '#f1f5f9' }} 
+                    contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  />
+                  <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                    {statsData.departmentDistribution.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={index === 0 ? '#2563eb' : '#94a3b8'} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full flex items-center justify-center text-xs text-slate-400">
+                Sem dados de distribuição por departamento.
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="space-y-6 xl:col-span-1">
-          {/* Most popular files */}
-          <div id="popular-docs-panel" className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs flex flex-col h-full">
-            <div className="flex items-center gap-2 pb-4 mb-4 border-b border-slate-100">
-              <FileText className="h-4.5 w-4.5 text-[#030213]" />
-              <h2 className="text-sm font-bold text-[#030213]">Documentos Populares</h2>
-            </div>
-            <div className="divide-y divide-slate-100 flex-1">
-              {popDocs.map((doc) => (
-                <div key={doc.id} className="py-3.5 flex items-center justify-between first:pt-0 last:pb-0">
-                  <div className="truncate max-w-[70%]">
-                    <p className="text-xs font-semibold text-slate-800 truncate hover:text-[#030213] cursor-pointer" onClick={() => router.push('/documents')}>
-                      {doc.name}
-                    </p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Última leitura: {doc.lastAccess}</p>
-                  </div>
-                  <div className="text-right">
-                    <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700">
-                      {doc.views} acessos
-                    </span>
+        {/* Right side panels */}
+        <div className="space-y-6">
+          {/* Recent Docs */}
+          <div id="popular-docs-panel" className="bg-white border border-slate-200 rounded-xl p-6 shadow-2xs">
+            <h3 className="text-sm font-bold text-slate-900 tracking-tight mb-4">Documentos Recentes</h3>
+            <div className="space-y-4">
+              {statsData.recentDocs.length > 0 ? statsData.recentDocs.map(doc => (
+                <div key={doc.id} className="flex items-start justify-between border-b border-slate-100 pb-3 last:border-0 last:pb-0">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-500">
+                      <FileText className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-800 line-clamp-1">{doc.filename}</h4>
+                      <p className="text-[10px] text-slate-500 mt-0.5">{new Date(doc.created_at).toLocaleDateString()}</p>
+                    </div>
                   </div>
                 </div>
-              ))}
+              )) : (
+                <p className="text-xs text-slate-400">Nenhum documento encontrado.</p>
+              )}
+            </div>
+            <button 
+              onClick={() => router.push('/documents')}
+              className="w-full mt-4 py-2 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors cursor-pointer"
+            >
+              Ver todos
+            </button>
+          </div>
+
+          {/* Recent Queries */}
+          <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-2xs">
+            <h3 className="text-sm font-bold text-slate-900 tracking-tight mb-4 flex items-center gap-2">
+              <Search className="h-4 w-4 text-slate-400" />
+              Pesquisas Recentes
+            </h3>
+            <div className="space-y-3">
+              {statsData.recentQueries.length > 0 ? statsData.recentQueries.map((query, i) => (
+                <div key={query.id || i} className="bg-slate-50 border border-slate-100 rounded-lg p-3">
+                  <p className="text-xs text-slate-700 font-medium line-clamp-2">&quot;{query.content}&quot;</p>
+                  <div className="flex items-center justify-between mt-2">
+                    <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{new Date(query.created_at).toLocaleDateString()}</span>
+                    {query.is_error ? (
+                      <span className="inline-flex items-center gap-1 text-[9px] font-bold text-red-600 bg-red-100 px-1.5 py-0.5 rounded uppercase">Falhado</span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded uppercase">Resolvido</span>
+                    )}
+                  </div>
+                </div>
+              )) : (
+                <p className="text-xs text-slate-400">Nenhuma pesquisa efetuada.</p>
+              )}
             </div>
           </div>
         </div>
+
       </div>
     </div>
   );

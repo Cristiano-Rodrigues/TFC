@@ -218,7 +218,7 @@ export const WikiView: React.FC = () => {
             <div className="px-6 py-4 bg-[#030213] flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
                 <Edit3 className="h-5 w-5 text-indigo-400" />
-                <h3 className="text-base font-bold text-white tracking-wide">Modo Fact-Check (Rascunho de IA)</h3>
+                <h3 className="text-base font-bold text-white tracking-wide">Modo Rascunho</h3>
               </div>
               <button onClick={() => setDraftArticle(null)} className="text-slate-400 hover:text-white transition-colors cursor-pointer">
                 <X className="h-5 w-5" />

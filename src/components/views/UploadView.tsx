@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { UploadCloud, FileText, CheckCircle2, Trash2, ShieldAlert, History, Loader2, Play } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
+import { toast } from 'sonner';
 
 interface QueuedFile {
   id: string;
@@ -46,12 +47,27 @@ export const UploadView: React.FC = () => {
     if (canUpload) {
       Promise.all([
         fetch('/api/departments').then(res => res.json()),
-        fetch('/api/roles').then(res => res.json())
-      ]).then(([deptData, roleData]) => {
+        fetch('/api/roles').then(res => res.json()),
+        fetch('/api/documents').then(res => res.json())
+      ]).then(([deptData, roleData, docData]) => {
         if (deptData.departments) {
           setDepartments(deptData.departments);
         }
         if (roleData.roles) setRoles(roleData.roles);
+        
+        if (docData.documents) {
+          const recent = docData.documents.slice(0, 5).map((d: any) => ({
+            id: d.id,
+            name: d.filename,
+            size: d.file_size ? `${Math.round(d.file_size / 1024)} KB` : 'Desconhecido',
+            category: d.document_departments && d.document_departments.length > 0
+              ? d.document_departments[0].departments?.name || 'Desconhecido'
+              : 'Desconhecido',
+            uploadedAt: d.created_at ? d.created_at.split('T')[0] : 'Desconhecido',
+            status: 'Sincronizado'
+          }));
+          setUploadHistory(recent);
+        }
       }).catch(err => console.error(err));
     }
   }, [canUpload]);
@@ -64,7 +80,7 @@ export const UploadView: React.FC = () => {
         </div>
         <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Acesso Restrito - Upload de Documentos</h2>
         <p className="text-xs text-slate-500 leading-relaxed font-sans">
-          A sua conta actual <strong>({profile?.fullName || "Colaborador"})</strong> licenciada sob o cargo <strong>(role: {profile?.role})</strong> não possui outorga explícita para registrar regulamentos na base central. Entre em contacto com a equipa de TI para elevar o seu perfil.
+          A sua conta actual <strong>({profile?.fullName || "Colaborador"})</strong> com o cargo <strong>(role: {profile?.role})</strong> não possui permissões para upload de documentos. Entre em contacto com a equipa de TI para elevar o seu perfil.
         </p>
       </div>
     );
@@ -98,7 +114,7 @@ export const UploadView: React.FC = () => {
 
   const handleFiles = (files: FileList) => {
     if (selectedDepts.length === 0) {
-      alert("Por favor, selecione pelo menos um departamento.");
+      toast.error("Por favor, selecione pelo menos um departamento.");
       return;
     }
 

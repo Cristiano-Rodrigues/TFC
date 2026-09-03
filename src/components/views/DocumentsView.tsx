@@ -61,6 +61,9 @@ export const DocumentsView: React.FC = () => {
           const depts = d.document_departments ? d.document_departments.map((dd: any) => dd.departments).filter(Boolean) : [];
           const roles = d.document_permissions ? d.document_permissions.map((dp: any) => dp.roles).filter(Boolean) : [];
 
+          const metadata = d.metadata || {};
+          const content = metadata.text || metadata.content || metadata.description || metadata.abstract || '';
+          
           return {
             id: d.id,
             name: d.filename,
@@ -71,8 +74,8 @@ export const DocumentsView: React.FC = () => {
             indexingState: indexState,
             allowedRoles: roles.map((r: any) => r.name),
             allowedRolesData: roles,
-            content: '',
-            highlightedClasue: '',
+            content: content,
+            highlightedClasue: metadata.highlighted_clause || '',
             source: 'Local Upload' as const,
           };
         });
@@ -247,10 +250,10 @@ export const DocumentsView: React.FC = () => {
       </div>
 
       {/* Primary Split View (Table + PDF Viewer Column) */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      <div className={`grid grid-cols-1 ${selectedDoc ? 'xl:grid-cols-3' : ''} gap-6 transition-all duration-300`}>
 
         {/* Table list */}
-        <div className="xl:col-span-2 space-y-4">
+        <div className={`${selectedDoc ? 'xl:col-span-2' : 'col-span-1'} space-y-4 transition-all duration-300`}>
 
           {/* Advanced Filter Panel */}
           <div className="bg-white p-4 border border-slate-200 rounded-xl grid grid-cols-1 sm:grid-cols-4 gap-3 items-end shadow-2xs">
@@ -453,10 +456,9 @@ export const DocumentsView: React.FC = () => {
         </div>
 
         {/* Column representing simulated PDF Reader */}
-        <div className="xl:col-span-1">
-          {selectedDoc ? (
-            /* --- Actual Document Viewer UI --- */
-            <div id="document-viewer-container" className="bg-white border border-slate-200 rounded-lg overflow-hidden flex flex-col h-full shadow-xs animate-in slide-in-from-right duration-150">
+        {selectedDoc && (
+          <div className="xl:col-span-1 h-[calc(100vh-200px)]">
+            <div id="document-viewer-container" className="bg-white border border-slate-200 rounded-lg overflow-hidden flex flex-col h-full shadow-xs animate-in slide-in-from-right duration-300">
 
               {/* Header */}
               <div className="bg-white px-4 py-3 border-b border-slate-200 text-slate-800 flex items-center justify-between shrink-0">
@@ -473,32 +475,17 @@ export const DocumentsView: React.FC = () => {
               </div>
 
               {/* PDF style sheet */}
-              <div className="p-5 flex-1 bg-slate-50 min-h-[300px] border-b border-slate-200">
+              <div className="p-5 flex-1 bg-slate-50 min-h-[300px] border-b border-slate-200 overflow-y-auto">
                 <div className="bg-white border border-slate-200 rounded p-5 shadow-2xs space-y-4">
-
-                  {/* Internal file Header */}
-                  <div className="flex items-center justify-between border-b pb-3 text-[10px] text-slate-400 font-semibold font-mono">
-                    <span>MANUAL INTERNO</span>
-                    <span>NIF: 509200192</span>
-                  </div>
-
-                  {/* Highlighter section */}
-                  <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded">
-                    <span className="text-[10px] font-bold text-yellow-800 uppercase tracking-wider block mb-1">Cláusula Destacada por Relevância RAG:</span>
-                    <p className="text-[11px] text-yellow-950 font-medium leading-relaxed font-sans italic">
-                      &ldquo;{selectedDoc.highlightedClasue}&rdquo;
-                    </p>
-                  </div>
-
                   {/* Body Content */}
                   <div className="text-xs text-slate-700 leading-relaxed space-y-2 whitespace-pre-wrap font-sans">
-                    {selectedDoc.content}
+                    {selectedDoc.content || "Conteúdo do documento não disponível."}
                   </div>
                 </div>
               </div>
 
               {/* Linked topics footnote */}
-              <div className="p-4 bg-slate-50/50 space-y-2.5">
+              <div className="p-4 bg-slate-50/50 space-y-2.5 shrink-0">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Metadados de conformidade:</span>
                 <div className="space-y-1.5 text-xs">
                   <div className="flex justify-between">
@@ -507,22 +494,13 @@ export const DocumentsView: React.FC = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-500">Acesso:</span>
-                    <span className="font-bold text-slate-800 uppercase tracking-widest text-[9px]">{selectedDoc.allowedRoles.join(' | ')}</span>
+                    <span className="font-bold text-slate-800 uppercase tracking-widest text-[9px]">{selectedDoc.allowedRoles.join(' | ') || 'NENHUM'}</span>
                   </div>
                 </div>
               </div>
             </div>
-          ) : (
-            /* --- Empty State --- */
-            <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-lg p-10 text-center h-full flex flex-col items-center justify-center text-slate-400 min-h-[350px]">
-              <FileText className="h-8 w-8 stroke-[1.5] text-slate-300 mb-2" />
-              <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Leitor PDF</h4>
-              <p className="text-[10px] text-slate-500 max-w-[200px] mt-1 line-clamp-3 leading-relaxed">
-                Clique sobre o título de qualquer documento para carregar a pré-visualização.
-              </p>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
 
       </div>
 

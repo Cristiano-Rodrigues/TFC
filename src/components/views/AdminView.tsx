@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth, UserProfile } from '@/lib/auth-context';
 import { ShieldCheck, UserPlus, FileEdit, Trash2, CheckCircle2, X, ShieldAlert, KeyRound, Search, Filter, Users, Building2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { DepartmentsPanel } from './admin/DepartmentsPanel';
 import { RolesPanel } from './admin/RolesPanel';
 
@@ -132,9 +133,13 @@ export const AdminView: React.FC = () => {
         setAddPassword('');
         setAddRoleId(availableRoles[0]?.id || '');
         setAddDeptId(availableDepts[0]?.id || '');
+        toast.success('Utilizador criado com sucesso.');
+      } else {
+        toast.error('Erro ao criar utilizador.');
       }
     } catch (e) {
       console.error("Invite error", e);
+      toast.error('Ocorreu um erro ao comunicar com o servidor.');
     } finally {
       setIsSubmitInvite(false);
     }
@@ -159,9 +164,13 @@ export const AdminView: React.FC = () => {
       if (res.ok) {
         await fetchUsers();
         setEditingUser(null);
+        toast.success('Utilizador atualizado.');
+      } else {
+        toast.error('Erro ao atualizar utilizador.');
       }
     } catch (err) {
       console.error("Update failed", err);
+      toast.error('Erro de sistema ao atualizar utilizador.');
     }
   };
 
@@ -180,29 +189,38 @@ export const AdminView: React.FC = () => {
 
       if (res.ok) {
         await fetchUsers();
+        toast.success(`Estado do utilizador alterado para ${!u.active ? 'Ativo' : 'Desativado'}.`);
+      } else {
+        toast.error('Erro ao alterar o estado do utilizador.');
       }
     } catch (e) {
       console.error("Toggle active state failed", e);
+      toast.error('Erro de sistema ao alterar o estado.');
     }
   };
 
   const handleDeleteUser = async (u: UserProfile) => {
-    if (!confirm(`Tem a certeza que deseja eliminar permanentemente o utilizador ${u.fullName}?`)) return;
-
-    try {
-      const res = await fetch(`/api/users/${u.id}`, {
-        method: 'DELETE'
-      });
-
-      if (res.ok) {
-        await fetchUsers();
-      } else {
-        alert("Erro ao eliminar o utilizador.");
-      }
-    } catch (e) {
-      console.error("Delete user failed", e);
-      alert("Erro ao eliminar o utilizador.");
-    }
+    toast('Eliminar utilizador', {
+      description: `Tem a certeza que deseja eliminar permanentemente o utilizador ${u.fullName}?`,
+      action: {
+        label: 'Eliminar',
+        onClick: async () => {
+          try {
+            const res = await fetch(`/api/users/${u.id}`, { method: 'DELETE' });
+            if (res.ok) {
+              await fetchUsers();
+              toast.success('Utilizador eliminado com sucesso.');
+            } else {
+              toast.error('Erro ao eliminar o utilizador.');
+            }
+          } catch (e) {
+            console.error("Delete user failed", e);
+            toast.error('Erro ao eliminar o utilizador.');
+          }
+        }
+      },
+      cancel: { label: 'Cancelar', onClick: () => {} }
+    });
   };
 
   return (
@@ -476,7 +494,7 @@ export const AdminView: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isSubmitInvite}
-                  className="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded shadow-3xs flex items-center gap-1 transition-colors cursor-pointer"
+                  className="px-4 py-2 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded flex items-center gap-1 transition-colors cursor-pointer"
                 >
                   Criar Utilizador
                 </button>
@@ -570,7 +588,7 @@ export const AdminView: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded shadow-3xs cursor-pointer"
+                  className="px-4 py-1.5 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded shadow-3xs cursor-pointer"
                 >
                   Salvar Cadastro
                 </button>

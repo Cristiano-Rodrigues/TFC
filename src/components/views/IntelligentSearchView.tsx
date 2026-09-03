@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Sparkles, Send, FileText, Info, Eye } from 'lucide-react';
+import { Sparkles, Send, FileText, Info, Eye, X } from 'lucide-react';
 
 interface Source {
   category: string;
@@ -29,14 +29,7 @@ export const IntelligentSearchView: React.FC<IntelligentSearchViewProps> = ({ se
   const [query, setQuery] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const createdLocal = useRef(false);
-  const welcomeMessage: ChatMessage = React.useMemo(() => ({
-    id: "welcome",
-    role: "assistant",
-    content: "Olá! Tenho muito prazer em ajudar. Vamos começar?.",
-    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-  }), []);
-
-  const [messages, setMessages] = useState<ChatMessage[]>([welcomeMessage]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [selectedSource, setSelectedSource] = useState<Source | null>(null);
 
   useEffect(() => {
@@ -60,7 +53,7 @@ export const IntelligentSearchView: React.FC<IntelligentSearchViewProps> = ({ se
               timestamp: new Date(m.created_at as string).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             })));
           } else {
-            setMessages([welcomeMessage]);
+            setMessages([]);
           }
         } catch (err) {
           console.error("Erro ao buscar mensagens", err);
@@ -68,11 +61,11 @@ export const IntelligentSearchView: React.FC<IntelligentSearchViewProps> = ({ se
           setIsSubmitting(false);
         }
       } else {
-        setMessages([welcomeMessage]);
+        setMessages([]);
       }
     };
     fetchSessionMessages();
-  }, [sessionId, welcomeMessage]);
+  }, [sessionId]);
 
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
@@ -199,9 +192,9 @@ export const IntelligentSearchView: React.FC<IntelligentSearchViewProps> = ({ se
   };
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-4 h-[calc(100vh-140px)] border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm">
+    <div className={`grid ${selectedSource ? 'grid-cols-1 xl:grid-cols-4' : 'grid-cols-1'} h-[calc(100vh-140px)] border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm transition-all duration-300`}>
 
-      <div className="xl:col-span-3 flex flex-col h-full bg-[#f8fafc] border-r border-slate-200 relative overflow-hidden">
+      <div className={`${selectedSource ? 'xl:col-span-3' : 'col-span-1'} flex flex-col h-full bg-[#f8fafc] border-r border-slate-200 relative overflow-hidden transition-all duration-300`}>
         <div className="flex items-center justify-between px-6 py-4 bg-white/80 backdrop-blur-md border-b border-slate-200 shrink-0 z-10">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-[#030213] text-white rounded-lg shadow-md">
@@ -214,8 +207,19 @@ export const IntelligentSearchView: React.FC<IntelligentSearchViewProps> = ({ se
           </div>
         </div>
 
-        <div id="workspace-search-container" ref={messagesContainerRef} className="flex-1 overflow-y-auto p-6 space-y-6 min-h-0">
-          <div className="space-y-6">
+        <div id="workspace-search-container" ref={messagesContainerRef} className="flex-1 overflow-y-auto p-6 space-y-6 min-h-0 relative">
+          {messages.length === 0 && !isSubmitting && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center text-slate-500 animate-in fade-in duration-500">
+              <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4 border border-slate-200 shadow-sm">
+                <Sparkles className="h-6 w-6 stroke-[1.5] text-slate-400" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-800 mb-2">Olá! Tenho muito prazer em ajudar.</h3>
+              <p className="text-xs font-medium max-w-sm leading-relaxed">
+                Vamos começar? Coloque a sua questão abaixo e irei consultar a base de conhecimento da empresa para lhe responder.
+              </p>
+            </div>
+          )}
+          <div className="space-y-6 z-10 relative">
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -303,8 +307,9 @@ export const IntelligentSearchView: React.FC<IntelligentSearchViewProps> = ({ se
         </div>
       </div>
 
-      <div className="hidden xl:flex flex-col h-full bg-white relative">
-        <div className="px-6 py-5 border-b border-slate-200 bg-slate-50/50">
+      {selectedSource && (
+        <div className="hidden xl:flex flex-col h-full bg-white relative animate-in slide-in-from-right duration-300">
+          <div className="px-6 py-5 border-b border-slate-200 bg-slate-50/50">
           <h3 className="text-xs font-extrabold text-[#030213] uppercase tracking-widest flex items-center gap-2">
             <FileText className="h-4 w-4" /> Fontes citadas
           </h3>
@@ -312,52 +317,48 @@ export const IntelligentSearchView: React.FC<IntelligentSearchViewProps> = ({ se
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-white">
-          {selectedSource ? (
-            <div id="source-preview" className="space-y-5 animate-in slide-in-from-right-4 duration-300">
-              <div className="bg-slate-50 p-4 border border-slate-200 rounded-xl">
-                <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-[#030213]/5 text-[#030213] border border-[#030213]/10 mb-2">
-                  {selectedSource.category}
-                </span>
-                <h4 className="text-sm font-bold text-slate-900 leading-snug">{selectedSource.title}</h4>
-                <p className="text-[10px] text-slate-400 mt-1 font-medium">Última indexação: {selectedSource.updatedAt}</p>
-              </div>
-
-              <div className="rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="bg-slate-50 px-4 py-2.5 border-b border-slate-200 flex items-center justify-between text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                  <span>Excerto Relevante</span>
-                </div>
-                <div className="p-4 text-xs leading-relaxed text-slate-700 bg-white font-mono whitespace-pre-wrap">
-                  {selectedSource.snippet}
-                </div>
-              </div>
-
-              <div className="flex items-start gap-2 p-3 bg-blue-50/50 rounded-lg border border-blue-100">
-                <Info className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" />
-                <div className="text-[10px] text-slate-600 font-medium leading-relaxed">
-                  Este conteúdo foi vectorizado e considerado o mais relevante pelo modelo de IA para fundamentar a resposta actual.
-                </div>
-              </div>
-
-              <button
-                onClick={() => setSelectedSource(null)}
-                className="w-full flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-700 text-xs py-2.5 rounded-xl border border-slate-200 transition-colors cursor-pointer font-bold shadow-2xs"
-              >
-                Limpar Inspeção
-              </button>
+          <div id="source-preview" className="space-y-5 animate-in slide-in-from-right-4 duration-300 relative">
+            <button
+              onClick={() => setSelectedSource(null)}
+              className="absolute top-2 right-2 p-1 text-slate-400 hover:text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-full transition-colors z-10 cursor-pointer"
+              title="Fechar Inspeção"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <div className="bg-slate-50 p-4 border border-slate-200 rounded-xl relative pt-6">
+              <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-[#030213]/5 text-[#030213] border border-[#030213]/10 mb-2">
+                {selectedSource.category}
+              </span>
+              <h4 className="text-sm font-bold text-slate-900 leading-snug pr-6">{selectedSource.title}</h4>
+              <p className="text-[10px] text-slate-400 mt-1 font-medium">Última indexação: {selectedSource.updatedAt}</p>
             </div>
-          ) : (
-            <div className="h-full flex flex-col items-center justify-center text-center text-slate-400 p-8">
-              <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 border border-slate-100 shadow-sm">
-                <Eye className="h-6 w-6 stroke-[1.5] text-slate-300" />
+
+            <div className="rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="bg-slate-50 px-4 py-2.5 border-b border-slate-200 flex items-center justify-between text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                <span>Excerto Relevante</span>
               </div>
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Sem Destaque</p>
-              <p className="text-[11px] text-slate-400 max-w-[200px] mx-auto leading-relaxed font-medium">
-                Selecione uma citação nos resultados do chat para visualizar o excerto original do documento.
-              </p>
+              <div className="p-4 text-xs leading-relaxed text-slate-700 bg-white font-mono whitespace-pre-wrap">
+                {selectedSource.snippet}
+              </div>
             </div>
-          )}
+
+            <div className="flex items-start gap-2 p-3 bg-blue-50/50 rounded-lg border border-blue-100">
+              <Info className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" />
+              <div className="text-[10px] text-slate-600 font-medium leading-relaxed">
+                Este conteúdo foi vectorizado e considerado o mais relevante pelo modelo de IA para fundamentar a resposta actual.
+              </div>
+            </div>
+
+            <button
+              onClick={() => setSelectedSource(null)}
+              className="w-full flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-700 text-xs py-2.5 rounded-xl border border-slate-200 transition-colors cursor-pointer font-bold shadow-2xs"
+            >
+              Ocultar / Limpar Inspeção
+            </button>
+          </div>
         </div>
-      </div>
+        </div>
+      )}
 
     </div>
   );

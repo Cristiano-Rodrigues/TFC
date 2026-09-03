@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Plus, Edit2, Trash2, X } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Permission {
   id: string;
@@ -71,22 +72,34 @@ export const RolesPanel: React.FC = () => {
       }
     } catch (e) {
       console.error(e);
+      toast.error('Ocorreu um erro ao guardar.');
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Tem a certeza que deseja eliminar esta role?')) return;
-
-    try {
-      const res = await fetch(`/api/roles/${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        await fetchData();
-      }
-    } catch (e) {
-      console.error(e);
-    }
+    toast('Eliminar Cargo', {
+      description: 'Tem a certeza que deseja eliminar esta role?',
+      action: {
+        label: 'Eliminar',
+        onClick: async () => {
+          try {
+            const res = await fetch(`/api/roles/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+              await fetchData();
+              toast.success('Role eliminada.');
+            } else {
+              toast.error('Erro ao eliminar role.');
+            }
+          } catch (e) {
+            console.error(e);
+            toast.error('Erro ao eliminar role.');
+          }
+        }
+      },
+      cancel: { label: 'Cancelar', onClick: () => {} }
+    });
   };
 
   const openNewModal = () => {

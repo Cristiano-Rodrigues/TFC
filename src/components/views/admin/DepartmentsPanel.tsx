@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Building2, Plus, Edit2, Trash2, X } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Department {
   id: string;
@@ -60,22 +61,34 @@ export const DepartmentsPanel: React.FC = () => {
       }
     } catch (e) {
       console.error(e);
+      toast.error('Ocorreu um erro ao guardar.');
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Tem a certeza que deseja eliminar este departamento?')) return;
-
-    try {
-      const res = await fetch(`/api/departments/${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        await fetchDepartments();
-      }
-    } catch (e) {
-      console.error(e);
-    }
+    toast('Eliminar Departamento', {
+      description: 'Tem a certeza que deseja eliminar este departamento?',
+      action: {
+        label: 'Eliminar',
+        onClick: async () => {
+          try {
+            const res = await fetch(`/api/departments/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+              await fetchDepartments();
+              toast.success('Departamento eliminado.');
+            } else {
+              toast.error('Erro ao eliminar departamento.');
+            }
+          } catch (e) {
+            console.error(e);
+            toast.error('Erro ao eliminar departamento.');
+          }
+        }
+      },
+      cancel: { label: 'Cancelar', onClick: () => {} }
+    });
   };
 
   const openNewModal = () => {

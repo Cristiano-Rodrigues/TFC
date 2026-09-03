@@ -102,10 +102,8 @@ export const DepartmentsPanel: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-slate-700" />
             Gestão de Departamentos
           </h2>
-          <p className="text-xs text-slate-500 mt-1">Crie e edite as áreas organizacionais da empresa.</p>
         </div>
         <button
           onClick={openNewModal}

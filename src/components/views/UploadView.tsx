@@ -209,9 +209,9 @@ export const UploadView: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="pb-4 border-b border-slate-200">
-        <h1 id="upload-title" className="text-2xl font-semibold text-slate-900 tracking-tight">Ingestão de Documentos</h1>
+        <h1 id="upload-title" className="text-2xl font-semibold text-slate-900 tracking-tight">Submissão de Documentos</h1>
         <p className="text-sm text-slate-500 mt-1">
-          Faça upload de novos materiais para que a IA processe a segmentação em pedaços (chunking) e crie os vectores semânticos no RAG.
+          Faça upload de novos documentos para indexação
         </p>
       </div>
 
@@ -294,8 +294,7 @@ export const UploadView: React.FC = () => {
               <UploadCloud className="h-10 w-10 text-slate-400 mx-auto stroke-[1.5]" />
               <p className="mt-4 text-xs font-bold text-slate-900 uppercase tracking-wider">Arraste os arquivos para aqui</p>
               <p className="text-[10px] text-slate-400 mt-1 max-w-[280px] mx-auto leading-normal">
-                Suporta: PDF, DOCX, TXT, CSV, XLSX, PPTX até 15MB para particionamento.
-              </p>
+                Suporta: PDF, DOCX, TXT, CSV, XLSX, PPTX até 15MB              </p>
               <button
                 type="button"
                 onClick={() => document.getElementById('file-input-manual')?.click()}
@@ -308,7 +307,7 @@ export const UploadView: React.FC = () => {
 
           {queuedFiles.length > 0 && (
             <div className="bg-white border border-slate-200 rounded-lg p-5 space-y-4">
-              <h3 className="text-xs font-bold text-[#1e293b] uppercase tracking-wider">Fila de registo de IA</h3>
+              <h3 className="text-xs font-bold text-[#1e293b] uppercase tracking-wider">Fila de registo</h3>
 
               <div className="divide-y divide-slate-100">
                 {queuedFiles.map((file) => (
@@ -358,7 +357,7 @@ export const UploadView: React.FC = () => {
                       {file.status === 'Concluído' && (
                         <span className="inline-flex items-center gap-1 text-[10px] text-emerald-700 font-bold bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded">
                           <CheckCircle2 className="h-3.5 w-3.5" />
-                          Sucesso IA
+                          Sucesso
                         </span>
                       )}
 
@@ -381,7 +380,7 @@ export const UploadView: React.FC = () => {
           <div className="bg-white border border-slate-200 rounded-lg p-4">
             <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider pb-2 border-b border-slate-100 mb-3 flex items-center gap-2">
               <History className="h-4 w-4 text-slate-400" />
-              Histórico Recente de Ingestões
+              Histórico Recente de upload
             </h3>
 
             <div className="space-y-4">
@@ -398,7 +397,7 @@ export const UploadView: React.FC = () => {
                   </div>
                   <div className="mt-1 flex justify-between items-center text-[10px] text-slate-400 font-mono">
                     <span>Sincronizado: {item.uploadedAt}</span>
-                    <span className="text-emerald-600 font-semibold">Grounded RAG</span>
+                    <span className="text-emerald-600 font-semibold">Indexado</span>
                   </div>
                 </div>
               ))}

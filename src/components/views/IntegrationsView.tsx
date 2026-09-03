@@ -131,7 +131,7 @@ export const IntegrationsView: React.FC = () => {
       
       {/* Header */}
       <div className="pb-4 border-b border-slate-200">
-        <h1 id="integrations-title" className="text-2xl font-semibold text-slate-900 tracking-tight">Sincronizadores Organizacionais</h1>
+        <h1 id="integrations-title" className="text-2xl font-semibold text-slate-900 tracking-tight">Fontes de dados não documentais</h1>
         <p className="text-sm text-slate-500 mt-1">
           Gerencie e integre canais externos para que a inteligência artificial absorva e documente as transformações da organização.
         </p>

@@ -210,9 +210,9 @@ export const AdminView: React.FC = () => {
 
       <div className="flex flex-col md:flex-row md:items-end md:justify-between pb-4 border-b border-slate-200 gap-4">
         <div>
-          <h1 id="admin-title" className="text-2xl font-semibold text-slate-900 tracking-tight">Administração RBAC</h1>
+          <h1 id="admin-title" className="text-2xl font-semibold text-slate-900 tracking-tight">Gestão de Utilizadores & Perfis</h1>
           <p className="text-sm text-slate-500 mt-1">
-            Gira permissões funcionais, departamentos e adicione novos membros.
+            Gerir permissões de acesso ao sistema, departamentos e utilizadors
           </p>
         </div>
 
@@ -223,7 +223,7 @@ export const AdminView: React.FC = () => {
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold transition-all ${activeTab === 'users' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500 hover:text-slate-700'}`}
             >
               <Users className="h-4 w-4" />
-              Membros
+              Utilizadores
             </button>
           )}
           {canManageDepts && (
@@ -312,10 +312,10 @@ export const AdminView: React.FC = () => {
             <table className="w-full border-collapse text-left text-xs text-slate-700">
               <thead className="bg-slate-50/80 text-[11px] font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-200">
                 <tr>
-                  <th scope="col" className="px-5 py-3">Identificação do Membro</th>
-                  <th scope="col" className="px-5 py-3">Departamento Organizacional</th>
+                  <th scope="col" className="px-5 py-3">Utilizador</th>
+                  <th scope="col" className="px-5 py-3">Departamento</th>
                   <th scope="col" className="px-5 py-3">Nível de Acesso (Role)</th>
-                  <th scope="col" className="px-5 py-3">Situação Cadastral</th>
+                  <th scope="col" className="px-5 py-3">Estado</th>
                   <th scope="col" className="px-5 py-3 text-right">Acção</th>
                 </tr>
               </thead>

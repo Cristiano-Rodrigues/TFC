@@ -239,9 +239,9 @@ export const DocumentsView: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between pb-4 border-b border-slate-200">
         <div>
-          <h1 id="docs-title" className="text-2xl font-semibold text-slate-900 tracking-tight">Base Documental Organizacional</h1>
+          <h1 id="docs-title" className="text-2xl font-semibold text-slate-900 tracking-tight">Documentos da organização</h1>
           <p className="text-sm text-slate-500 mt-1">
-            Gira permissões, audite estados de indexação de arquivos integrados e configure restrições com base em departamentos.
+            Gestão de documentos, permissões e restrições por departamento.
           </p>
         </div>
       </div>
@@ -516,9 +516,9 @@ export const DocumentsView: React.FC = () => {
             /* --- Empty State --- */
             <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-lg p-10 text-center h-full flex flex-col items-center justify-center text-slate-400 min-h-[350px]">
               <FileText className="h-8 w-8 stroke-[1.5] text-slate-300 mb-2" />
-              <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Leitor PDF Corporativo</h4>
+              <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Leitor PDF</h4>
               <p className="text-[10px] text-slate-500 max-w-[200px] mt-1 line-clamp-3 leading-relaxed">
-                Clique sobre o título de qualquer documento na tabela avançada para carregar a pré-visualização, com as devidas cláusulas de relevância em destaque.
+                Clique sobre o título de qualquer documento para carregar a pré-visualização.
               </p>
             </div>
           )}

@@ -26,7 +26,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, profile, loading, signOut } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
-  
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [chatSessions, setChatSessions] = useState<any[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
@@ -83,18 +83,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const sidebarLinks = [
     { id: "dashboard", label: "Painel de Controlo", icon: LayoutDashboard, permissions: [], badge: null },
     { id: "search", label: "Pesquisa Inteligente", icon: Search, permissions: [], badge: "IA" },
-    { id: "wiki", label: "Wiki Corporativa", icon: BookOpen, permissions: ["wiki:view"], badge: "Auto" },
-    { id: "documents", label: "Base Documental", icon: FileText, permissions: ["documents:view"], badge: null },
+    { id: "wiki", label: "Página de Wiki", icon: BookOpen, permissions: ["wiki:view"], badge: "Auto" },
+    { id: "documents", label: "Documentos", icon: FileText, permissions: ["documents:view"], badge: null },
     { id: "upload", label: "Carregar Arquivos", icon: UploadCloud, permissions: ["documents:create"], badge: null },
     { id: "integrations", label: "Sincronizadores", icon: Network, permissions: ["integrations:manage"], badge: null },
-    { id: "admin", label: "Administração", icon: Users, permissions: ["roles:manage", "users:manage", "departments:manage"], badge: null },
-    { id: "profile", label: "O Meu Perfil", icon: UserCircle, permissions: [], badge: null }
+    { id: "admin", label: "Utilizadores & Perfis", icon: Users, permissions: ["roles:manage", "users:manage", "departments:manage"], badge: null },
+    { id: "profile", label: "Minha conta", icon: UserCircle, permissions: [], badge: null }
   ];
 
   const activeLinkConfig = sidebarLinks.find(s => s.id === currentTab);
-  const isAuthorizedTab = activeLinkConfig?.permissions.length === 0 || 
-                          profile.role === 'admin' || 
-                          activeLinkConfig?.permissions.some(p => profile.permissions?.includes(p));
+  const isAuthorizedTab = activeLinkConfig?.permissions.length === 0 ||
+    profile.role === 'admin' ||
+    activeLinkConfig?.permissions.some(p => profile.permissions?.includes(p));
 
   // If unauthorized, redirecting in render is tricky. Using a client-side redirect.
   if (!isAuthorizedTab && currentTab !== 'profile') {
@@ -109,7 +109,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="w-7 h-7 bg-[#030213] text-white rounded-md flex items-center justify-center font-bold font-sans text-xs shadow-2xs">K</div>
           <div className="truncate">
             <h1 className="text-xs font-bold uppercase tracking-wider text-slate-900 font-sans">KNOWLEDGE CORE</h1>
-            <span className="text-[10px] text-slate-400 font-medium block tracking-wider uppercase">Enterprise Portal</span>
+            <span className="text-[10px] text-slate-400 font-medium block tracking-wider uppercase">Portal da empresa</span>
           </div>
         </div>
 
@@ -126,20 +126,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 {isSearch ? (
                   <div
                     onClick={() => setIsSearchExpanded(!isSearchExpanded)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium cursor-pointer transition-all ${
-                      isSelected
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium cursor-pointer transition-all ${isSelected
                         ? 'bg-[#030213] text-white font-semibold shadow-xs'
                         : 'hover:bg-slate-100 text-slate-600 hover:text-slate-900'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-2.5">
                       <item.icon className={`h-4 w-4 ${isSelected ? 'text-white' : 'text-slate-400'}`} />
                       <span>{item.label}</span>
                     </div>
                     {item.badge && (
-                      <span className={`inline-block text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider ${
-                        isSelected ? 'bg-slate-800 text-white' : 'bg-blue-50 text-blue-700 border border-blue-200'
-                      }`}>
+                      <span className={`inline-block text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider ${isSelected ? 'bg-slate-800 text-white' : 'bg-blue-50 text-blue-700 border border-blue-200'
+                        }`}>
                         {item.badge}
                       </span>
                     )}
@@ -147,36 +145,33 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 ) : (
                   <Link
                     href={`/${item.id}`}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium cursor-pointer transition-all ${
-                      isSelected
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium cursor-pointer transition-all ${isSelected
                         ? 'bg-[#030213] text-white font-semibold shadow-xs'
                         : 'hover:bg-slate-100 text-slate-600 hover:text-slate-900'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-2.5">
                       <item.icon className={`h-4 w-4 ${isSelected ? 'text-white' : 'text-slate-400'}`} />
                       <span>{item.label}</span>
                     </div>
                     {item.badge && (
-                      <span className={`inline-block text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider ${
-                        isSelected ? 'bg-slate-800 text-white' : 'bg-blue-50 text-blue-700 border border-blue-200'
-                      }`}>
+                      <span className={`inline-block text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider ${isSelected ? 'bg-slate-800 text-white' : 'bg-blue-50 text-blue-700 border border-blue-200'
+                        }`}>
                         {item.badge}
                       </span>
                     )}
                   </Link>
                 )}
-                
+
                 {isSearch && isSearchExpanded && (
                   <div className="mt-1 ml-4 border-l-2 border-slate-200 pl-2 space-y-1 mb-2">
                     <Link
                       href="/search"
                       onClick={() => setActiveSessionId(null)}
-                      className={`w-full text-left px-2 py-1.5 rounded-md text-[11px] font-medium transition-colors block ${
-                        !activeSessionId 
-                          ? 'bg-slate-200/60 text-slate-900 font-semibold' 
+                      className={`w-full text-left px-2 py-1.5 rounded-md text-[11px] font-medium transition-colors block ${!activeSessionId
+                          ? 'bg-slate-200/60 text-slate-900 font-semibold'
                           : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
-                      }`}
+                        }`}
                     >
                       + Nova Conversa
                     </Link>
@@ -185,11 +180,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                         key={session.id}
                         href={`/search?sessionId=${session.id}`}
                         onClick={() => setActiveSessionId(session.id)}
-                        className={`w-full text-left px-2 py-1.5 rounded-md text-[11px] truncate transition-colors block ${
-                          activeSessionId === session.id
+                        className={`w-full text-left px-2 py-1.5 rounded-md text-[11px] truncate transition-colors block ${activeSessionId === session.id
                             ? 'bg-slate-200/60 text-slate-900 font-semibold'
                             : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
-                        }`}
+                          }`}
                         title={session.title}
                       >
                         {session.title || 'Conversa sem título'}
@@ -205,7 +199,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="p-4 border-t border-slate-200 space-y-3 shrink-0 bg-[#fafafa]">
           <div className="flex items-center gap-3 px-1.5 py-1">
             <div className="bg-[#030213] text-white font-bold h-7 w-7 rounded-md flex items-center justify-center text-xs tracking-wider shrink-0 shadow-2xs">
-              {profile.fullName.substring(0,2).toUpperCase()}
+              {profile.fullName.substring(0, 2).toUpperCase()}
             </div>
             <div className="truncate text-xs">
               <span className="font-bold text-slate-800 block truncate leading-snug">{profile.fullName}</span>
@@ -217,7 +211,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             className="w-full bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-100 text-xs py-1.5 rounded-md flex items-center justify-center gap-1.5 transition-colors cursor-pointer border border-slate-200 shadow-2xs font-medium"
           >
             <LogOut className="h-3.5 w-3.5 rotate-180" />
-            <span>Sair do Portal</span>
+            <span>Sair</span>
           </button>
         </div>
       </aside>
@@ -238,19 +232,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="hidden lg:flex items-center gap-3 text-xs">
-            <div className="flex items-center gap-1.5 text-slate-600 font-medium bg-slate-50 border border-slate-200 px-3 py-1 rounded-md">
-              <Building className="h-3.5 w-3.5 text-slate-500" />
-              <span>Organização: <strong className="text-slate-900">{profile.companyName || 'A Minha Organização'}</strong></span>
-            </div>
+            <Building className="h-3.5 w-3.5 text-slate-500" />
+            <span><strong className="text-slate-900">{profile.companyName || 'A Minha Organização'}</strong></span>
           </div>
 
           <div className="flex items-center gap-4 text-xs font-semibold text-slate-600">
             <Link
               href="/profile"
-              className="flex items-center gap-2 bg-slate-50 border border-slate-200 p-1.5 rounded-md hover:border-slate-300 cursor-pointer select-none transition-all"
+              className="flex items-center gap-2 cursor-pointer select-none transition-all"
             >
               <div className="bg-[#030213] text-white font-extrabold h-6 w-6 rounded-md flex items-center justify-center text-[10px] tracking-wider shrink-0">
-                {profile.fullName.substring(0,2).toUpperCase()}
+                {profile.fullName.substring(0, 2).toUpperCase()}
               </div>
               <span className="max-w-[100px] truncate block text-slate-800 font-semibold">{profile.fullName.split(' ')[0]}</span>
             </Link>
@@ -265,7 +257,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-50 flex lg:hidden bg-slate-900/40 backdrop-blur-3xs transition-opacity animate-in fade-in duration-200">
           <div className="w-64 bg-white border-r border-slate-200 flex flex-col h-full text-slate-800 animate-in slide-in-from-left duration-200">
-            
+
             <div className="p-6 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 bg-[#030213] rounded flex items-center justify-center text-white font-semibold text-xs shrink-0">K</div>
@@ -292,11 +284,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     {isSearch ? (
                       <div
                         onClick={() => setIsSearchExpanded(!isSearchExpanded)}
-                        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-md text-xs font-medium cursor-pointer transition-all ${
-                          isSelected
+                        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-md text-xs font-medium cursor-pointer transition-all ${isSelected
                             ? 'bg-slate-100 text-[#030213] font-semibold'
                             : 'hover:bg-slate-50 text-slate-600 hover:text-slate-800'
-                        }`}
+                          }`}
                       >
                         <div className="flex items-center gap-2.5">
                           <item.icon className={`h-4.5 w-4.5 ${isSelected ? 'text-[#030213]' : 'text-slate-400'}`} />
@@ -307,11 +298,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       <Link
                         href={`/${item.id}`}
                         onClick={() => setMobileMenuOpen(false)}
-                        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-md text-xs font-medium cursor-pointer transition-all ${
-                          isSelected
+                        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-md text-xs font-medium cursor-pointer transition-all ${isSelected
                             ? 'bg-slate-100 text-[#030213] font-semibold'
                             : 'hover:bg-slate-50 text-slate-600 hover:text-slate-800'
-                        }`}
+                          }`}
                       >
                         <div className="flex items-center gap-2.5">
                           <item.icon className={`h-4.5 w-4.5 ${isSelected ? 'text-[#030213]' : 'text-slate-400'}`} />
@@ -319,17 +309,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                         </div>
                       </Link>
                     )}
-                    
+
                     {isSearch && isSearchExpanded && (
                       <div className="mt-1 ml-4 border-l-2 border-slate-100 pl-2 space-y-1 mb-2">
                         <Link
                           href="/search"
                           onClick={() => { setActiveSessionId(null); setMobileMenuOpen(false); }}
-                          className={`w-full text-left px-2 py-1.5 rounded-md text-[11px] font-medium transition-colors block ${
-                            !activeSessionId 
-                              ? 'bg-slate-100 text-[#030213] font-semibold' 
+                          className={`w-full text-left px-2 py-1.5 rounded-md text-[11px] font-medium transition-colors block ${!activeSessionId
+                              ? 'bg-slate-100 text-[#030213] font-semibold'
                               : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
-                          }`}
+                            }`}
                         >
                           + Nova Conversa
                         </Link>
@@ -338,11 +327,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                             key={session.id}
                             href={`/search?sessionId=${session.id}`}
                             onClick={() => { setActiveSessionId(session.id); setMobileMenuOpen(false); }}
-                            className={`w-full text-left px-2 py-1.5 rounded-md text-[11px] truncate transition-colors block ${
-                              activeSessionId === session.id
+                            className={`w-full text-left px-2 py-1.5 rounded-md text-[11px] truncate transition-colors block ${activeSessionId === session.id
                                 ? 'bg-slate-100 text-[#030213] font-semibold'
                                 : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
-                            }`}
+                              }`}
                           >
                             {session.title || 'Conversa sem título'}
                           </Link>
@@ -357,7 +345,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <div className="p-4 border-t border-slate-100 space-y-3 bg-slate-50/50">
               <div className="flex items-center gap-3 p-1 text-xs">
                 <div className="bg-[#030213] text-white font-bold h-6 w-6 rounded flex items-center justify-center text-[10px] tracking-wider shrink-0">
-                  {profile.fullName.substring(0,2).toUpperCase()}
+                  {profile.fullName.substring(0, 2).toUpperCase()}
                 </div>
                 <div className="truncate">
                   <span className="font-semibold text-slate-850 block truncate leading-snug">{profile.fullName}</span>

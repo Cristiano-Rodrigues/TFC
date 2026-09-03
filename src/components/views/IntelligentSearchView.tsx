@@ -209,7 +209,7 @@ export const IntelligentSearchView: React.FC<IntelligentSearchViewProps> = ({ se
             </div>
             <div>
               <h2 className="text-sm font-bold text-slate-900">Knowledge Core AI</h2>
-              <p className="text-[10px] text-slate-500 font-medium">Assistente Baseado em Contexto Corporativo</p>
+              <p className="text-[10px] text-slate-500 font-medium">Baseado na Base de Dados de Contexto da Organização</p>
             </div>
           </div>
         </div>
@@ -306,9 +306,9 @@ export const IntelligentSearchView: React.FC<IntelligentSearchViewProps> = ({ se
       <div className="hidden xl:flex flex-col h-full bg-white relative">
         <div className="px-6 py-5 border-b border-slate-200 bg-slate-50/50">
           <h3 className="text-xs font-extrabold text-[#030213] uppercase tracking-widest flex items-center gap-2">
-            <FileText className="h-4 w-4" /> Inspeção de Fontes
+            <FileText className="h-4 w-4" /> Fontes citadas
           </h3>
-          <p className="text-[10px] text-slate-500 mt-1 font-medium">Valide o contexto extraído dos documentos oficiais.</p>
+          <p className="text-[10px] text-slate-500 mt-1 font-medium">Valide o conteúdo das fontes citadas</p>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-white">

@@ -123,10 +123,8 @@ export const RolesPanel: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-            <ShieldCheck className="h-5 w-5 text-slate-700" />
-            Cargos e Permissões (Roles)
+            Cargos (Roles) e Permissões
           </h2>
-          <p className="text-xs text-slate-500 mt-1">Gira os níveis de acesso associando permissões a cargos.</p>
         </div>
         <button
           onClick={openNewModal}

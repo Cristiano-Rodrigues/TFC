@@ -93,12 +93,14 @@ export const WikiView: React.FC = () => {
   const categories = ["Todas", ...departments.map(d => d.name), "Geral"];
 
   const filteredArticles = articles.filter(art => {
-    if (art.status !== 'published' && !profile?.permissions?.includes('wiki:edit')) return false;
+    if ((art.status !== 'published' && art.status !== 'draft') && !profile?.permissions?.includes('wiki:edit')) return false;
     const matchesSearch = art.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           art.summary.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCat = selectedCategory === 'Todas' || art.category === selectedCategory;
-    return matchesSearch && matchesCat;
+    return matchesSearch && matchesCat && art.status !== 'needs_review';
   });
+
+  const pendingReviewArticles = articles.filter(a => a.status === 'needs_review' && profile?.permissions?.includes('wiki:edit'));
 
   const popularArticles = [...articles].filter(a => a.status === 'published').sort((a, b) => b.popularity - a.popularity).slice(0, 3);
   const recentArticles = [...articles].filter(a => a.status === 'published').sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()).slice(0, 3);
@@ -360,9 +362,9 @@ export const WikiView: React.FC = () => {
 
       <div className="flex flex-col md:flex-row md:items-center md:justify-between pb-4 border-b border-slate-200">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Wiki Corporativa Autogerada</h1>
+          <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Página de Wiki</h1>
           <p className="text-sm text-slate-500 mt-1">
-            Biblioteca de inteligência consolidada com base em documentos reais e curadoria humana.
+            Encontre artigos sobre as questões mais comuns da base documental
           </p>
         </div>
         <div className="mt-4 md:mt-0">
@@ -372,11 +374,46 @@ export const WikiView: React.FC = () => {
               className="inline-flex items-center gap-1.5 bg-[#030213] hover:bg-[#030213]/90 text-white text-xs font-semibold px-4 py-2 rounded-md shadow-2xs cursor-pointer transition-colors"
             >
               <Sparkles className="h-3.5 w-3.5" />
-              Compilar Novo Artigo (IA)
+              Novo Artigo (IA)
             </button>
           )}
         </div>
       </div>
+
+      {/* SECÇÃO APROVAÇÃO PENDENTE (CANAIS) */}
+      {!activeArticle && pendingReviewArticles.length > 0 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 shadow-sm">
+          <div className="flex items-center gap-2 mb-4">
+            <Shield className="h-5 w-5 text-amber-600" />
+            <h2 className="text-sm font-bold text-amber-900 uppercase tracking-wider">Aprovação Pendente (Mensagens de Canais)</h2>
+            <span className="bg-amber-200 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full">{pendingReviewArticles.length}</span>
+          </div>
+          <p className="text-xs text-amber-700 mb-4">
+            Os seguintes documentos foram gerados automaticamente a partir de canais de mensagens (ex: Slack) mas requerem revisão humana por potencial conflito com a base de conhecimento.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {pendingReviewArticles.map(art => (
+              <div key={art.id} className="bg-white border border-amber-200 hover:border-amber-400 rounded-lg p-4 transition-all cursor-pointer flex flex-col justify-between group" onClick={() => incrementPopularity(art)}>
+                <div>
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-[9px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800 px-2 py-0.5 rounded border border-amber-200">
+                      Revisão Necessária
+                    </span>
+                    <span className="text-[10px] text-slate-400">{art.updatedAt}</span>
+                  </div>
+                  <h3 className="text-sm font-bold text-slate-900 group-hover:text-amber-700 transition-colors">{art.title}</h3>
+                  <p className="text-xs text-slate-500 mt-1 line-clamp-2">{art.summary}</p>
+                </div>
+                <div className="mt-3 pt-2 border-t border-slate-100 text-right">
+                  <span className="text-xs text-amber-700 font-bold group-hover:translate-x-1 transition-transform inline-flex items-center gap-0.5">
+                    Analisar &rarr;
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {activeArticle ? (
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -487,7 +524,7 @@ export const WikiView: React.FC = () => {
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Pesquisar manuais, regulamentos técnicos e rascunhos de Wiki..."
+                  placeholder="Pesquisar"
                   className="w-full text-xs pl-9 pr-4 py-2 border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 text-slate-900 bg-[#f3f3f5]"
                 />
               </div>

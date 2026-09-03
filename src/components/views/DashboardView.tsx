@@ -102,7 +102,7 @@ export const DashboardView: React.FC = () => {
         <div>
           <h1 id="dashboard-title" className="text-xl font-bold text-slate-900 tracking-tight">Painel de Controlo</h1>
           <p className="text-xs text-slate-500 mt-1">
-            Status geral da base de conhecimento corporativa e métricas de sincronização da inteligência artificial.
+            Dados gerais do portal
           </p>
         </div>
       </div>

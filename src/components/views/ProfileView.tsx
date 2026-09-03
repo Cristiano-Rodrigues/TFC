@@ -16,7 +16,7 @@ export const ProfileView: React.FC = () => {
       <div className="pb-4 border-b border-slate-200">
         <h1 id="profile-title" className="text-2xl font-semibold text-slate-900 tracking-tight font-sans">O Meu Perfil</h1>
         <p className="text-sm text-slate-500 mt-1">
-          Gerencie suas informações de login e verifique suas permissões funcionais correspondentes à sua role no sistema corporativo.
+          Gerencie suas informações de perfil
         </p>
       </div>
 

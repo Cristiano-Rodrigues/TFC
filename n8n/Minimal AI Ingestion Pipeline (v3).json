@@ -1,0 +1,1121 @@
+{
+  "name": "Minimal AI Ingestion Pipeline (v3)",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "id": "5e1adde0-bc3c-4466-8e26-87598e5d3623",
+      "name": "Extract Text",
+      "position": [
+        -928,
+        208
+      ],
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const text = $json.data || JSON.stringify($json);\nreturn { text };"
+      },
+      "id": "5f3256c1-59b6-4b14-9309-12fd012ebe90",
+      "name": "Normalize Text",
+      "position": [
+        -704,
+        368
+      ],
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "jsCode": "let text = '';\nlet document_id = null;\nlet filename = 'Desconhecido';\n\ntry {\n  // Attempt to read from Upload Webhook\n  const webhookData = $('Upload webhook').first().json || {};\n  document_id = webhookData.body?.document_id || webhookData.document_id || null;\n  filename = webhookData.body?.filename || webhookData.filename || 'Desconhecido';\n  text = $json.text || '';\n} catch(e) {\n  // If Upload webhook didn't execute, it throws an error. We catch it and handle Slack Webhook path\n  document_id = $json.id || null; \n  filename = $json.filename || 'Desconhecido';\n  \n  try {\n     text = $(\"Extractor Chain\").item.json.content || '';\n  } catch(e2) {\n     text = '';\n  }\n}\n\nif (!text || text.length === 0) return [];\n\nfunction smartChunk(text, maxSize, overlapSize) {\n    const chunks = [];\n    // 1. Separar por parágrafos duplos\n    let parts = text.split(/(?:\\n\\n+)/);\n    \n    function splitAndAdd(str) {\n        if (str.length <= maxSize) return [str];\n        // 2. Se o parágrafo for gigante, separar por quebras de linha simples\n        let subParts = str.split(/(?<=\\n)/);\n        // 3. Se ainda for gigante, separar por pontos (frases)\n        if (subParts.length === 1) subParts = str.split(/(?<=\\. )/);\n        // 4. Se não houver pontos, corte estrito\n        if (subParts.length === 1) {\n            subParts = [];\n            for (let i = 0; i < str.length; i += maxSize) {\n                subParts.push(str.slice(i, i + maxSize));\n            }\n        }\n        \n        let result = [];\n        let current = \"\";\n        for (let p of subParts) {\n            if (current.length + p.length > maxSize && current.length > 0) {\n                result.push(current);\n                current = p;\n            } else {\n                current += p;\n            }\n        }\n        if (current) result.push(current);\n        return result;\n    }\n\n    let allParts = [];\n    for (let p of parts) {\n        // Garantir que as quebras de parágrafo são mantidas no texto final\n        allParts.push(...splitAndAdd(p + \"\\n\\n\"));\n    }\n\n    let currentChunk = \"\";\n    for (let i = 0; i < allParts.length; i++) {\n        let p = allParts[i];\n        if (currentChunk.length + p.length > maxSize && currentChunk.length > 0) {\n            chunks.push(currentChunk.trim());\n            \n            // Criar o overlap inteligente (tentar não cortar palavras a meio)\n            let overlapText = currentChunk.slice(-overlapSize);\n            let spaceIdx = overlapText.indexOf(' ');\n            if (spaceIdx !== -1) {\n                overlapText = overlapText.slice(spaceIdx + 1);\n            }\n            currentChunk = overlapText + (overlapText && p && !overlapText.endsWith(' ') && !p.startsWith(' ') ? ' ' : '') + p;\n        } else {\n            currentChunk += p;\n        }\n    }\n    \n    if (currentChunk.trim().length > 0) {\n        chunks.push(currentChunk.trim());\n    }\n    return chunks;\n}\n\nconst textChunks = smartChunk(text, 2000, 100);\n\nreturn textChunks.map(c => ({\n    pageContent: c,\n    document_id: document_id,\n    metadata: {\n        filename: filename\n    }\n}));"
+      },
+      "id": "179208dc-c23b-4124-880f-3d59a5942690",
+      "name": "Chunking Node",
+      "position": [
+        -496,
+        208
+      ],
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "e3135c71-d0de-4f72-932d-95c824101d5c",
+      "name": "Split In Batches",
+      "position": [
+        -288,
+        208
+      ],
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cohere.ai/v1/embed",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer lNKEGwRiOGNC2zaKOHIpCzz0IDiOPzUOIYq3VTiG"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ texts: [$json.pageContent], model: \"embed-multilingual-v3.0\", input_type: \"search_document\" }) }}",
+        "options": {}
+      },
+      "id": "cc7a53dc-d33b-4fa4-ab66-9f09f9af980f",
+      "name": "Cohere Embeddings",
+      "position": [
+        0,
+        208
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "tableId": "chunks",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "content",
+              "fieldValue": "={{ $json.texts[0] }}"
+            },
+            {
+              "fieldId": "embedding",
+              "fieldValue": "={{ $json.embeddings[0] }}"
+            },
+            {
+              "fieldId": "document_id",
+              "fieldValue": "={{ $('Split In Batches').item.json.document_id }}"
+            }
+          ]
+        }
+      },
+      "id": "4e6d746f-09b5-4048-8bd5-d355a7a617a3",
+      "name": "Supabase Vector Store Node",
+      "position": [
+        256,
+        208
+      ],
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "credentials": {
+        "supabaseApi": {
+          "id": "81Y8mJNnw5is5RJA",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"stored\"\n}",
+        "options": {}
+      },
+      "id": "9ace40dd-548d-4802-be73-02e5325dd04e",
+      "name": "Respond to Webhook",
+      "position": [
+        144,
+        496
+      ],
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ answer: $json.text, sources: $(\"Final_Context_Assembler\").first().json.sources || [] }) }}",
+        "options": {}
+      },
+      "id": "68ec1619-82e5-4660-9133-17756225db39",
+      "name": "Respond_to_Webhook",
+      "position": [
+        336,
+        736
+      ],
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "upload",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "0d217bee-f3a4-4ccb-9549-c57c83549b22",
+      "name": "Upload webhook",
+      "position": [
+        -1408,
+        224
+      ],
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "webhookId": "24cb58b8-0f7e-41be-94e8-bf64e7db3f7c"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "query",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "cdb97588-4cf5-4e15-895e-1fe8b89cc6c0",
+      "name": "Search webhook",
+      "position": [
+        -1328,
+        720
+      ],
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "webhookId": "25676621-ef24-4673-8adf-4108950ccfae"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cohere.ai/v1/embed",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer lNKEGwRiOGNC2zaKOHIpCzz0IDiOPzUOIYq3VTiG"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ texts: [ typeof $json.body === \"string\" ? JSON.parse($json.body).query : $json.body.query ], model: 'embed-multilingual-v3.0', input_type: 'search_query' }) }}",
+        "options": {}
+      },
+      "id": "25d5cd36-cb40-4866-bc5d-f54d889ec598",
+      "name": "Cohere Embedding Node",
+      "position": [
+        -1072,
+        928
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "const webhookData = $(\"Search webhook\").first().json;\nconst currentData = $json;\n\nconst body = webhookData.body || webhookData;\n\nlet finalQuery = \"\";\n\nif (body.query && typeof body.query === 'string') {\n  finalQuery = body.query;\n} else if (webhookData.query && typeof webhookData.query === 'string') {\n  finalQuery = webhookData.query;\n} else {\n  const values = Object.values(body);\n  finalQuery = values.find(v => typeof v === 'string') || \"Pergunta não detectada\";\n}\n\nconst userId = body.user_id || webhookData.user_id || null;\nconst departmentId = body.department_id || webhookData.department_id || null;\nconst roleId = body.role_id || webhookData.role_id || null;\nconst companyId = body.company_id || webhookData.company_id || null;\n\nreturn [{\n  body: {\n    p_embedding: $json.embeddings[0],\n    p_threshold: 0.4,\n    p_count: 15,\n    p_user_id: userId,\n    p_department_id: departmentId,\n    p_role_id: roleId,\n    p_company_id: companyId\n  },\n  query: finalQuery\n}];"
+      },
+      "id": "b1bc64f9-023c-42f0-a884-230a56de9ca5",
+      "name": "Format_Data_For_Search_Final",
+      "position": [
+        -560,
+        736
+      ],
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nlet context = \"\";\nlet sources = [];\nconst uniqueSources = new Map();\n\nif (items.length > 0) {\n  context = items.map((item, index) => {\n    let text = item.json.content || item.json.text || \"\";\n    let filename = item.json.metadata?.filename || item.json.filename || \"Desconhecido\";\n    let docId = item.json.document_id;\n    let category = item.json.metadata?.category || \"Regulamentos\";\n    \n    if (docId && !uniqueSources.has(docId)) {\n        uniqueSources.set(docId, true);\n        sources.push({ \n            title: filename, \n            category: category,\n            updatedAt: new Date().toLocaleDateString('pt-PT'),\n            snippet: text.substring(0, 800) + (text.length > 800 ? \"...\" : \"\")\n        });\n    }\n    return `[Fonte: ${filename}]:\\\n${text}`;\n  }).join('\\\n\\\n---\\\n\\\n');\n}\n\nconst query = $(\"Format_Data_For_Search_Final\").first().json.query;\nconst webhookData = $(\"Search webhook\").first().json;\nconst isWiki = webhookData.body?.type === 'wiki' || webhookData.query?.type === 'wiki';\n\nif (isWiki) {\n  return [{\n    cohereBody: {\n      model: \"command-r-plus-08-2024\",\n      message: `Tópico da Wiki: ${query}`,\n      response_format: { type: \"json_object\" },\n      preamble: `Você é um Redator-Chefe de Inteligência Artificial para a Wiki Corporativa.\nO seu objetivo é criar um artigo técnico e denso sobre o tópico fornecido.\n\nDOCUMENTOS DE CONTEXTO:\n${context || \"Nenhum documento relevante encontrado.\"}\n\nREGRAS OBRIGATÓRIAS DE ESTRUTURA E CONTEÚDO:\n1. O artigo (content) DEVE ser profundo, abrangente e longo (NO MÍNIMO 500 palavras).\n2. Utilize múltiplos subtítulos em markdown (###) para estruturar o artigo de forma lógica.\n3. O summary DEVE ser gerado com um único parágrafo conciso, resumindo o propósito do artigo.\n4. O array sources DEVE ser preenchido com o nome dos documentos de onde extraiu a informação. Se o contexto estiver vazio, retorne [\"Conhecimento Geral\"].\n5. Retorne ESTRITAMENTE um objeto JSON válido, sem qualquer tag markdown ao redor.\n\nESTRUTURA JSON ESPERADA:\n{\n  \"title\": \"Título sugestivo do artigo\",\n  \"summary\": \"Resumo de 1 parágrafo\",\n  \"content\": \"Conteúdo exaustivo em Markdown com secções, tabelas ou listas se aplicável...\",\n  \"sources\": [\"Nome do ficheiro 1\", \"Nome do ficheiro 2\"]\n}`,\n      temperature: 0.3\n    },\n    sources: sources\n  }];\n} else {\n  return [{\n    cohereBody: {\n      model: \"command-r-plus-08-2024\",\n      message: `Pergunta: ${query}`,\n      preamble: `És um assistente preciso e analítico. Responde APENAS com base no contexto fornecido abaixo. Se a resposta não estiver no contexto, diz que não sabes.\\\n\\\nATENÇÃO: O contexto abaixo é formado por múltiplos fragmentos de documentos. Cada fragmento começa com [Fonte: Nome_do_Ficheiro]. Na tua resposta, deves sempre referenciar as fontes utilizadas indicando o nome do ficheiro (ex: \"De acordo com o ficheiro X...\").\\\n\\\nContexto:\\\n${context || \"Nenhum documento relevante encontrado.\"}`,\n      temperature: 0.2\n    },\n    sources: sources\n  }];\n}"
+      },
+      "id": "809700b4-9b0f-454e-b433-d8c0129935d8",
+      "name": "Final_Context_Assembler",
+      "position": [
+        -112,
+        736
+      ],
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "0f176148-5ac5-490e-a394-6e120865aee5",
+      "name": "Merge_Query_Embedding_v2",
+      "position": [
+        -832,
+        736
+      ],
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://gcxqjjbeobrmbuwdnvwy.supabase.co/rest/v1/rpc/match_chunks",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "***REMOVED***"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer ***REMOVED***"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.body }}",
+        "options": {}
+      },
+      "alwaysOutputData": true,
+      "id": "ff6e7603-d944-4a76-8a4d-9e36d56b2208",
+      "name": "Supabase_RPC_Search_Manual",
+      "position": [
+        -336,
+        736
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cohere.ai/v1/chat",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer lNKEGwRiOGNC2zaKOHIpCzz0IDiOPzUOIYq3VTiG"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.cohereBody }}",
+        "options": {}
+      },
+      "id": "2cc979bf-c1f2-4f0c-918b-e7efd7942ccb",
+      "name": "Cohere_Chat_Node",
+      "position": [
+        128,
+        736
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $binary !== undefined && Object.keys($binary).length > 0 }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "91551141-7953-4aae-846b-22464e899ce6",
+      "name": "Check If Binary",
+      "position": [
+        -1184,
+        224
+      ],
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "f09f817f-9500-40d0-8455-ea8268f14c7d",
+      "name": "Cohere Chat Model (Extractor)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatCohere",
+      "typeVersion": 1,
+      "position": [
+        -1104,
+        1616
+      ],
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "cohereApi": {
+          "id": "WQBhUMUQHMWIo24d",
+          "name": "Cohere account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"is_relevant\": { \"type\": \"boolean\" },\n    \"title\": { \"type\": \"string\" },\n    \"content\": { \"type\": \"string\" }\n  },\n  \"required\": [\"is_relevant\"]\n}"
+      },
+      "id": "fdfed581-41f7-4629-bda0-c852a2132778",
+      "name": "Structured Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1,
+      "position": [
+        -960,
+        1712
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.is_relevant }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "872c56d3-1dc8-4bd4-b847-d029c747a604",
+      "name": "Is Relevant?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        1344
+      ]
+    },
+    {
+      "parameters": {
+        "model": "command-r-plus-08-2024",
+        "options": {}
+      },
+      "id": "644abe03-39c0-447a-b56a-22c201421aa1",
+      "name": "Cohere Chat Model (Validator)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatCohere",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        1600
+      ],
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "cohereApi": {
+          "id": "WQBhUMUQHMWIo24d",
+          "name": "Cohere account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.output.decision }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "CREATE"
+            },
+            {
+              "value2": "NEEDS_REVIEW"
+            }
+          ]
+        }
+      },
+      "id": "a1ce47f6-93c5-4de8-8d88-fc0f730468e2",
+      "name": "Decision Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        112,
+        1296
+      ]
+    },
+    {
+      "parameters": {
+        "tableId": "documents",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "filename",
+              "fieldValue": "={{ $(\"Extractor Chain\").item.json.title }}"
+            },
+            {
+              "fieldId": "metadata",
+              "fieldValue": "={{ JSON.stringify({ summary: $(\"Extractor Chain\").item.json.title, body: $(\"Extractor Chain\").item.json.content, source_type: \"channel_message\", is_ai_generated: true }) }}"
+            },
+            {
+              "fieldId": "uploaded_by",
+              "fieldValue": "e9d0ac26-1884-4279-a3c4-9c8d152a3cf3"
+            },
+            {
+              "fieldId": "company_id",
+              "fieldValue": "031350f5-0575-4090-95b1-a2bf22c0fa44"
+            },
+            {
+              "fieldId": "n8n_status",
+              "fieldValue": "success"
+            }
+          ]
+        }
+      },
+      "id": "b02960ab-6af2-4864-a6f9-62648535c9ee",
+      "name": "Insert Document",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        368,
+        1024
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "81Y8mJNnw5is5RJA",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "documents",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "filename",
+              "fieldValue": "={{ $(\"Extractor Chain\").item.json.title }}"
+            },
+            {
+              "fieldId": "metadata",
+              "fieldValue": "={{ JSON.stringify({ summary: $(\"Extractor Chain\").item.json.title, body: $(\"Extractor Chain\").item.json.content, source_type: \"channel_message\", is_ai_generated: true }) }}"
+            },
+            {
+              "fieldId": "uploaded_by",
+              "fieldValue": "e9d0ac26-1884-4279-a3c4-9c8d152a3cf3"
+            },
+            {
+              "fieldId": "company_id",
+              "fieldValue": "031350f5-0575-4090-95b1-a2bf22c0fa44"
+            },
+            {
+              "fieldId": "n8n_status",
+              "fieldValue": "needs_review"
+            }
+          ]
+        }
+      },
+      "id": "f695b178-e502-41ef-9dc3-32a75d1b455e",
+      "name": "Insert Needs Review",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        368,
+        1312
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "81Y8mJNnw5is5RJA",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://gcxqjjbeobrmbuwdnvwy.supabase.co/rest/v1/rpc/match_chunks",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "***REMOVED***"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer ***REMOVED***"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"p_embedding\": $json.embeddings[0], \"p_threshold\": 0.4, \"p_count\": 3 } }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -352,
+        1328
+      ],
+      "id": "31619bfa-5ba7-40f8-9d31-60a01d9f35ed",
+      "name": "HTTP Request",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.event.text || $json.body.text }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "Analisa a mensagem do Slack recebida. Se for ruído (saudação, conversa, perguntas casuais), responde com is_relevant: false. Se for política, decisão ou processo corporativo válido, responde com is_relevant: true, extrai um título adequado e limpa o texto em content."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -1104,
+        1344
+      ],
+      "id": "9a5c5ffe-6ab4-4587-acce-c38be85784b6",
+      "name": "Extractor Chain"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ JSON.stringify($json) }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Compara a informação nova extraída do Slack: {{ $(\"Extractor Chain\").item.json.content }} com o histórico que pesquisámos na base de dados: {{ $json }}. Toma uma decisão e devolve as chaves decision e reasoning no formato JSON exigido."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -176,
+        1328
+      ],
+      "id": "7c69eb0a-c50d-43eb-8d37-140edb03a7ce",
+      "name": "Validator Chain"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"decision\": {\n      \"type\": \"string\",\n      \"enum\": [\"CREATE\", \"UPDATE\", \"NEEDS_REVIEW\"],\n      \"description\": \"A decisão final de roteamento. Usa CREATE para nova política validada, UPDATE para atualizar histórico existente e NEEDS_REVIEW em caso de incerteza ou conflito.\"\n    },\n    \"reasoning\": {\n      \"type\": \"string\",\n      \"description\": \"A justificação lógica detalhada e o raciocínio por detrás da decisão escolhida.\"\n    }\n  },\n  \"required\": [\n    \"decision\",\n    \"reasoning\"\n  ]\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -32,
+        1696
+      ],
+      "id": "121ce6e3-d286-4a2a-80a1-8d8c201cec04",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cohere.ai/v1/embed",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer lNKEGwRiOGNC2zaKOHIpCzz0IDiOPzUOIYq3VTiG"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ texts: [ `${$json.title} ${$json.content}` ], model: \"embed-multilingual-v3.0\", input_type: \"search_document\" }) }}",
+        "options": {}
+      },
+      "id": "cohere-embed-validation-123",
+      "name": "Cohere Embed Validation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -560,
+        1328
+      ],
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "slack-events",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "a5e09196-7463-496c-81e7-824a4e3c609d",
+      "name": "Slack Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -1680,
+        1376
+      ],
+      "webhookId": "9b23ead6-05dc-4a7d-8c94-f8d491109166",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.body.type }}",
+              "value2": "url_verification"
+            }
+          ]
+        }
+      },
+      "id": "ad0234cf-9768-413a-b6cc-974f055197f6",
+      "name": "É Validação do Slack?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -1488,
+        1376
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.body.challenge }}",
+        "options": {}
+      },
+      "id": "3badddbe-7368-4b18-ae9a-89c5b6b5d6c8",
+      "name": "Devolver Challenge",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        -1296,
+        1232
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "OK",
+        "options": {}
+      },
+      "id": "e028738c-c71c-4c56-a91b-2e22204c4a70",
+      "name": "Devolver OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        -1296,
+        1440
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Check If Binary": {
+      "main": [
+        [
+          {
+            "node": "Extract Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Normalize Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chunking Node": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cohere Embedding Node": {
+      "main": [
+        [
+          {
+            "node": "Merge_Query_Embedding_v2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Cohere Embeddings": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store Node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cohere_Chat_Node": {
+      "main": [
+        [
+          {
+            "node": "Respond_to_Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Text": {
+      "main": [
+        [
+          {
+            "node": "Normalize Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final_Context_Assembler": {
+      "main": [
+        [
+          {
+            "node": "Cohere_Chat_Node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format_Data_For_Search_Final": {
+      "main": [
+        [
+          {
+            "node": "Supabase_RPC_Search_Manual",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge_Query_Embedding_v2": {
+      "main": [
+        [
+          {
+            "node": "Format_Data_For_Search_Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Text": {
+      "main": [
+        [
+          {
+            "node": "Chunking Node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search webhook": {
+      "main": [
+        [
+          {
+            "node": "Cohere Embedding Node",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge_Query_Embedding_v2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches": {
+      "main": [
+        [
+          {
+            "node": "Cohere Embeddings",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store Node": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase_RPC_Search_Manual": {
+      "main": [
+        [
+          {
+            "node": "Final_Context_Assembler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload webhook": {
+      "main": [
+        [
+          {
+            "node": "Check If Binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cohere Chat Model (Extractor)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Extractor Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Extractor Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Relevant?": {
+      "main": [
+        [
+          {
+            "node": "Cohere Embed Validation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cohere Chat Model (Validator)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Validator Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decision Switch": {
+      "main": [
+        [
+          {
+            "node": "Insert Document",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Insert Needs Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Document": {
+      "main": [
+        [
+          {
+            "node": "Chunking Node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extractor Chain": {
+      "main": [
+        [
+          {
+            "node": "Is Relevant?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Validator Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Validator Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validator Chain": {
+      "main": [
+        [
+          {
+            "node": "Decision Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cohere Embed Validation": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Webhook": {
+      "main": [
+        [
+          {
+            "node": "É Validação do Slack?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "É Validação do Slack?": {
+      "main": [
+        [
+          {
+            "node": "Devolver Challenge",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Devolver OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Devolver OK": {
+      "main": [
+        [
+          {
+            "node": "Extractor Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true
+  },
+  "versionId": "c37c4d50-b02b-4ee2-abda-8d24de62ea6d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "db228bbabe3953453a4ea7693a13c07417b63983daf6322236a1b38e29ec519f"
+  },
+  "nodeGroups": [],
+  "id": "FBuIhtWJZDNZo8Ff",
+  "tags": [
+    {
+      "updatedAt": "2026-09-02T14:48:12.008Z",
+      "createdAt": "2026-09-02T14:48:12.008Z",
+      "id": "7zqocQtxYAr6hLf4",
+      "name": "test_version"
+    }
+  ]
+}
